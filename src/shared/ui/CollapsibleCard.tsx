@@ -76,10 +76,10 @@ export function CollapsibleCard({ id, icon, tone = 'brand', title, action, defau
       </h2>
       <div
         id={contentId}
-        className={`grid motion-safe:transition-[grid-template-rows] motion-safe:duration-300 motion-safe:ease-out ${collapsed ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'}`}
+        className={`grid grid-cols-1 motion-safe:transition-[grid-template-rows] motion-safe:duration-300 motion-safe:ease-out ${collapsed ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]'}`}
         inert={collapsed}
       >
-        <div className="min-h-0 overflow-hidden">
+        <div className="relative min-h-0 overflow-hidden">
           <div className="space-y-3 px-4 pb-4 sm:px-5 sm:pb-5">{children}</div>
         </div>
       </div>

@@ -98,7 +98,7 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
             {uploadingNow ? <Loader2 className="size-4 shrink-0 text-brand motion-safe:animate-spin" aria-hidden /> : <CloudUpload className="size-4 shrink-0" aria-hidden />}
             {queuedLabel}
           </p>
-          <ul className="flex gap-2 overflow-x-auto pb-1">
+          <ul className="relative flex gap-2 overflow-x-auto pb-1">
             {queued.map((job) => (
               <li key={job.id} className="shrink-0">
                 <QueuedPhotoTile job={job} className="size-24" />
@@ -124,7 +124,7 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
             <ChevronDown className={`size-5 shrink-0 motion-safe:transition-transform ${photosOpen ? 'rotate-180' : ''}`} aria-hidden />
           </button>
           {photosOpen && (
-            <ul id={photosId} className="animate-pop-in flex snap-x gap-2 overflow-x-auto px-3 pb-3" aria-label={`Fotos de ${item.title}`}>
+            <ul id={photosId} className="animate-pop-in relative flex snap-x gap-2 overflow-x-auto px-3 pb-3" aria-label={`Fotos de ${item.title}`}>
               {item.photos.map((photo, i) => (
                 <li key={photo.id} className="shrink-0 snap-start">
                   <button

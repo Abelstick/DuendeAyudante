@@ -69,7 +69,7 @@ export function PhotoViewer({ title, photos, startAt = 0, onClose }: Props) {
             <p className="text-center text-base font-bold text-ink-700" aria-live="polite">
               Foto {index + 1} de {total}
             </p>
-            <ul className="flex justify-center gap-2 overflow-x-auto pb-1">
+            <ul className="relative flex justify-center gap-2 overflow-x-auto pb-1">
               {photos.map((p, i) => (
                 <li key={p.id} className="shrink-0">
                   <button

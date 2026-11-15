@@ -235,7 +235,7 @@ export function BulkMembersModal({ families, members, onClose }: Props) {
           </Notice>
         )}
 
-        <div className="overflow-x-auto rounded-xl border-2 border-night-900">
+        <div className="relative overflow-x-auto rounded-xl border-2 border-night-900">
           <table className="w-full min-w-[60rem] border-collapse text-left">
             <thead className="bg-night-800 text-white">
               <tr className="eyebrow">

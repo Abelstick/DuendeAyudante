@@ -113,7 +113,7 @@ export function GiftsHomeCard() {
       {people.length === 0 ? (
         <p className="text-base text-ink-700">{q.trim() ? 'No encontramos a nadie con ese nombre.' : 'Todavía nadie más agregó regalos. ¡Vuelve pronto!'}</p>
       ) : (
-        <ul className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 pt-1" aria-label="Listas de deseos">
+        <ul className="relative -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 pt-1 sm:-mx-5 sm:px-5" aria-label="Listas de deseos">
           {people.map((p) => {
             const wishes = WishlistService.byPriority(byPerson.get(p.id) ?? []);
             const family = familyList.find((f) => f.id === p.familyId);

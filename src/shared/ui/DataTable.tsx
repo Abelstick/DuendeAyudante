@@ -33,7 +33,7 @@ interface Props<T> {
 export function DataTable<T>({ label, rows, columns, rowKey, sort, onSort, rowClassName }: Props<T>) {
   return (
     <div
-      className="overflow-x-auto rounded-xl border-2 border-night-900 bg-white shadow-block md:relative md:left-1/2 md:w-max md:min-w-full md:max-w-[min(80rem,calc(100vw_-_var(--nf-side,0px)_-_3rem))] md:-translate-x-1/2"
+      className="relative overflow-x-auto rounded-xl border-2 border-night-900 bg-white shadow-block md:relative md:left-1/2 md:w-max md:min-w-full md:max-w-[min(80rem,calc(100vw_-_var(--nf-side,0px)_-_3rem))] md:-translate-x-1/2"
       role="region"
       aria-label={label}
       tabIndex={0}
