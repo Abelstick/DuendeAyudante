@@ -1,4 +1,4 @@
-import { ClipboardPlus, KeyRound, MessageCircle } from 'lucide-react';
+import { ClipboardPlus, KeyRound, MessageCircle, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { ROLE_LABELS, type EventRole } from '@/modules/events/domain/Event';
@@ -17,6 +17,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { useToast } from '@/shared/ui/Toast';
 import { generateFriendlyPassword } from '@/shared/validation/names';
 import { AccessCard } from './AccessCard';
+import { EditMemberModal } from './EditMemberModal';
 
 interface Props {
   members: Member[];
@@ -58,6 +59,7 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
   const { resetPassword, updateFamily } = useMemberMutations(event.id);
   const toast = useToast();
   const [panel, setPanel] = useState<Panel>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [prefs, setPrefs] = useSessionState<MemberPrefs>(`${event.id}:organizar:familiares`, DEFAULT_PREFS);
 
   if (members.length === 0) {
@@ -151,6 +153,9 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
       header: 'Acciones',
       cell: (m) => (
         <div className="flex gap-1.5">
+          <RowAction onClick={() => setEditingId(m.id)} icon={<Pencil className="size-4" aria-hidden />}>
+            Editar
+          </RowAction>
           <RowAction onClick={() => onAssignTask(m)} icon={<ClipboardPlus className="size-4" aria-hidden />}>
             Tarea
           </RowAction>
@@ -244,6 +249,9 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
               )}
 
               <div className="flex flex-wrap gap-2">
+                <Button variant="secondary" onClick={() => setEditingId(m.id)} icon={<Pencil className="size-5" aria-hidden />}>
+                  Editar
+                </Button>
                 <Button variant="secondary" onClick={() => onAssignTask(m)} icon={<ClipboardPlus className="size-5" aria-hidden />}>
                   Asignar tarea
                 </Button>
@@ -264,6 +272,10 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
           );
         })}
       </ul>
+      )}
+
+      {editingId && byId.get(editingId) && (
+        <EditMemberModal key={editingId} member={byId.get(editingId)!} families={families} onClose={() => setEditingId(null)} />
       )}
 
       {/* Acceso y contraseñas: en una ventana, para no alargar la lista */}

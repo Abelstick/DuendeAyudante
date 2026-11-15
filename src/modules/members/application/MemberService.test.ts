@@ -3,8 +3,8 @@ import { MemberService } from './MemberService';
 
 function setup() {
   const accounts = { createMember: vi.fn().mockResolvedValue({ participantId: 'p', fullName: 'ROSA GARCÍA', username: 'rosa' }), resetPassword: vi.fn() };
-  const participants = { listActive: vi.fn(), listMembers: vi.fn(), updateFamily: vi.fn() };
-  return { accounts, service: new MemberService(participants, accounts) };
+  const participants = { listActive: vi.fn(), listMembers: vi.fn(), updateFamily: vi.fn(), updateDetails: vi.fn() };
+  return { accounts, participants, service: new MemberService(participants, accounts) };
 }
 
 describe('mensaje de acceso por WhatsApp', () => {
@@ -66,5 +66,29 @@ describe('agregar familiar', () => {
         guardianParticipantIds: [],
       }),
     ).rejects.toMatchObject({ code: 'ACCOUNT_REQUIRED_FOR_ROLE' });
+  });
+});
+
+describe('editar familiar', () => {
+  const details = { firstName: ' Rosa ', paternalSurname: 'García', maternalSurname: '  ', distinguishingNote: ' hija ', familyId: '' };
+
+  it('limpia espacios, deja vacíos como null y guarda', async () => {
+    const { participants, service } = setup();
+    await service.updateMember('p1', details);
+    expect(participants.updateDetails).toHaveBeenCalledWith('p1', {
+      firstName: 'Rosa',
+      paternalSurname: 'García',
+      maternalSurname: null,
+      distinguishingNote: 'hija',
+      familyId: null,
+    });
+  });
+
+  it('rechaza nombres inválidos sin llamar a la base de datos', async () => {
+    const { participants, service } = setup();
+    await expect(service.updateMember('p1', { ...details, firstName: 'R0sa' })).rejects.toMatchObject({ code: 'FIRST_NAME_INVALID' });
+    await expect(service.updateMember('p1', { ...details, paternalSurname: '' })).rejects.toMatchObject({ code: 'PATERNAL_SURNAME_INVALID' });
+    await expect(service.updateMember('p1', { ...details, distinguishingNote: 'x'.repeat(41) })).rejects.toMatchObject({ code: 'DISTINGUISHING_NOTE_INVALID' });
+    expect(participants.updateDetails).not.toHaveBeenCalled();
   });
 });

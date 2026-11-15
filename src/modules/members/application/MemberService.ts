@@ -1,7 +1,7 @@
 import { AppError } from '@/shared/domain/errors';
 import { isValidPersonName, normalizeUsername, USERNAME_PATTERN } from '@/shared/validation/names';
 import type { IMemberAccountService, NewMemberData } from '../domain/IMemberAccountService';
-import type { IParticipantRepository } from '../domain/IParticipantRepository';
+import type { IParticipantRepository, ParticipantDetails } from '../domain/IParticipantRepository';
 
 export interface AccessMessageInput {
   firstName: string;
@@ -28,6 +28,23 @@ export class MemberService {
 
   updateFamily(participantId: string, familyId: string | null) {
     return this.participants.updateFamily(participantId, familyId);
+  }
+
+  /** Corrige nombre, apellidos, dato para diferenciar y familia (mismas reglas que al agregar). */
+  async updateMember(participantId: string, details: ParticipantDetails) {
+    if (!isValidPersonName(details.firstName)) throw new AppError('FIRST_NAME_INVALID');
+    if (!isValidPersonName(details.paternalSurname)) throw new AppError('PATERNAL_SURNAME_INVALID');
+    if (details.maternalSurname?.trim() && !isValidPersonName(details.maternalSurname)) throw new AppError('MATERNAL_SURNAME_INVALID');
+    const note = details.distinguishingNote?.trim() || null;
+    if (note && note.length > 40) throw new AppError('DISTINGUISHING_NOTE_INVALID');
+
+    await this.participants.updateDetails(participantId, {
+      firstName: details.firstName.trim(),
+      paternalSurname: details.paternalSurname.trim(),
+      maternalSurname: details.maternalSurname?.trim() || null,
+      distinguishingNote: note,
+      familyId: details.familyId || null,
+    });
   }
 
   async addMember(data: NewMemberData) {

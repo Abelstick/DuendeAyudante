@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { EventRole } from '@/modules/events/domain/Event';
 import { fromPostgrestError } from '@/shared/infrastructure/supabase/errors';
-import type { IParticipantRepository } from '../domain/IParticipantRepository';
+import type { IParticipantRepository, ParticipantDetails } from '../domain/IParticipantRepository';
 import type { Member, Participant } from '../domain/Participant';
 import { mapParticipantRow, PARTICIPANT_COLUMNS, type ParticipantRow } from './mappers';
 
@@ -57,6 +57,21 @@ export class SupabaseParticipantRepository implements IParticipantRepository {
 
   async updateFamily(participantId: string, familyId: string | null): Promise<void> {
     const { error } = await this.supabase.from('participants').update({ family_id: familyId }).eq('id', participantId);
+    if (error) throw fromPostgrestError(error);
+  }
+
+  async updateDetails(participantId: string, d: ParticipantDetails): Promise<void> {
+    // El trigger participants_before_write normaliza (mayúsculas, espacios) y valida los nombres
+    const { error } = await this.supabase
+      .from('participants')
+      .update({
+        first_name: d.firstName,
+        paternal_surname: d.paternalSurname,
+        maternal_surname: d.maternalSurname,
+        distinguishing_note: d.distinguishingNote,
+        family_id: d.familyId,
+      })
+      .eq('id', participantId);
     if (error) throw fromPostgrestError(error);
   }
 }

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useServices } from '@/app/ContainerContext';
 import type { NewMemberData } from '../domain/IMemberAccountService';
+import type { ParticipantDetails } from '../domain/IParticipantRepository';
 
 export const memberKeys = {
   participants: (eventId: string) => ['participants', eventId] as const,
@@ -34,6 +35,10 @@ export function useMemberMutations(eventId: string) {
     updateFamily: useMutation({
       mutationFn: ({ participantId, familyId }: { participantId: string; familyId: string | null }) =>
         members.updateFamily(participantId, familyId),
+      onSuccess: refresh,
+    }),
+    update: useMutation({
+      mutationFn: ({ participantId, details }: { participantId: string; details: ParticipantDetails }) => members.updateMember(participantId, details),
       onSuccess: refresh,
     }),
   };
