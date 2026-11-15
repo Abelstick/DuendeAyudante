@@ -236,6 +236,7 @@ export function GamesPage() {
               ]}
               summary={hasFilters ? `${visibleGames.length} de ${active.length} juegos` : undefined}
               onReset={hasFilters ? () => patch({ q: '', category: '' }) : null}
+              activeFilters={prefs.category ? 1 : 0}
             >
               <FilterSelect label="Categoría" value={prefs.category} onChange={(category) => patch({ category })}>
                 <option value="">Todas</option>

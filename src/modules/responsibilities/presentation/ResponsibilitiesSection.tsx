@@ -236,6 +236,7 @@ export function ResponsibilitiesSection() {
             showView
             summary={hasFilters ? `${visible.length} de ${all.length}` : undefined}
             onReset={hasFilters ? reset : null}
+            activeFilters={(Object.keys(DEFAULT_FILTERS) as (keyof ResponsibilityFilters)[]).filter((k) => filters[k] !== DEFAULT_FILTERS[k]).length}
           >
             {familyList.length > 0 && (
               <FilterSelect label="Familia" value={filters.familyId ?? ''} onChange={(v) => set('familyId', v || null)}>

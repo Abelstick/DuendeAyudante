@@ -202,6 +202,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
         showView
         summary={hasFilters ? `${people.length} de ${everyone.length} personas` : undefined}
         onReset={hasFilters ? () => patch({ q: '', familyId: '', gifts: '' }) : null}
+        activeFilters={[prefs.familyId, prefs.gifts].filter(Boolean).length}
       >
         {familyList.length > 0 && (
           <FilterSelect label="Familia" value={prefs.familyId} onChange={(familyId) => patch({ familyId })}>
@@ -236,7 +237,9 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
           <h2 className="text-lg font-bold">{g.family ? <FamilyBadge family={g.family} /> : 'Sin familia'}</h2>
           <ul className="stagger space-y-2">
             {g.people.map((p) => {
-              const count = byPerson.get(p.id)?.length ?? 0;
+              const wishes = WishlistService.byPriority(byPerson.get(p.id) ?? []);
+              const count = wishes.length;
+              const preview = wishes.slice(0, 2).map((w) => w.title);
               return (
                 <li key={p.id}>
                   <Link
@@ -246,7 +249,15 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
                     <Avatar name={p.fullName} colors={g.family && { bg: FAMILY_COLORS[g.family.color].soft, fg: FAMILY_COLORS[g.family.color].text }} />
                     <span className="min-w-0 flex-1">
                       <span className="block text-lg font-bold leading-tight">{displayName(p)}</span>
-                      <span className="block text-sm text-ink-700">{count === 0 ? 'Todavía no agregó regalos' : 'Toca para ver su lista'}</span>
+                      {count === 0 ? (
+                        <span className="block text-sm text-ink-700">Todavía no agregó regalos</span>
+                      ) : (
+                        <span className="block truncate text-sm text-ink-700">
+                          <span className="sr-only">Le gustaría: </span>
+                          {preview.join(' · ')}
+                          {count > preview.length && <strong className="text-ink-900"> y {count - preview.length} más</strong>}
+                        </span>
+                      )}
                     </span>
                     {count > 0 && (
                       <Pill tone="berry">

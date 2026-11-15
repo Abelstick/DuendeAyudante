@@ -135,6 +135,7 @@ export function ChecklistManager({ eventId, families, members }: Props) {
           showView
           summary={hasFilters ? `${visible.length} de ${list.length} tareas` : undefined}
           onReset={hasFilters ? () => patch({ q: '', scope: '' }) : null}
+          activeFilters={prefs.scope ? 1 : 0}
         >
           <FilterSelect label="Para quién" value={prefs.scope} onChange={(scope) => patch({ scope })}>
             <option value="">Cualquiera</option>

@@ -72,6 +72,7 @@ export function AnnouncementsPage() {
           ]}
           summary={hasFilters ? `${visible.length} de ${all.length} anuncios` : undefined}
           onReset={hasFilters ? () => patch({ q: '', priority: '' }) : null}
+          activeFilters={prefs.priority ? 1 : 0}
         >
           <FilterSelect label="Importancia" value={prefs.priority} onChange={(priority) => patch({ priority })}>
             <option value="">Todos</option>

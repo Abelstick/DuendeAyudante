@@ -31,6 +31,11 @@ export class WishlistService {
     return map;
   }
 
+  /** Los regalos que más ilusión le hacen primero ("Me encantaría"); a igual prioridad, los más antiguos. */
+  static byPriority(items: readonly WishlistItem[]): WishlistItem[] {
+    return [...items].sort((a, b) => a.priority - b.priority || a.createdAt.getTime() - b.createdAt.getTime());
+  }
+
   async save(data: SaveWishlistItemData): Promise<string> {
     const title = data.title.trim();
     if (!title || title.length > 120) throw new AppError('WISH_TITLE_INVALID');

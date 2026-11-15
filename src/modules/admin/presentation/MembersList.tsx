@@ -181,6 +181,7 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
         showView
         summary={hasFilters ? `${visible.length} de ${members.length} familiares` : undefined}
         onReset={hasFilters ? () => patch({ q: '', familyId: '', role: '' }) : null}
+        activeFilters={[prefs.familyId, prefs.role].filter(Boolean).length}
       >
         {families.length > 0 && (
           <FilterSelect label="Familia" value={prefs.familyId} onChange={(familyId) => patch({ familyId })}>

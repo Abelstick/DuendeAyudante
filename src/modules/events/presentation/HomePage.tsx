@@ -10,6 +10,7 @@ import { GamesTeaserCard } from '@/modules/games/presentation/GamesTeaserCard';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { MyResponsibilitiesCard } from '@/modules/responsibilities/presentation/MyResponsibilitiesCard';
 import { NowNextCard } from '@/modules/schedule/presentation/NowNextCard';
+import { GiftsHomeCard } from '@/modules/wishlist/presentation/GiftsHomeCard';
 import { SecretFriendCard } from '@/modules/secret-friend/presentation/SecretFriendCard';
 import { formatMoney } from '@/shared/lib/money';
 import { Avatar } from '@/shared/ui/Avatar';
@@ -69,6 +70,9 @@ export function HomePage() {
 
       {/* 4 · Accesos rápidos */}
       <QuickAccessGrid />
+
+      {/* Regalos a la mano: mi lista y las de los demás */}
+      <GiftsHomeCard />
 
       <GamesTeaserCard />
 

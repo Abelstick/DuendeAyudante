@@ -88,3 +88,19 @@ describe('precio', () => {
     expect(describePrice({ priceMin: null, priceMax: null }, fmt)).toBeNull();
   });
 });
+
+describe('WishlistService.byPriority', () => {
+  const item = (id: string, priority: 1 | 2 | 3, day: number) =>
+    ({ id, priority, createdAt: new Date(2026, 10, day) }) as Parameters<typeof WishlistService.byPriority>[0][number];
+
+  it('pone primero lo que más le gustaría y, a igual prioridad, lo más antiguo', () => {
+    const sorted = WishlistService.byPriority([item('a', 3, 1), item('b', 1, 5), item('c', 2, 2), item('d', 1, 3)]);
+    expect(sorted.map((w) => w.id)).toEqual(['d', 'b', 'c', 'a']);
+  });
+
+  it('no modifica la lista original', () => {
+    const list = [item('a', 3, 1), item('b', 1, 2)];
+    WishlistService.byPriority(list);
+    expect(list.map((w) => w.id)).toEqual(['a', 'b']);
+  });
+});

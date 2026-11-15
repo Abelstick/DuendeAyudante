@@ -1,5 +1,5 @@
-import { ArrowDown, ArrowUp, LayoutGrid, Search, Table2, X } from 'lucide-react';
-import { useId, type ReactNode } from 'react';
+import { ArrowDown, ArrowUp, ChevronDown, LayoutGrid, Search, SlidersHorizontal, Table2, X } from 'lucide-react';
+import { useId, useState, type ReactNode } from 'react';
 import type { ListPrefs, ListView } from '@/shared/lib/listing';
 import { selectClasses } from './Tabs';
 
@@ -22,12 +22,18 @@ interface Props {
   summary?: string;
   /** Si hay algo que quitar, muestra «Quitar filtros». */
   onReset?: (() => void) | null;
+  /** Cuántos filtros están activos: se ve en el botón «Filtros» aunque el panel esté oculto. */
+  activeFilters?: number;
 }
 
 /** Barra de controles de una lista: buscar, filtrar, ordenar (asc/desc) y elegir la vista. */
-export function ListToolbar({ prefs, onChange, searchLabel, sortOptions, showView, children, summary, onReset }: Props) {
+export function ListToolbar({ prefs, onChange, searchLabel, sortOptions, showView, children, summary, onReset, activeFilters = 0 }: Props) {
   const asc = prefs.dir === 'asc';
   const sortId = useId();
+  const panelId = useId();
+  // Filtros y orden se pliegan para que la lista quede a la vista; el buscador siempre se ve
+  const [open, setOpen] = useState(false);
+  const hasPanel = Boolean(children || sortOptions);
   return (
     <section aria-label="Buscar, filtrar y ordenar" className="space-y-3 rounded-2xl border-2 border-night-900 bg-white p-3 shadow-block sm:p-4">
       <div className="flex flex-wrap items-end gap-2">
@@ -54,11 +60,30 @@ export function ListToolbar({ prefs, onChange, searchLabel, sortOptions, showVie
             )}
           </div>
         )}
+        {hasPanel && (
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls={panelId}
+            onClick={() => setOpen((v) => !v)}
+            className={`flex min-h-12 shrink-0 items-center gap-1.5 rounded-xl border-2 border-night-900 px-3 text-base font-bold focus:outline-none focus:ring-4 focus:ring-aqua-400 ${open ? 'bg-brand-soft text-brand' : 'bg-white text-night-900 hover:bg-brand-soft'}`}
+          >
+            <SlidersHorizontal className="size-5" aria-hidden />
+            {open ? 'Ocultar filtros' : 'Filtros'}
+            {activeFilters > 0 && (
+              <span className="flex min-w-6 items-center justify-center rounded-full bg-berry-500 px-1.5 text-sm font-black text-white">
+                {activeFilters}
+                <span className="sr-only">{activeFilters === 1 ? ' filtro activo' : ' filtros activos'}</span>
+              </span>
+            )}
+            <ChevronDown className={`size-5 transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden />
+          </button>
+        )}
         {showView && <ViewToggle value={prefs.view} onChange={(view) => onChange({ view })} />}
       </div>
 
-      {(children || sortOptions) && (
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      {hasPanel && open && (
+        <div id={panelId} className="animate-pop-in grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           {children}
           {sortOptions && (
             <div className="flex flex-col gap-1 text-sm font-semibold text-ink-700">
