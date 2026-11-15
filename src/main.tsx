@@ -8,11 +8,14 @@ import { createContainer } from '@/app/container';
 import { ContainerProvider } from '@/app/ContainerContext';
 import { router } from '@/app/router';
 import { env } from '@/shared/config/env';
+import { InstallPrompt } from '@/shared/pwa/InstallPrompt';
+import { setupPwa } from '@/shared/pwa/install';
 import { ToastProvider } from '@/shared/ui/Toast';
 import { applyTextSize, getTextSize } from '@/shared/ui/textSize';
 import './index.css';
 
 applyTextSize(getTextSize());
+setupPwa();
 
 const root = createRoot(document.getElementById('root')!);
 
@@ -41,6 +44,7 @@ if (!env.isConfigured) {
             <ToastProvider>
               <AuthProvider>
                 <RouterProvider router={router} />
+                <InstallPrompt />
               </AuthProvider>
             </ToastProvider>
           </MotionConfig>
