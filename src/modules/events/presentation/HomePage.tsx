@@ -1,4 +1,4 @@
-import { ChevronRight, Settings, Users } from 'lucide-react';
+import { ChevronRight, LayoutGrid, Settings, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { AnnouncementsHomeCard } from '@/modules/announcements/presentation/AnnouncementsHomeCard';
@@ -68,8 +68,10 @@ export function HomePage() {
       {/* 3 · Anuncios */}
       <AnnouncementsHomeCard />
 
-      {/* 4 · Accesos rápidos */}
-      <QuickAccessGrid />
+      {/* 4 · Accesos rápidos (Regalos, Juegos, Aportes y tareas, Cronograma), contraídos para que el inicio sea corto */}
+      <CollapsibleCard id="inicio:accesos" icon={<LayoutGrid className="size-6" />} tone="gold" title="Accesos rápidos" action={<span className="text-sm font-semibold text-ink-700">Regalos, juegos, tareas y horarios</span>}>
+        <QuickAccessGrid />
+      </CollapsibleCard>
 
       {/* Regalos a la mano: mi lista y las de los demás */}
       <GiftsHomeCard />

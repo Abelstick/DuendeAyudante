@@ -90,11 +90,11 @@ export function QuickAccessGrid() {
             <Link
               to={to}
               onClick={() => playSound('tap')}
-              className={`select-ring relative flex h-full min-h-32 flex-col justify-between gap-2 overflow-hidden rounded-2xl border-2 border-night-900 p-3.5 shadow-block active:shadow-none ${style}`}
+              className={`select-ring relative flex h-full min-h-32 flex-col justify-between gap-2 overflow-hidden rounded-2xl border-2 border-night-900 p-3 shadow-block active:shadow-none sm:p-3.5 ${style}`}
             >
               {/* franja de brillo, como la carátula de un juego */}
               <span className="pointer-events-none absolute inset-x-0 top-0 h-2 bg-white/25" aria-hidden />
-              <span className="relative flex items-start justify-between gap-2">
+              <span className="relative flex flex-wrap items-start justify-between gap-2">
                 <span className="flex size-12 items-center justify-center rounded-xl border-2 border-night-900 bg-white text-night-900 shadow-[0_3px_0_0_var(--color-night-900)]">
                   <Icon className="size-7 motion-safe:animate-float" style={{ animationDelay: `${i * 0.3}s` }} aria-hidden />
                 </span>

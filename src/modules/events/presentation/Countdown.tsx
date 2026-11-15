@@ -34,26 +34,26 @@ export function Countdown({ target, timezone, title, description }: Props) {
   const headline = c.isOver ? '¡Feliz Navidad!' : c.days === 0 ? '¡Es hoy!' : c.days === 1 ? '¡Falta 1 día!' : `¡Faltan ${c.days} días!`;
 
   return (
-    <section aria-labelledby="countdown-title" className="sky-bg snow-bg relative animate-pop-in overflow-hidden rounded-xl border-2 border-night-900 px-5 pb-32 pt-5 text-white shadow-lift">
+    <section aria-labelledby="countdown-title" className="sky-bg snow-bg relative animate-pop-in overflow-hidden rounded-xl border-2 border-night-900 px-4 pb-24 pt-4 text-white shadow-lift sm:px-5 sm:pb-32 sm:pt-5">
       <Snowfall fall={380} />
       <Moon className="absolute right-4 top-4 w-14 motion-safe:animate-float" />
 
       <div className="relative pr-16">
         <p className="eyebrow text-gold-300">Cuenta regresiva{title ? ` · ${title}` : ''}</p>
-        <h2 id="countdown-title" className="mt-1 text-[2.6rem] font-extrabold leading-[0.95]">
+        <h2 id="countdown-title" className="mt-1 text-[2.1rem] leading-[0.95] font-extrabold wrap-break-word sm:text-[2.6rem]">
           {headline}
         </h2>
       </div>
 
       {!c.isOver && (
-        <div className="relative mt-5 grid grid-cols-4 gap-2" role="timer" aria-live="off" aria-label={`Faltan ${c.days} días, ${c.hours} horas y ${c.minutes} minutos`}>
+        <div className="relative mt-4 grid grid-cols-4 gap-1.5 sm:mt-5 sm:gap-2" role="timer" aria-live="off" aria-label={`Faltan ${c.days} días, ${c.hours} horas y ${c.minutes} minutos`}>
           {units.map((u) => (
             <div key={u.key} className="count-tile px-1 py-2 text-center">
               {/* `key` cambia con el valor: el número da un saltito al cambiar */}
-              <span key={u.value} className="font-display block text-[1.9rem] font-extrabold leading-none tabular-nums text-gold-300 motion-safe:animate-tick">
+              <span key={u.value} className="font-display block text-[1.6rem] leading-none font-extrabold text-gold-300 tabular-nums motion-safe:animate-tick sm:text-[1.9rem]">
                 {u.value}
               </span>
-              <span className="eyebrow mt-1 block tracking-[0.08em]! text-white/85">{u.label}</span>
+              <span className="eyebrow mt-1 block truncate tracking-[0.02em]! text-white/85 sm:tracking-[0.08em]!">{u.label}</span>
             </div>
           ))}
         </div>
@@ -66,7 +66,7 @@ export function Countdown({ target, timezone, title, description }: Props) {
       </p>
       {description && <p className="relative mt-1 text-base text-white/85">{description}</p>}
 
-      <WinterScene className="h-28" />
+      <WinterScene className="h-20 sm:h-28" />
     </section>
   );
 }

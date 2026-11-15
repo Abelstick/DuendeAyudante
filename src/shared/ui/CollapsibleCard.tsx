@@ -14,7 +14,7 @@ function readCollapsed(id: string, fallback: boolean): boolean {
 }
 
 /** Abierto/contraído, recordado en este dispositivo (cada persona decide qué quiere ver en su inicio). */
-export function useCollapsed(id: string, defaultCollapsed = false): [boolean, () => void] {
+export function useCollapsed(id: string, defaultCollapsed = true): [boolean, () => void] {
   const [collapsed, setCollapsed] = useState(() => readCollapsed(id, defaultCollapsed));
   const toggle = useCallback(() => {
     setCollapsed((prev) => {
@@ -36,8 +36,9 @@ interface Props {
   icon?: ReactNode;
   tone?: Tone;
   title: ReactNode;
-  /** Dato que sigue visible aunque esté contraída (p. ej. un contador). */
+  /** Dato que sigue visible aunque esté contraída (p. ej. un contador). Va debajo del título. */
   action?: ReactNode;
+  /** Empieza contraída (por defecto sí: el inicio queda corto y cada quien abre lo que quiere). */
   defaultCollapsed?: boolean;
   className?: string;
   children: ReactNode;
@@ -47,7 +48,7 @@ interface Props {
  * Tarjeta con título que se puede contraer tocando el encabezado.
  * El contenido se pliega con una transición suave (sin animación si la persona la desactivó).
  */
-export function CollapsibleCard({ id, icon, tone = 'brand', title, action, defaultCollapsed = false, className = '', children }: Props) {
+export function CollapsibleCard({ id, icon, tone = 'brand', title, action, defaultCollapsed = true, className = '', children }: Props) {
   const [collapsed, toggle] = useCollapsed(id, defaultCollapsed);
   const contentId = useId();
 
@@ -59,11 +60,14 @@ export function CollapsibleCard({ id, icon, tone = 'brand', title, action, defau
           onClick={toggle}
           aria-expanded={!collapsed}
           aria-controls={contentId}
-          className="flex w-full items-center gap-3 rounded-xl p-5 text-left focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-gold-400"
+          className="flex w-full items-center gap-3 rounded-xl p-4 text-left focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-gold-400 sm:p-5"
         >
           {icon && <IconBubble tone={tone}>{icon}</IconBubble>}
-          <span className="min-w-0 flex-1 text-[1.4rem] font-extrabold leading-tight text-night-900">{title}</span>
-          {action && <span className="shrink-0">{action}</span>}
+          {/* El contador va debajo del título: en el celular no le quita espacio y nunca se monta encima */}
+          <span className="min-w-0 flex-1">
+            <span className="block text-xl leading-tight font-extrabold text-night-900 hyphens-auto wrap-break-word sm:text-[1.4rem]">{title}</span>
+            {action && <span className="mt-1 flex flex-wrap gap-1">{action}</span>}
+          </span>
           <span className="flex size-10 shrink-0 items-center justify-center rounded-lg text-night-700" aria-hidden>
             <ChevronDown className={`size-6 motion-safe:transition-transform motion-safe:duration-200 ${collapsed ? '-rotate-90' : ''}`} />
           </span>
@@ -76,7 +80,7 @@ export function CollapsibleCard({ id, icon, tone = 'brand', title, action, defau
         inert={collapsed}
       >
         <div className="min-h-0 overflow-hidden">
-          <div className="space-y-3 px-5 pb-5">{children}</div>
+          <div className="space-y-3 px-4 pb-4 sm:px-5 sm:pb-5">{children}</div>
         </div>
       </div>
     </section>

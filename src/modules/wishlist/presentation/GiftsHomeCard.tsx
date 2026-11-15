@@ -59,11 +59,11 @@ export function GiftsHomeCard() {
     >
       {/* Mi lista */}
       {context.me && (
-        <div className="flex items-center gap-3 rounded-xl border-2 border-night-900 bg-berry-50 p-3">
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border-2 border-night-900 bg-berry-50 p-3">
           <span className="text-3xl" aria-hidden>
             {myCount === 0 ? '📝' : '🎁'}
           </span>
-          <p className="min-w-0 flex-1 text-base font-semibold text-ink-900">
+          <p className="min-w-40 flex-1 text-base font-semibold text-ink-900">
             {myCount === 0 ? (
               'Todavía no agregas tu lista de deseos.'
             ) : (

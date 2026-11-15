@@ -27,13 +27,18 @@ export function Card({ className = '', children, ...rest }: HTMLAttributes<HTMLD
   );
 }
 
-/** Título de tarjeta con icono. `action` va a la derecha (p. ej. un contador). */
+/**
+ * Título de tarjeta con icono. `action` (p. ej. un contador) va debajo del título:
+ * en el celular las palabras largas ("Responsabilidades") no caben junto a él y se montarían.
+ */
 export function CardTitle({ icon, tone = 'brand', children, action }: { icon?: ReactNode; tone?: Tone; children: ReactNode; action?: ReactNode }) {
   return (
     <div className="flex items-center gap-3">
       {icon && <IconBubble tone={tone}>{icon}</IconBubble>}
-      <h2 className="min-w-0 flex-1 text-[1.4rem] font-extrabold leading-tight text-night-900">{children}</h2>
-      {action && <span className="shrink-0">{action}</span>}
+      <div className="min-w-0 flex-1">
+        <h2 className="text-xl leading-tight font-extrabold text-night-900 hyphens-auto wrap-break-word sm:text-[1.4rem]">{children}</h2>
+        {action && <div className="mt-1 flex flex-wrap gap-1">{action}</div>}
+      </div>
     </div>
   );
 }
@@ -47,7 +52,7 @@ export function PageTitle({ icon, title, subtitle, tone = 'brand' }: { icon?: Re
         </IconBubble>
       )}
       <div className="min-w-0">
-        <h1 className="text-[2rem] font-extrabold leading-none text-night-900 sm:text-4xl">{title}</h1>
+        <h1 className="text-[1.75rem] leading-none font-extrabold text-night-900 hyphens-auto wrap-break-word sm:text-4xl">{title}</h1>
         {subtitle && <p className="mt-1 text-base text-ink-700">{subtitle}</p>}
       </div>
     </header>
