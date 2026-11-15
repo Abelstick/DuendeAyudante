@@ -2,7 +2,16 @@
 import { HttpError } from '../_shared/http.ts';
 
 // Se leen en cada uso (no al cargar): si se cambian los secretos, la función los toma sin quedarse con los viejos.
-const env = (name: string) => (Deno.env.get(name) ?? '').trim();
+// Tolera nombres guardados con espacios de más (p. ej. "GOOGLE_CLIENT_ID " al pegarlo en el panel)
+// y prefiere el que tenga valor si hay uno vacío con el nombre exacto.
+export function env(name: string): string {
+  const exact = (Deno.env.get(name) ?? '').trim();
+  if (exact) return exact;
+  for (const [key, value] of Object.entries(Deno.env.toObject())) {
+    if (key.trim() === name && value.trim()) return value.trim();
+  }
+  return '';
+}
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 
 /** Google vuelve aquí después de que la persona acepta (la misma función, por GET). */

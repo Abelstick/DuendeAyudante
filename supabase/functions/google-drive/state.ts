@@ -1,6 +1,7 @@
 // "state" del OAuth firmado con HMAC: Google lo devuelve tal cual y así sabemos,
 // sin guardar nada, qué familia conectar, quién lo pidió y a dónde volver.
 import { HttpError } from '../_shared/http.ts';
+import { env } from './google.ts';
 
 export interface OAuthState {
   /** null = Drive general de la celebración. */
@@ -25,7 +26,7 @@ function fromB64url(text: string): Uint8Array {
 }
 
 async function key(): Promise<CryptoKey> {
-  const secret = (Deno.env.get('GOOGLE_OAUTH_STATE_SECRET') ?? '').trim();
+  const secret = env('GOOGLE_OAUTH_STATE_SECRET');
   if (secret.length < 32) {
     throw new HttpError(503, 'GOOGLE_NOT_CONFIGURED', {
       missing: [secret ? 'GOOGLE_OAUTH_STATE_SECRET (mínimo 32 caracteres)' : 'GOOGLE_OAUTH_STATE_SECRET'],
