@@ -8,6 +8,8 @@ interface ModalProps {
   children: ReactNode;
   /** Botones de abajo (siempre visibles). */
   footer?: ReactNode;
+  /** `wide` para contenido ancho como tablas (en computadora). */
+  size?: 'md' | 'wide';
 }
 
 /**
@@ -15,7 +17,7 @@ interface ModalProps {
  * Esc o con el botón "Cerrar" (con texto visible). En el celular se abre
  * desde abajo ocupando todo el ancho.
  */
-export function Modal({ open, title, onClose, children, footer }: ModalProps) {
+export function Modal({ open, title, onClose, children, footer, size = 'md' }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
@@ -38,7 +40,9 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
         // Tocar fuera de la ventana (el fondo) la cierra
         if (e.target === ref.current) onClose();
       }}
-      className="m-0 mt-auto max-h-[92dvh] w-full max-w-none overflow-hidden rounded-t-2xl border-2 border-b-0 border-night-900 bg-white p-0 text-ink-900 sm:m-auto sm:max-w-lg sm:rounded-2xl sm:border-b-2"
+      className={`m-0 mt-auto max-h-[92dvh] w-full max-w-none overflow-hidden rounded-t-2xl border-2 border-b-0 border-night-900 bg-white p-0 text-ink-900 sm:m-auto sm:rounded-2xl sm:border-b-2 ${
+        size === 'wide' ? 'sm:max-w-[min(72rem,calc(100vw-2rem))]' : 'sm:max-w-lg'
+      }`}
     >
       {open && (
         <div className="flex max-h-[92dvh] flex-col">

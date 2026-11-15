@@ -84,11 +84,12 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
   };
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="animate-pop-in space-y-5 rounded-2xl border-2 border-brand bg-white p-5 shadow-block" noValidate>
-      <h2 className="text-xl font-extrabold text-ink-900">
-        {initial ? 'Cambiar regalo' : savedCount > 0 ? '¿Otro regalo? 🎁' : 'Nuevo regalo 🎁'}
-        {forName && <span className="block text-base font-normal text-ink-700">Para {forName}</span>}
-      </h2>
+    <form onSubmit={handleSubmit(submit)} className="space-y-5" noValidate>
+      {forName && (
+        <p className="text-base text-ink-700">
+          Para <strong className="text-ink-900">{forName}</strong>
+        </p>
+      )}
 
       {savedCount > 0 && !initial && <Notice tone="success">✅ ¡Regalo guardado! Ya aparece en tu lista. Si quieres, agrega otro aquí.</Notice>}
 

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
+import { Modal } from '@/shared/ui/Modal';
 import { useToast } from '@/shared/ui/Toast';
 import type { WishlistItem } from '../domain/WishlistItem';
 import { useWishlistMutations } from './hooks';
@@ -20,7 +21,7 @@ interface Props {
   startAdding?: boolean;
 }
 
-/** Lista de regalos de una persona, con agregar / cambiar / quitar. */
+/** Lista de regalos de una persona. Agregar y cambiar se hacen en una ventana, para no alargar la pantalla. */
 export function EditableWishlist({ eventId, participantId, items, budget, currency, forName, startAdding = false }: Props) {
   const { save, remove } = useWishlistMutations(eventId);
   const toast = useToast();
@@ -51,70 +52,66 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
     }
   };
 
+  const editing = items.find((item) => item.id === editingId);
+  const closeForm = () => {
+    setAdding(false);
+    setEditingId(null);
+    setFormError(null);
+  };
+
   return (
     <div className="space-y-4">
-      {adding ? (
-        <WishlistItemForm
-          budget={budget}
-          currency={currency}
-          forName={forName}
-          submitting={save.isPending}
-          error={formError}
-          onSubmit={(data) => handleSave(null, data)}
-          onCancel={() => {
-            setAdding(false);
-            setFormError(null);
-          }}
-        />
-      ) : (
-        <Button
-          size="lg"
-          onClick={() => {
-            setEditingId(null);
-            setAdding(true);
-          }}
-          icon={<Plus className="size-6" aria-hidden />}
-        >
-          Agregar regalo
-        </Button>
-      )}
+      <Button size="lg" onClick={() => setAdding(true)} icon={<Plus className="size-6" aria-hidden />}>
+        Agregar regalo
+      </Button>
 
-      {items.length === 0 && !adding && (
+      {items.length === 0 && (
         <EmptyState emoji="🎁" title={forName ? `${forName} todavía no tiene regalos.` : 'Todavía no agregaste regalos.'}>
           Toca «Agregar regalo» y escribe lo que te gustaría recibir.
         </EmptyState>
       )}
 
-      {items.map((item) =>
-        editingId === item.id ? (
+      {items.map((item) => (
+        <WishlistItemCard
+          key={item.id}
+          item={item}
+          budget={budget}
+          currency={currency}
+          canEdit
+          deleting={remove.isPending && remove.variables === item.id}
+          onEdit={() => setEditingId(item.id)}
+          onDelete={() => handleDelete(item)}
+        />
+      ))}
+
+      {adding && (
+        <Modal open title="Nuevo regalo" onClose={closeForm}>
           <WishlistItemForm
-            key={item.id}
-            initial={item}
             budget={budget}
             currency={currency}
+            forName={forName}
             submitting={save.isPending}
             error={formError}
-            onSubmit={(data) => handleSave(item.id, data)}
-            onCancel={() => {
-              setEditingId(null);
-              setFormError(null);
-            }}
+            onSubmit={(data) => handleSave(null, data)}
+            onCancel={closeForm}
           />
-        ) : (
-          <WishlistItemCard
-            key={item.id}
-            item={item}
+        </Modal>
+      )}
+
+      {editing && (
+        <Modal open title="Cambiar regalo" onClose={closeForm}>
+          <WishlistItemForm
+            key={editing.id}
+            initial={editing}
             budget={budget}
             currency={currency}
-            canEdit
-            deleting={remove.isPending && remove.variables === item.id}
-            onEdit={() => {
-              setAdding(false);
-              setEditingId(item.id);
-            }}
-            onDelete={() => handleDelete(item)}
+            forName={forName}
+            submitting={save.isPending}
+            error={formError}
+            onSubmit={(data) => handleSave(editing.id, data)}
+            onCancel={closeForm}
           />
-        ),
+        </Modal>
       )}
     </div>
   );

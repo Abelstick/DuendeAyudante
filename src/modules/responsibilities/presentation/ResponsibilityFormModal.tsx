@@ -36,17 +36,19 @@ interface Props {
   defaultKind: ResponsibilityKind;
   families: Family[];
   participants: Participant[];
+  /** Al crear: personas que ya vienen marcadas como responsables (p. ej. "Asignar tarea" desde un familiar). */
+  initialParticipantIds?: string[];
   onClose: () => void;
 }
 
-export function ResponsibilityFormModal({ eventId, initial, defaultKind, families, participants, onClose }: Props) {
+export function ResponsibilityFormModal({ eventId, initial, defaultKind, families, participants, initialParticipantIds = [], onClose }: Props) {
   const { save, remove } = useResponsibilityMutations(eventId);
   const toast = useToast();
   const [kind, setKind] = useState<ResponsibilityKind>(initial?.kind ?? defaultKind);
   const [category, setCategory] = useState<ResponsibilityCategory>(initial?.category ?? (defaultKind === 'task' ? 'other' : 'food'));
   const [status, setStatus] = useState<ResponsibilityStatus>(initial?.status ?? 'pending');
   const [familyIds, setFamilyIds] = useState<string[]>(initial?.familyIds ?? []);
-  const [participantIds, setParticipantIds] = useState<string[]>(initial?.participantIds ?? []);
+  const [participantIds, setParticipantIds] = useState<string[]>(initial?.participantIds ?? initialParticipantIds);
   const [search, setSearch] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);

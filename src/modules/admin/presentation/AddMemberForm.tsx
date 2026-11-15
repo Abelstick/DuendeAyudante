@@ -49,6 +49,7 @@ interface Props {
   myRole: EventRole;
 }
 
+/** Formulario para agregar un familiar. Se muestra dentro de una ventana (ver OrganizePage). */
 export function AddMemberForm({ families, members, myRole }: Props) {
   const { event } = useEventScope();
   const { add } = useMemberMutations(event.id);
@@ -143,8 +144,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 rounded-2xl border-2 border-night-900 bg-white p-4 shadow-block" noValidate>
-        <h3 className="text-lg font-extrabold text-ink-900">Agregar a un familiar</h3>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
 
         <TextField label="Nombre" autoComplete="off" error={errors.firstName?.message} {...register('firstName')} />
         <TextField label="Apellido paterno" autoComplete="off" error={errors.paternalSurname?.message} {...register('paternalSurname')} />

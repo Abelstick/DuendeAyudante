@@ -13,6 +13,7 @@ import { displayName } from '@/modules/members/domain/Participant';
 import { Avatar } from '@/shared/ui/Avatar';
 import { Button } from '@/shared/ui/Button';
 import { Card, CardTitle, PageTitle, Pill } from '@/shared/ui/Card';
+import { Modal } from '@/shared/ui/Modal';
 import { applyTextSize, getTextSize, type TextSize } from '@/shared/ui/textSize';
 import { ChangePasswordForm } from './ChangePasswordForm';
 
@@ -105,15 +106,14 @@ export function ProfilePage() {
         <CardTitle icon={<KeyRound className="size-6" />} tone="night">
           Mi contraseña
         </CardTitle>
-        {changing ? (
-          <ChangePasswordForm onDone={() => setChanging(false)} />
-        ) : (
-          <>
-            <p className="text-base text-ink-700">Si quieres, puedes cambiar la contraseña que te enviaron. No es obligatorio.</p>
-            <Button variant="secondary" onClick={() => setChanging(true)}>
-              Cambiar mi contraseña
-            </Button>
-          </>
+        <p className="text-base text-ink-700">Si quieres, puedes cambiar la contraseña que te enviaron. No es obligatorio.</p>
+        <Button variant="secondary" onClick={() => setChanging(true)}>
+          Cambiar mi contraseña
+        </Button>
+        {changing && (
+          <Modal open title="Cambiar mi contraseña" onClose={() => setChanging(false)}>
+            <ChangePasswordForm onDone={() => setChanging(false)} />
+          </Modal>
         )}
       </Card>
 

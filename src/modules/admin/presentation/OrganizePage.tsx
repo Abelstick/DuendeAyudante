@@ -1,4 +1,5 @@
-import { CalendarDays, Check, ListChecks, Settings, UserPlus, Users, Wallet } from 'lucide-react';
+import { CalendarDays, Check, ChevronRight, ClipboardPlus, ListChecks, Settings, Table2, UserPlus, Users, Wallet } from 'lucide-react';
+import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { canManageEvent } from '@/modules/events/domain/Event';
@@ -6,10 +7,14 @@ import { useFamilies } from '@/modules/families/presentation/hooks';
 import { useMembers } from '@/modules/members/presentation/hooks';
 import { formatEventDate } from '@/shared/lib/datetime';
 import { formatMoney } from '@/shared/lib/money';
-import { Spinner } from '@/shared/ui/Button';
+import { ResponsibilityFormModal } from '@/modules/responsibilities/presentation/ResponsibilityFormModal';
+import type { ResponsibilityKind } from '@/modules/responsibilities/domain/Responsibility';
+import { Button, ButtonLink, Spinner } from '@/shared/ui/Button';
+import { Modal } from '@/shared/ui/Modal';
 import { Card, CardTitle, Notice, PageTitle } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { AddMemberForm } from './AddMemberForm';
+import { BulkMembersModal } from './BulkMembersModal';
 import { ChecklistManager } from './ChecklistManager';
 import { JoinCodeEditor } from './JoinCodeEditor';
 import { FamiliesManager } from './FamiliesManager';
@@ -20,6 +25,8 @@ export function OrganizePage() {
   const { event, context } = useEventScope();
   const families = useFamilies(event.id);
   const members = useMembers(event.id);
+  const [adding, setAdding] = useState<'one' | 'many' | null>(null);
+  const [assigning, setAssigning] = useState<{ kind: ResponsibilityKind; participantIds: string[] } | null>(null);
 
   if (!canManageEvent(context.role)) return <Navigate to={`/e/${event.id}`} replace />;
   if (families.isLoading || members.isLoading) return <Spinner label="Cargando…" />;
@@ -81,14 +88,67 @@ export function OrganizePage() {
 
       <section className="space-y-4">
         <CardTitle icon={<UserPlus className="size-6" />}>Familiares ({memberList.length})</CardTitle>
-        <AddMemberForm families={familyList} members={memberList} myRole={context.role} />
-        <MembersList members={memberList} families={familyList} myRole={context.role} />
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => setAdding('one')} icon={<UserPlus className="size-5" aria-hidden />}>
+            Agregar familiar
+          </Button>
+          {/* La tabla necesita espacio: solo se ofrece en pantallas grandes */}
+          <span className="hidden md:inline">
+            <Button variant="secondary" onClick={() => setAdding('many')} icon={<Table2 className="size-5" aria-hidden />}>
+              Agregar varios en una tabla
+            </Button>
+          </span>
+        </div>
+        <MembersList
+          members={memberList}
+          families={familyList}
+          myRole={context.role}
+          onAssignTask={(m) => setAssigning({ kind: 'task', participantIds: [m.id] })}
+        />
+      </section>
+
+      <section className="space-y-3">
+        <CardTitle icon={<ClipboardPlus className="size-6" />}>Tareas y aportes</CardTitle>
+        <p className="text-base text-ink-700">
+          Reparte quién hace o lleva cada cosa. A cada persona le aparece en su inicio, en «Mis responsabilidades», y la marca cuando la cumple.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => setAssigning({ kind: 'task', participantIds: [] })} icon={<ClipboardPlus className="size-5" aria-hidden />}>
+            Asignar una tarea
+          </Button>
+          <Button variant="secondary" onClick={() => setAssigning({ kind: 'contribution', participantIds: [] })} icon={<ClipboardPlus className="size-5" aria-hidden />}>
+            Asignar un aporte
+          </Button>
+          <ButtonLink to={`/e/${event.id}/celebracion`} variant="ghost" icon={<ChevronRight className="size-5" aria-hidden />}>
+            Ver todas
+          </ButtonLink>
+        </div>
       </section>
 
       <section className="space-y-3">
         <CardTitle icon={<ListChecks className="size-6" />}>Checklist de preparación</CardTitle>
         <ChecklistManager eventId={event.id} families={familyList} members={memberList} />
       </section>
+
+      {adding === 'one' && (
+        <Modal open title="Agregar a un familiar" onClose={() => setAdding(null)}>
+          <AddMemberForm families={familyList} members={memberList} myRole={context.role} />
+        </Modal>
+      )}
+      {adding === 'many' && <BulkMembersModal families={familyList} members={memberList} onClose={() => setAdding(null)} />}
+
+      {assigning && (
+        <ResponsibilityFormModal
+          key={`${assigning.kind}-${assigning.participantIds.join()}`}
+          eventId={event.id}
+          initial={null}
+          defaultKind={assigning.kind}
+          families={familyList}
+          participants={memberList.filter((m) => m.status === 'active')}
+          initialParticipantIds={assigning.participantIds}
+          onClose={() => setAssigning(null)}
+        />
+      )}
     </div>
   );
 }
