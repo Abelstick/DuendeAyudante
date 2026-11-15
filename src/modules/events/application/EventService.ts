@@ -39,6 +39,12 @@ export class EventService {
     await this.events.updateBudget(eventId, Math.round(amount * 100) / 100);
   }
 
+  updateDescription(eventId: string, description: string): Promise<void> {
+    const text = description.trim();
+    if (text.length > 1000) throw new AppError('DESCRIPTION_TOO_LONG');
+    return this.events.updateDescription(eventId, text || null);
+  }
+
   async create(input: CreateEventInput): Promise<string> {
     if (!input.name.trim()) throw new AppError('EVENT_NAME_INVALID');
     const joinCode = normalizeJoinCode(input.joinCode);

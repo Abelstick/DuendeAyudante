@@ -23,4 +23,6 @@ export interface IEventRepository {
   getMyContext(eventId: string): Promise<EventContext>;
   /** Cambia el monto acordado del intercambio (solo organizador/administradores, por RLS). */
   updateBudget(eventId: string, amount: number): Promise<void>;
+  /** Cambia la descripción de la celebración (null la borra). */
+  updateDescription(eventId: string, description: string | null): Promise<void>;
 }

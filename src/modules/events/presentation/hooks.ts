@@ -52,6 +52,18 @@ export function useUpdateBudget(eventId: string) {
   });
 }
 
+export function useUpdateDescription(eventId: string) {
+  const { events } = useServices();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (description: string) => events.updateDescription(eventId, description),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
+      void qc.invalidateQueries({ queryKey: eventKeys.mine });
+    },
+  });
+}
+
 export function useCreateEvent() {
   const { events } = useServices();
   const qc = useQueryClient();

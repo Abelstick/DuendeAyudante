@@ -1,6 +1,7 @@
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, Wallet } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { countdownTo, formatEventDate } from '@/shared/lib/datetime';
+import { formatMoneyWords } from '@/shared/lib/money';
 import { Moon, Snowfall, WinterScene } from '@/shared/ui/illustrations';
 
 interface Props {
@@ -9,6 +10,9 @@ interface Props {
   /** Nombre de la celebración (aparece como rótulo del banner). */
   title?: string;
   description?: string | null;
+  /** Monto acordado del intercambio (se muestra debajo de la fecha). */
+  budget?: number | null;
+  currency?: string;
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -17,7 +21,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
  * Banner principal del inicio: noche nevada con la cuenta regresiva.
  * Se actualiza sola cada segundo; la ficha de los segundos da un saltito al cambiar.
  */
-export function Countdown({ target, timezone, title, description }: Props) {
+export function Countdown({ target, timezone, title, description, budget, currency }: Props) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
@@ -64,6 +68,14 @@ export function Countdown({ target, timezone, title, description }: Props) {
         <CalendarDays className="mt-0.5 size-5 shrink-0 text-gold-300" aria-hidden />
         <span className="first-letter:uppercase">{formatEventDate(target, timezone)}</span>
       </p>
+      {budget != null && (
+        <p className="relative mt-1 flex items-start gap-2 text-base font-semibold text-white">
+          <Wallet className="mt-0.5 size-5 shrink-0 text-gold-300" aria-hidden />
+          <span>
+            Monto acordado: <strong className="text-gold-300 uppercase">{formatMoneyWords(budget, currency)}</strong>
+          </span>
+        </p>
+      )}
       {description && <p className="relative mt-1 text-base text-white/85">{description}</p>}
 
       <WinterScene className="h-20 sm:h-28" />

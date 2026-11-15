@@ -13,6 +13,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { Card, CardTitle, Notice, PageTitle } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { BudgetEditor } from './BudgetEditor';
+import { DescriptionEditor } from './DescriptionEditor';
 import { AddMemberForm } from './AddMemberForm';
 import { BulkMembersModal } from './BulkMembersModal';
 import { ChecklistManager } from './ChecklistManager';
@@ -54,6 +55,9 @@ export function OrganizePage() {
               <BudgetEditor budget={event.giftExchange.budgetMax} onEditingChange={setEditingBudget} />
             </li>
           )}
+          <li className="sm:col-span-2">
+            <DescriptionEditor />
+          </li>
         </ul>
       </Card>
 

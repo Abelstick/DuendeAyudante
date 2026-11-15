@@ -61,7 +61,7 @@ export function HomePage() {
       </header>
 
       {/* 2 · Banner con la cuenta regresiva */}
-      <Countdown target={event.celebrationAt} timezone={event.timezone} title={event.name} description={event.description} />
+      <Countdown target={event.celebrationAt} timezone={event.timezone} title={event.name} description={event.description} budget={budget} currency={event.currency} />
 
       <NowNextCard />
 

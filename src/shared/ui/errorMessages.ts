@@ -36,6 +36,7 @@ const MESSAGES: Record<string, string> = {
   JOIN_CODE_INVALID: 'El código debe tener entre 4 y 20 letras o números, sin espacios (ej. GARCIA25).',
   JOIN_CODE_TAKEN: 'Ese código ya lo usa otra Navidad. Prueba agregando un número o una palabra (ej. GARCIA25LIMA).',
   EVENT_NAME_INVALID: 'Escribe un nombre para tu Navidad.',
+  DESCRIPTION_TOO_LONG: 'La descripción es muy larga (máximo 1000 letras).',
   BUDGET_INVALID: 'Escribe un presupuesto mayor a cero (ej. 65).',
   DATE_INVALID: 'Revisa la fecha y la hora.',
   TIMEZONE_INVALID: 'La zona horaria no es válida.',

@@ -100,6 +100,12 @@ export class SupabaseEventRepository implements IEventRepository {
     if (!data || data.length === 0) throw new AppError('FORBIDDEN');
   }
 
+  async updateDescription(eventId: string, description: string | null): Promise<void> {
+    const { data, error } = await this.supabase.from('events').update({ description }).eq('id', eventId).select('id');
+    if (error) throw fromPostgrestError(error);
+    if (!data || data.length === 0) throw new AppError('FORBIDDEN');
+  }
+
   async getMyContext(eventId: string): Promise<EventContext> {
     const { data, error } = await this.supabase.rpc('get_my_event_context', { p_event_id: eventId });
     if (error) throw fromPostgrestError(error);
