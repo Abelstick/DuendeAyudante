@@ -1,4 +1,4 @@
-import { CalendarDays, Camera, Check, ChevronRight, ClipboardPlus, ListChecks, Settings, Table2, UserPlus, Users, Wallet } from 'lucide-react';
+import { CalendarDays, Camera, Check, ChevronRight, ClipboardPlus, ListChecks, Settings, Table2, UserPlus, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
@@ -6,13 +6,13 @@ import { canManageEvent } from '@/modules/events/domain/Event';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { useMembers } from '@/modules/members/presentation/hooks';
 import { formatEventDate } from '@/shared/lib/datetime';
-import { formatMoney } from '@/shared/lib/money';
 import { ResponsibilityFormModal } from '@/modules/responsibilities/presentation/ResponsibilityFormModal';
 import type { ResponsibilityKind } from '@/modules/responsibilities/domain/Responsibility';
 import { Button, ButtonLink, Spinner } from '@/shared/ui/Button';
 import { Modal } from '@/shared/ui/Modal';
 import { Card, CardTitle, Notice, PageTitle } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
+import { BudgetEditor } from './BudgetEditor';
 import { AddMemberForm } from './AddMemberForm';
 import { BulkMembersModal } from './BulkMembersModal';
 import { ChecklistManager } from './ChecklistManager';
@@ -26,6 +26,7 @@ export function OrganizePage() {
   const { event, context } = useEventScope();
   const families = useFamilies(event.id);
   const members = useMembers(event.id);
+  const [editingBudget, setEditingBudget] = useState(false);
   const [adding, setAdding] = useState<'one' | 'many' | null>(null);
   const [assigning, setAssigning] = useState<{ kind: ResponsibilityKind; participantIds: string[] } | null>(null);
 
@@ -49,11 +50,8 @@ export function OrganizePage() {
             <span className="first-letter:uppercase">{formatEventDate(event.celebrationAt, event.timezone)}</span>
           </li>
           {event.giftExchange && (
-            <li className="flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-base">
-              <Wallet className="size-5 shrink-0 text-night-700" aria-hidden />
-              <span>
-                Presupuesto: <strong>{formatMoney(event.giftExchange.budgetMax, event.currency)}</strong>
-              </span>
+            <li className={editingBudget ? 'sm:col-span-2' : undefined}>
+              <BudgetEditor budget={event.giftExchange.budgetMax} onEditingChange={setEditingBudget} />
             </li>
           )}
         </ul>

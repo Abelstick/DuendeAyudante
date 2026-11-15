@@ -89,6 +89,17 @@ export class SupabaseEventRepository implements IEventRepository {
     return data.joinCode;
   }
 
+  async updateBudget(eventId: string, amount: number): Promise<void> {
+    const { data, error } = await this.supabase
+      .from('gift_exchanges')
+      .update({ budget_max: amount })
+      .eq('event_id', eventId)
+      .select('id');
+    if (error) throw fromPostgrestError(error);
+    // RLS filtra en silencio: sin filas significa que no tiene permiso
+    if (!data || data.length === 0) throw new AppError('FORBIDDEN');
+  }
+
   async getMyContext(eventId: string): Promise<EventContext> {
     const { data, error } = await this.supabase.rpc('get_my_event_context', { p_event_id: eventId });
     if (error) throw fromPostgrestError(error);

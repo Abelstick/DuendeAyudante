@@ -40,6 +40,18 @@ export function useChangeJoinCode(eventId: string) {
   });
 }
 
+export function useUpdateBudget(eventId: string) {
+  const { events } = useServices();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (amount: number) => events.updateBudget(eventId, amount),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
+      void qc.invalidateQueries({ queryKey: eventKeys.mine });
+    },
+  });
+}
+
 export function useCreateEvent() {
   const { events } = useServices();
   const qc = useQueryClient();

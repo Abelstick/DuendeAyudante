@@ -33,6 +33,12 @@ export class EventService {
     return this.events.changeJoinCode(eventId, code);
   }
 
+  /** Monto acordado del intercambio: mayor a cero y con hasta 2 decimales. */
+  async updateBudget(eventId: string, amount: number): Promise<void> {
+    if (!Number.isFinite(amount) || amount <= 0 || amount >= 100_000_000) throw new AppError('BUDGET_INVALID');
+    await this.events.updateBudget(eventId, Math.round(amount * 100) / 100);
+  }
+
   async create(input: CreateEventInput): Promise<string> {
     if (!input.name.trim()) throw new AppError('EVENT_NAME_INVALID');
     const joinCode = normalizeJoinCode(input.joinCode);
