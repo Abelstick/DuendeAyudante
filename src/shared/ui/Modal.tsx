@@ -38,25 +38,25 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
         // Tocar fuera de la ventana (el fondo) la cierra
         if (e.target === ref.current) onClose();
       }}
-      className="m-0 mt-auto max-h-[92dvh] w-full max-w-none overflow-hidden rounded-t-[1.75rem] bg-white p-0 text-ink-900 shadow-2xl sm:m-auto sm:max-w-lg sm:rounded-[1.75rem]"
+      className="m-0 mt-auto max-h-[92dvh] w-full max-w-none overflow-hidden rounded-t-2xl border-[3px] border-b-0 border-night-900 bg-white p-0 text-ink-900 sm:m-auto sm:max-w-lg sm:rounded-2xl sm:border-b-[3px]"
     >
       {open && (
         <div className="flex max-h-[92dvh] flex-col">
-          <header className="flex items-center justify-between gap-3 border-b border-mist-200 bg-brand-soft py-3 pl-5 pr-3">
-            <h2 id={titleId} className="text-xl font-extrabold text-brand">
+          <header className="flex items-center justify-between gap-3 border-b-[3px] border-night-900 bg-gold-400 py-3 pl-5 pr-3">
+            <h2 id={titleId} className="text-xl font-semibold text-night-900">
               {title}
             </h2>
             <button
               type="button"
               onClick={onClose}
-              className="flex min-h-12 shrink-0 items-center gap-1 rounded-full bg-white px-4 text-base font-bold text-brand shadow-card hover:bg-mist-50"
+              className="btn-3d font-display flex min-h-12 shrink-0 items-center gap-1 rounded-xl border-2 border-night-900 bg-white px-3 text-base font-semibold text-night-900"
             >
               <X className="size-5" aria-hidden />
               Cerrar
             </button>
           </header>
           <div className="overflow-y-auto overscroll-contain px-5 py-5">{children}</div>
-          {footer && <footer className="border-t border-mist-200 bg-white px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">{footer}</footer>}
+          {footer && <footer className="border-t-[3px] border-night-900 bg-white px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">{footer}</footer>}
         </div>
       )}
     </dialog>

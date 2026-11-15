@@ -8,13 +8,13 @@ import { CATEGORY_LABELS, type Game, type GameCategory } from '../domain/Game';
 
 /** Color de la "carátula" de cada categoría (la categoría también va escrita). */
 const CATEGORY_COVER: Record<GameCategory, string> = {
-  family_bonding: 'from-berry-500 to-berry-700',
-  competition: 'from-gold-300 to-gold-400',
-  board: 'from-night-600 to-night-800',
-  movement: 'from-pine-600 to-pine-800',
-  trivia_challenges: 'from-night-600 to-berry-600',
-  kids: 'from-gold-300 to-berry-500',
-  adults: 'from-pine-600 to-night-700',
+  family_bonding: 'bg-berry-500',
+  competition: 'bg-gold-400',
+  board: 'bg-sky-500',
+  movement: 'bg-pine-600',
+  trivia_challenges: 'bg-night-700',
+  kids: 'bg-gold-300',
+  adults: 'bg-berry-700',
 };
 
 function playersText(g: Game): string | null {
@@ -92,9 +92,9 @@ export function GameCard({ game, rank, votes = 0, percent = 0, showVotes, credit
   const medal = showVotes && rank !== undefined && rank <= 3 && votes > 0 ? ['🥇', '🥈', '🥉'][rank - 1] : null;
 
   return (
-    <article className={`animate-pop-in overflow-hidden rounded-3xl border-2 bg-white shadow-card ${selected ? 'border-brand' : voting?.hasVoted ? 'border-brand/40' : 'border-mist-200'}`}>
+    <article className={`group animate-pop-in overflow-hidden rounded-2xl border-[3px] border-night-900 bg-white ${selected || voting?.hasVoted ? 'shadow-[0_5px_0_0_var(--brand)]' : 'shadow-block'}`}>
       {selecting && (
-        <label className="flex min-h-12 cursor-pointer items-center gap-3 bg-brand-soft px-4 font-bold text-brand">
+        <label className="flex min-h-12 cursor-pointer items-center gap-3 border-b-[3px] border-night-900 bg-brand-soft px-4 font-bold text-brand">
           <input type="checkbox" className="size-6 accent-brand" checked={selected} onChange={onToggleSelect} />
           Elegir para unir
         </label>
@@ -102,10 +102,10 @@ export function GameCard({ game, rank, votes = 0, percent = 0, showVotes, credit
 
       <div className="flex items-stretch">
         {/* Carátula: emoji de la categoría, como la caja de un videojuego */}
-        <div className={`relative flex w-20 shrink-0 items-center justify-center bg-gradient-to-br text-4xl ${CATEGORY_COVER[game.category]}`} aria-hidden>
-          <span className="drop-shadow">{cat.emoji}</span>
+        <div className={`relative flex w-20 shrink-0 items-center justify-center border-r-[3px] border-night-900 text-4xl ${CATEGORY_COVER[game.category]}`} aria-hidden>
+          <span className="motion-safe:group-hover:animate-wiggle">{cat.emoji}</span>
           {showVotes && rank !== undefined && (
-            <span className="absolute left-2 top-2 flex size-8 items-center justify-center rounded-full bg-white text-base font-black text-ink-900 shadow-card">
+            <span className="font-display absolute left-1.5 top-1.5 flex size-8 items-center justify-center rounded-lg border-2 border-night-900 bg-white text-base font-semibold text-night-900">
               {medal ?? rank}
             </span>
           )}
@@ -117,7 +117,7 @@ export function GameCard({ game, rank, votes = 0, percent = 0, showVotes, credit
               {cat.label}
               {showVotes && rank !== undefined && <span className="sr-only"> · Puesto {rank}</span>}
             </p>
-            <h3 className="text-xl font-extrabold leading-tight text-ink-900">{game.name}</h3>
+            <h3 className="text-xl font-semibold leading-tight text-night-900">{game.name}</h3>
           </div>
           {(game.durationMinutes || players) && (
             <p className="flex flex-wrap gap-1.5">
@@ -161,7 +161,7 @@ export function GameCard({ game, rank, votes = 0, percent = 0, showVotes, credit
               {open ? 'Ocultar cómo se juega' : 'Ver cómo se juega'}
             </button>
             {open && (
-              <div className="animate-pop-in rounded-2xl bg-mist-100 p-4">
+              <div className="animate-pop-in rounded-xl border-2 border-night-900 bg-sky-100 p-4">
                 <GameDetails game={game} participants={participants} hideMeta />
               </div>
             )}

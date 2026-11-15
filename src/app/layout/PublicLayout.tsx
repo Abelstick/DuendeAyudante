@@ -1,20 +1,22 @@
 import type { ReactNode } from 'react';
-import { Stars, WinterScene } from '@/shared/ui/illustrations';
+import { LevelScene, PixelCloud, PixelStar, Snowfall } from '@/shared/ui/illustrations';
 
 /** Pantallas sin sesión: bienvenida, entrar, registro. */
 export function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-dvh">
-      <header className="sky-bg relative overflow-hidden px-4 pb-20 pt-[calc(1.75rem+env(safe-area-inset-top))] text-center text-white">
-        <Stars />
-        <p className="relative text-5xl motion-safe:animate-float" aria-hidden>
-          🎄
+      <header className="day-sky relative overflow-hidden border-b-[3px] border-night-900 px-4 pb-28 pt-[calc(1.5rem+env(safe-area-inset-top))] text-center">
+        <PixelCloud className="pointer-events-none absolute left-0 top-4 w-20 motion-safe:animate-drift" />
+        <PixelCloud className="pointer-events-none absolute left-0 top-20 w-14 motion-safe:animate-drift" style={{ animationDuration: '55s', animationDelay: '-30s' }} />
+        <Snowfall fall={300} />
+        <PixelStar className="relative mx-auto w-12 motion-safe:animate-spin-coin" />
+        <p className="font-display text-outline relative mt-2 text-[2.1rem] font-bold leading-tight">Navidad en Familia</p>
+        <p className="relative mx-auto mt-3 w-fit rounded-lg border-2 border-night-900 bg-white px-3 py-1 text-base font-bold text-night-900">
+          Regalos, juegos y celebración
         </p>
-        <p className="relative mt-1 text-3xl font-black">Navidad en Familia</p>
-        <p className="relative text-base text-white/85">Regalos, juegos y celebración, todos juntos</p>
-        <WinterScene className="absolute inset-x-0 bottom-0 h-20 w-full text-brand-page" />
+        <LevelScene />
       </header>
-      <main className="relative mx-auto -mt-6 w-full max-w-lg px-4 pb-10">{children}</main>
+      <main className="relative mx-auto w-full max-w-lg px-4 py-6">{children}</main>
     </div>
   );
 }

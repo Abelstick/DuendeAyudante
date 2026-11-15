@@ -56,7 +56,7 @@ export function ScheduleSection() {
         [...days.entries()].map(([day, dayItems]) => (
           <section key={day} className="space-y-2">
             {days.size > 1 && <h3 className="text-lg font-extrabold text-ink-900 first-letter:uppercase">{formatDateOnly(day)}</h3>}
-            <ol className="stagger relative space-y-3 border-l-4 border-night-100 pl-5">
+            <ol className="stagger relative space-y-4 border-l-4 border-dashed border-night-900/40 pl-5">
               {dayItems.map((item) => {
                 const isNow = item.id === currentId;
                 const responsible = people.find((p) => p.id === item.responsibleId);
@@ -65,12 +65,12 @@ export function ScheduleSection() {
                 return (
                   <li
                     key={item.id}
-                    className={`relative rounded-2xl border-2 p-4 shadow-card ${isNow ? 'border-berry-600 bg-berry-50' : 'border-mist-200 bg-white'} ${muted ? 'opacity-70' : ''}`}
+                    className={`relative rounded-xl border-[3px] border-night-900 p-4 ${isNow ? 'bg-gold-100 shadow-[0_5px_0_0_var(--color-berry-600)]' : 'bg-white shadow-block'} ${muted ? 'opacity-70' : ''}`}
                     aria-current={isNow ? 'step' : undefined}
                   >
-                    <span className={`absolute -left-[2.05rem] top-5 size-5 rounded-full border-4 border-white shadow-card ${isNow ? 'bg-berry-600' : item.status === 'done' ? 'bg-pine-600' : 'bg-night-600'}`} aria-hidden />
+                    <span className={`absolute -left-[2.05rem] top-5 size-5 rounded-md border-2 border-night-900 ${isNow ? 'bg-berry-600' : item.status === 'done' ? 'bg-pine-600' : 'bg-night-600'}`} aria-hidden />
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="rounded-full bg-night-800 px-3 py-0.5 text-base font-extrabold text-white">
+                      <p className="font-display rounded-lg bg-night-800 px-3 py-0.5 text-base font-semibold text-white">
                         {formatTime(item.startsAt, event.timezone)}
                         {item.endsAt && <span className="font-semibold text-white/85"> – {formatTime(item.endsAt, event.timezone)}</span>}
                       </p>

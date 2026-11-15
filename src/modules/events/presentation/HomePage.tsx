@@ -41,12 +41,12 @@ export function HomePage() {
     <div className="space-y-5">
       {/* 1 · Saludo y perfil */}
       <header>
-        <Link to={`${base}/perfil`} className="tap-card flex min-h-16 items-center gap-3 rounded-3xl" aria-label="Ver mi perfil">
+        <Link to={`${base}/perfil`} className="tap-card flex min-h-16 items-center gap-3 rounded-2xl" aria-label="Ver mi perfil">
           <Avatar name={me?.fullName ?? event.organizerName} colors={familyColor && { bg: familyColor.soft, fg: familyColor.text }} size="lg" />
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-2xl font-black leading-tight text-ink-900">¡Hola{me ? `, ${toTitleCase(me.firstName)}` : ''}! 👋</h1>
             <span className="flex items-center gap-0.5 text-base font-bold text-brand">
-              {context.role === 'participant' ? 'Ver mi perfil' : `${ROLE_LABELS[context.role]} · Ver mi perfil`}
+              Ver mi perfil
               <ChevronRight className="size-5 shrink-0" aria-hidden />
             </span>
           </div>
@@ -54,6 +54,7 @@ export function HomePage() {
         {myFamily && (
           <p className="mt-2">
             <FamilyBadge family={myFamily} />
+            {context.role !== 'participant' && <span className="ml-2 text-sm font-bold text-ink-700">· {ROLE_LABELS[context.role]}</span>}
           </p>
         )}
       </header>

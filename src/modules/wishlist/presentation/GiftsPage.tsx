@@ -45,8 +45,8 @@ export function GiftsPage() {
       />
 
       {budget != null && (
-        <p className="flex items-center gap-3 rounded-2xl border border-gold-300 bg-gold-50 px-4 py-3 text-base">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gold-400 text-night-900" aria-hidden>
+        <p className="flex items-center gap-3 rounded-xl border-2 border-night-900 bg-gold-100 px-4 py-3 text-base">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border-2 border-night-900 bg-gold-400 text-night-900" aria-hidden>
             <Wallet className="size-5" />
           </span>
           <span>
@@ -153,7 +153,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
                 <li key={p.id}>
                   <Link
                     to={`/e/${event.id}/regalos/persona/${p.id}`}
-                    className="tap-card flex min-h-16 items-center gap-3 rounded-2xl border border-mist-200 bg-white px-4 py-3 shadow-card hover:border-brand"
+                    className="tap-card flex min-h-16 items-center gap-3 rounded-2xl border-2 border-mist-300 bg-white px-4 py-3 shadow-card hover:border-brand"
                   >
                     <Avatar name={p.fullName} colors={g.family && { bg: FAMILY_COLORS[g.family.color].soft, fg: FAMILY_COLORS[g.family.color].text }} />
                     <span className="min-w-0 flex-1">

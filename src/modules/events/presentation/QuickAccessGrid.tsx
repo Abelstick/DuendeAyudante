@@ -46,14 +46,14 @@ export function QuickAccessGrid() {
       title: 'Regalos',
       detail: myWishes === 0 ? 'Agrega tu lista de deseos' : `${plural(myWishes, 'regalo', 'regalos')} en tu lista`,
       icon: Gift,
-      style: 'bg-gradient-to-br from-berry-500 to-berry-700 text-white',
+      style: 'bg-berry-500 text-white',
     },
     {
       to: `${base}/juegos`,
       title: 'Juegos',
       detail: pollOpen ? 'Elige tus favoritos' : gameCount === 0 ? 'Propón el primero' : `${plural(gameCount, 'idea', 'ideas')} para jugar`,
       icon: Dices,
-      style: 'bg-gradient-to-br from-night-600 to-night-800 text-white',
+      style: 'bg-sky-500 text-white',
       badge: pollOpen ? '¡A votar!' : undefined,
     },
     {
@@ -61,7 +61,7 @@ export function QuickAccessGrid() {
       title: 'Aportes y tareas',
       detail: mine.length === 0 ? 'Quién lleva qué' : pending === 0 ? '¡Todo listo de tu parte!' : `Te ${pending === 1 ? 'falta' : 'faltan'} ${pending}`,
       icon: HandPlatter,
-      style: 'bg-gradient-to-br from-pine-600 to-pine-800 text-white',
+      style: 'bg-pine-600 text-white',
       badge: pending > 0 ? `${pending}` : undefined,
     },
     {
@@ -69,7 +69,7 @@ export function QuickAccessGrid() {
       title: 'Cronograma',
       detail: activities === 0 ? 'Horarios del día' : plural(activities, 'actividad', 'actividades'),
       icon: CalendarClock,
-      style: 'bg-gradient-to-br from-gold-300 to-gold-400 text-night-900',
+      style: 'bg-gold-400 text-night-900',
     },
   ];
 
@@ -78,21 +78,28 @@ export function QuickAccessGrid() {
       <ul className="stagger grid grid-cols-2 gap-3">
         {tiles.map(({ to, title, detail, icon: Icon, style, badge }) => (
           <li key={to}>
-            <Link to={to} className={`tap-card relative flex h-full min-h-32 flex-col justify-between gap-2 overflow-hidden rounded-3xl p-4 shadow-card ${style}`}>
-              {/* brillo decorativo */}
-              <span className="pointer-events-none absolute -right-6 -top-6 size-24 rounded-full bg-white/15" aria-hidden />
+            <Link
+              to={to}
+              className={`tap-card select-ring relative flex h-full min-h-32 flex-col justify-between gap-2 overflow-hidden rounded-2xl border-[3px] border-night-900 p-3.5 shadow-block active:shadow-none ${style}`}
+            >
+              {/* franja de brillo, como la carátula de un juego */}
+              <span className="pointer-events-none absolute inset-x-0 top-0 h-2 bg-white/25" aria-hidden />
               <span className="relative flex items-start justify-between gap-2">
-                <span className="flex size-12 items-center justify-center rounded-2xl bg-white/25">
+                <span className="flex size-12 items-center justify-center rounded-xl border-2 border-night-900 bg-white text-night-900 shadow-[0_3px_0_0_var(--color-night-900)]">
                   <Icon className="size-7" aria-hidden />
                 </span>
-                {badge && <span className="whitespace-nowrap rounded-full bg-white px-2.5 py-0.5 text-sm font-black text-berry-700 shadow-card">{badge}</span>}
+                {badge && (
+                  <span className="font-display whitespace-nowrap rounded-lg border-2 border-night-900 bg-white px-2 py-0.5 text-sm font-semibold text-berry-700 motion-safe:animate-float">
+                    {badge}
+                  </span>
+                )}
               </span>
               <span className="relative">
-                <span className="flex items-center gap-0.5 text-base font-black leading-tight">
+                <span className="font-display flex items-center gap-0.5 text-lg font-semibold leading-tight">
                   {title}
                   <ChevronRight className="size-5 shrink-0" aria-hidden />
                 </span>
-                <span className="block text-sm font-semibold leading-snug opacity-95">{detail}</span>
+                <span className="block text-sm font-bold leading-snug">{detail}</span>
               </span>
             </Link>
           </li>

@@ -94,8 +94,8 @@ export function SecretFriendCard() {
       ) : (
         <>
           {/* El nombre queda dentro del regalo hasta que la persona decide abrirlo */}
-          <div className={`flex items-center gap-4 rounded-2xl border-2 p-4 transition-colors ${revealed ? 'border-gold-400 bg-gold-50' : 'border-berry-100 bg-berry-50'}`}>
-            <GiftBox tone="berry" open={revealed} className={`size-20 shrink-0 ${revealed ? '' : 'motion-safe:animate-float'}`} />
+          <div className={`flex items-center gap-4 rounded-xl border-2 border-night-900 p-4 transition-colors ${revealed ? 'bg-gold-100' : 'bg-sky-100'}`}>
+            <GiftBox tone="berry" open={revealed} className={`w-16 shrink-0 ${revealed ? '' : 'motion-safe:animate-float'}`} />
             <div className="min-w-0 flex-1 space-y-1">
               <p className="text-sm font-semibold text-ink-700">{forName ? `${forName} le regala a:` : 'Le regalas a:'}</p>
               {revealed ? (

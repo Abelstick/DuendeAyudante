@@ -1,6 +1,6 @@
 import { useMemo, type CSSProperties } from 'react';
 
-const COLORS = ['#c62828', '#176b45', '#e7b84b', '#2c4a7c', '#ffffff', '#f2d27d'];
+const COLORS = ['#de4343', '#1f8a55', '#f2b824', '#2f8ee0', '#ffffff', '#f7d066'];
 const PIECES = 28;
 
 /**

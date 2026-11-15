@@ -15,14 +15,14 @@ export function MyEventsPage() {
 
   return (
     <PublicLayout>
-      <h1 className="mb-4 rounded-3xl bg-white px-5 py-4 text-2xl font-black text-ink-900 shadow-card">Mis Navidades</h1>
+      <h1 className="mb-4 rounded-2xl border-[3px] border-night-900 bg-white px-5 py-4 text-2xl font-semibold text-night-900 shadow-block">Mis Navidades</h1>
       {events.error && <Notice tone="error">{errorMessage(events.error)}</Notice>}
       <ul className="stagger space-y-3">
         {(events.data ?? []).map(({ event, role }) => (
           <li key={event.id}>
             <Link
               to={`/e/${event.id}`}
-              className="tap-card flex min-h-20 items-center justify-between gap-3 rounded-3xl border border-mist-200 bg-white p-5 shadow-card hover:border-brand"
+              className="tap-card flex min-h-20 items-center justify-between gap-3 rounded-2xl border-[3px] border-night-900 bg-white p-5 shadow-block hover:border-brand"
             >
               <span>
                 <span className="block text-lg font-extrabold text-ink-900">🎄 {event.name}</span>

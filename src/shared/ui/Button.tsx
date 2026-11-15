@@ -5,7 +5,7 @@ type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'whatsapp' | 'gold
 type Size = 'md' | 'lg';
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-2xl font-extrabold select-none text-center disabled:opacity-55 disabled:cursor-not-allowed';
+  'font-display [&>svg]:shrink-0 inline-flex items-center justify-center gap-2 rounded-xl font-semibold tracking-wide select-none text-center disabled:opacity-55 disabled:cursor-not-allowed';
 
 /**
  * Jerarquía de acciones:
@@ -16,18 +16,18 @@ const base =
  *  · gold      → momentos especiales (ruleta, sorteos, premios).
  */
 const variants: Record<Variant, string> = {
-  primary: 'btn-3d bg-brand text-white hover:bg-brand-strong [--btn-edge:var(--brand-strong)]',
-  secondary: 'btn-3d bg-white text-brand border-2 border-mist-300 hover:border-brand hover:bg-brand-soft [--btn-edge:var(--color-mist-300)]',
-  danger: 'btn-3d bg-berry-600 text-white hover:bg-berry-700 [--btn-edge:var(--color-berry-700)]',
-  ghost: 'bg-transparent text-brand hover:bg-brand-soft active:bg-brand-soft transition-colors',
-  whatsapp: 'btn-3d bg-[#1f8f4e] text-white hover:bg-[#187540] [--btn-edge:#14633a]',
-  gold: 'btn-3d bg-gold-400 text-night-900 hover:bg-gold-300 [--btn-edge:var(--color-gold-600)]',
+  primary: 'btn-3d border-2 border-night-900 bg-brand text-white hover:bg-brand-strong',
+  secondary: 'btn-3d border-2 border-night-900 bg-white text-night-900 hover:bg-brand-soft',
+  danger: 'btn-3d border-2 border-night-900 bg-berry-600 text-white hover:bg-berry-700',
+  ghost: 'bg-transparent text-brand underline decoration-2 underline-offset-4 hover:bg-brand-soft active:bg-brand-soft transition-colors',
+  whatsapp: 'btn-3d border-2 border-night-900 bg-[#1f8f4e] text-white hover:bg-[#187540]',
+  gold: 'btn-3d border-2 border-night-900 bg-gold-400 text-night-900 hover:bg-gold-300',
 };
 
 // Áreas táctiles de 48 px o más
 const sizes: Record<Size, string> = {
-  md: 'min-h-12 px-4 py-2 text-base',
-  lg: 'min-h-14 px-6 py-3 text-lg w-full',
+  md: 'min-h-12 px-4 py-2 text-lg',
+  lg: 'min-h-14 px-6 py-3 text-xl w-full',
 };
 
 export function buttonClasses(variant: Variant = 'primary', size: Size = 'md', extra = '') {

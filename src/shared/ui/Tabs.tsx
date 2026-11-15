@@ -19,7 +19,7 @@ export function SegmentedTabs<T extends string>({ label, value, options, onChang
     <div
       role="tablist"
       aria-label={label}
-      className="grid gap-1.5 rounded-2xl bg-mist-200 p-1.5"
+      className="grid gap-1.5 rounded-2xl border-[3px] border-night-900 bg-night-800 p-1.5 shadow-block"
       style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
     >
       {options.map((o) => {
@@ -31,8 +31,8 @@ export function SegmentedTabs<T extends string>({ label, value, options, onChang
             role="tab"
             aria-selected={active}
             onClick={() => onChange(o.value)}
-            className={`flex min-h-13 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-sm font-extrabold leading-tight transition-colors sm:flex-row sm:gap-2 sm:text-base ${
-              active ? 'bg-white text-brand shadow-card' : 'text-ink-700 hover:bg-white/60'
+            className={`font-display flex min-h-13 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-sm font-semibold leading-tight transition-colors sm:flex-row sm:gap-2 sm:text-base ${
+              active ? 'animate-hop bg-gold-400 text-night-900' : 'text-white hover:bg-white/15'
             }`}
           >
             {o.icon}
@@ -46,10 +46,10 @@ export function SegmentedTabs<T extends string>({ label, value, options, onChang
 
 /** Estilo de las opciones tipo "ficha" (elegir persona, filtro, etc.). */
 export function chipClasses(active: boolean) {
-  return `min-h-12 rounded-full border-2 px-4 text-base font-bold transition-colors ${
-    active ? 'border-brand bg-brand text-white' : 'border-mist-300 bg-white text-ink-900 hover:border-brand'
+  return `btn-3d font-display min-h-12 rounded-xl border-2 border-night-900 px-4 text-base font-semibold ${
+    active ? 'bg-brand text-white' : 'bg-white text-night-900 hover:bg-brand-soft'
   }`;
 }
 
 /** Estilo común de los <select>. */
-export const selectClasses = 'min-h-12 w-full rounded-xl border-2 border-mist-300 bg-white px-3 text-base text-ink-900 focus:border-brand focus:outline-none';
+export const selectClasses = 'min-h-12 w-full rounded-xl border-2 border-night-900 bg-white px-3 text-base text-ink-900 focus:outline-none focus:ring-4 focus:ring-aqua-400';

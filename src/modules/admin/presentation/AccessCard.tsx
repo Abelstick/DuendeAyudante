@@ -37,7 +37,7 @@ export function AccessCard({ firstName, username, password, onClose }: Props) {
   };
 
   return (
-    <div className="animate-pop-in space-y-4 rounded-3xl border-2 border-brand bg-brand-soft p-5">
+    <div className="animate-pop-in space-y-4 rounded-2xl border-2 border-brand bg-brand-soft p-5">
       <div className="space-y-1 text-lg">
         <p>
           🏠 Código: <strong className="select-all tracking-wider">{event.joinCode}</strong>

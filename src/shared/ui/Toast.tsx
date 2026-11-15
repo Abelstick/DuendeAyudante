@@ -18,9 +18,9 @@ interface ToastApi {
 const ToastContext = createContext<ToastApi | null>(null);
 
 const toneStyles: Record<ToastItem['tone'], string> = {
-  success: 'bg-pine-700 text-white',
+  success: 'bg-pine-600 text-white',
   error: 'bg-berry-600 text-white',
-  celebrate: 'bg-night-800 text-white ring-2 ring-gold-400',
+  celebrate: 'bg-gold-400 text-night-900',
 };
 
 /** Confirmaciones claras y visibles después de cada acción (sin ventanas emergentes). */
@@ -56,11 +56,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={t.id}
             role={t.tone === 'error' ? 'alert' : undefined}
-            className={`animate-pop-in pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-2xl px-5 py-4 text-lg font-bold shadow-lift ${toneStyles[t.tone]}`}
+            className={`animate-pop-in pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-xl border-[3px] border-night-900 px-5 py-4 text-lg font-bold shadow-block ${toneStyles[t.tone]}`}
           >
             {t.tone === 'success' && <CheckCircle2 className="size-7 shrink-0" aria-hidden />}
             {t.tone === 'error' && <XCircle className="size-7 shrink-0" aria-hidden />}
-            {t.tone === 'celebrate' && <PartyPopper className="size-7 shrink-0 text-gold-400" aria-hidden />}
+            {t.tone === 'celebrate' && <PartyPopper className="size-7 shrink-0 motion-safe:animate-wiggle" aria-hidden />}
             {t.message}
           </div>
         ))}

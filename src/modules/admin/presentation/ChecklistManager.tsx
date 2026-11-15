@@ -51,7 +51,7 @@ export function ChecklistManager({ eventId, families, members }: Props) {
             const target = active.filter((m) => appliesTo(item, m));
             const done = target.filter((m) => progress.data?.some((p) => p.itemId === item.id && p.participantId === m.id)).length;
             return (
-              <li key={item.id} className="space-y-2 rounded-2xl border border-mist-200 bg-white p-4">
+              <li key={item.id} className="space-y-2 rounded-2xl border-2 border-mist-300 bg-white p-4">
                 <p className="text-lg font-semibold">{item.title}</p>
                 {item.description && <p className="text-sm text-ink-700">{item.description}</p>}
                 <div className="flex flex-wrap items-center gap-2 text-sm text-ink-700">

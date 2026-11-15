@@ -42,7 +42,7 @@ export function PersonGiftsPage() {
       <ButtonLink to={`/e/${event.id}/regalos?vista=todos`} variant="ghost" icon={<ArrowLeft className="size-5" aria-hidden />}>
         Volver a Regalos de todos
       </ButtonLink>
-      <header className="flex items-center gap-4 rounded-3xl border border-mist-200 bg-white p-5 shadow-card">
+      <header className="flex items-center gap-4 rounded-2xl border-[3px] border-night-900 bg-white p-5 shadow-block">
         <Avatar name={person.fullName} size="lg" colors={family && { bg: FAMILY_COLORS[family.color].soft, fg: FAMILY_COLORS[family.color].text }} />
         <div className="min-w-0 space-y-1">
           <p className="text-sm font-bold uppercase tracking-wide text-ink-500">Lista de deseos de</p>

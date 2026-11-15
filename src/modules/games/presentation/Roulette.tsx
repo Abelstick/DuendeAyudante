@@ -10,7 +10,7 @@ const prefersReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion:
 
 const SPIN_MS = 2600;
 const MAX_SLICES = 12;
-const SLICE_COLORS = ['#c62828', '#e7b84b', '#176b45', '#2c4a7c', '#de4343', '#f2d27d'];
+const SLICE_COLORS = ['#de4343', '#f2b824', '#1f8a55', '#2f8ee0', '#ffffff', '#f7d066'];
 
 /** Fondo de la ruleta: un gajo de color por juego (hasta 12, para que se distingan). */
 function wheelBackground(slices: number): string {
@@ -88,25 +88,25 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
   if (games.length === 0) return null;
 
   return (
-    <section aria-labelledby="roulette-title" className="sky-bg snow-bg relative space-y-4 overflow-hidden rounded-[1.75rem] p-5 text-white shadow-lift">
+    <section aria-labelledby="roulette-title" className="sky-bg snow-bg relative space-y-4 overflow-hidden rounded-2xl border-[3px] border-night-900 p-5 text-white shadow-lift">
       <div className="flex items-center gap-4">
         {/* Ruleta (decorativa: el resultado siempre aparece escrito) */}
         <div className="relative size-28 shrink-0" aria-hidden>
-          <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1 border-x-[10px] border-t-[16px] border-x-transparent border-t-gold-300 drop-shadow" />
+          <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1.5 border-x-[11px] border-t-[18px] border-x-transparent border-t-gold-400" />
           <div
-            className="size-full rounded-full border-4 border-white shadow-lift"
+            className="size-full rounded-full border-4 border-white shadow-[0_5px_0_0_#000]"
             style={{
               background: wheelBackground(slices),
               transform: `rotate(${rotation}deg)`,
               transition: spinning ? `transform ${SPIN_MS}ms cubic-bezier(0.15, 0.8, 0.2, 1)` : 'none',
             }}
           />
-          <span className="absolute left-1/2 top-1/2 flex size-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-night-800 shadow-card">
+          <span className="absolute left-1/2 top-1/2 flex size-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl border-2 border-night-900 bg-white text-night-900">
             <Dices className="size-6" />
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <h2 id="roulette-title" className="text-2xl font-black leading-tight">
+          <h2 id="roulette-title" className="text-2xl font-semibold leading-tight text-gold-300">
             Ruleta de juegos
           </h2>
           <p className="text-base text-white/90">
@@ -116,9 +116,9 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
       </div>
 
       {display && (
-        <div className={`rounded-2xl bg-white p-4 text-center text-ink-900 ${spinning ? '' : 'animate-pop-in ring-4 ring-gold-400'}`} aria-live={spinning ? 'off' : 'polite'}>
+        <div className={`rounded-xl border-[3px] bg-white p-4 text-center text-ink-900 ${spinning ? 'border-white' : 'animate-pop-in border-gold-400'}`} aria-live={spinning ? 'off' : 'polite'}>
           <p className="text-sm font-bold uppercase tracking-wide text-ink-500">{spinning ? 'Eligiendo…' : '¡Les toca jugar!'}</p>
-          <p className={`text-2xl font-black leading-tight ${spinning ? 'text-ink-500' : 'text-brand'}`}>
+          <p className={`font-display text-2xl font-semibold leading-tight ${spinning ? 'text-ink-500' : 'text-night-900'}`}>
             {!spinning && <span aria-hidden>🎉 </span>}
             {display.name}
           </p>
@@ -131,7 +131,7 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
       )}
 
       {result && !spinning && (
-        <div className="animate-pop-in space-y-3 rounded-2xl bg-white p-4 text-ink-900">
+        <div className="animate-pop-in space-y-3 rounded-xl bg-white p-4 text-ink-900">
           {result.description && <p className="whitespace-pre-line text-base">{result.description}</p>}
           <GameDetails game={result} participants={participants} />
         </div>
@@ -140,6 +140,7 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
       <div className="flex flex-col gap-2 sm:flex-row">
         <Button
           variant="gold"
+          style={{ ['--btn-edge' as string]: '#000' }}
           size={display ? 'md' : 'lg'}
           onClick={spin}
           disabled={spinning}
@@ -149,7 +150,7 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
           {spinning ? 'Girando…' : display ? 'Girar otra vez' : '¡Girar la ruleta!'}
         </Button>
         {canMarkPlayed && result && !spinning && (
-          <Button variant="secondary" onClick={() => onMarkPlayed(result)} icon={<CheckCircle2 className="size-5" aria-hidden />} className="sm:flex-1">
+          <Button variant="secondary" style={{ ['--btn-edge' as string]: '#000' }} onClick={() => onMarkPlayed(result)} icon={<CheckCircle2 className="size-5" aria-hidden />} className="sm:flex-1">
             Ya lo jugamos
           </Button>
         )}

@@ -88,7 +88,7 @@ export function GamesPage() {
       {pollStatus === 'open' && voter && (
         <Card className="space-y-3 border-2 border-brand!">
           <CardTitle icon={<Vote className="size-6" />} action={<Pill tone={remaining > 0 ? 'brand' : 'success'}>{pollMax - remaining} de {pollMax}</Pill>}>
-            ¡La votación está abierta!
+            ¡Votación abierta!
           </CardTitle>
           {acting.length > 1 && (
             <fieldset>
@@ -238,7 +238,7 @@ export function GamesPage() {
           <SectionTitle>✅ Ya jugamos</SectionTitle>
           <ul className="space-y-2">
             {played.map((g) => (
-              <li key={g.id} className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-mist-200 bg-white px-4 py-3">
+              <li key={g.id} className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border-2 border-mist-300 bg-white px-4 py-3">
                 <span className="text-base font-bold text-ink-700">{g.name}</span>
                 {isEditor && (
                   <Button

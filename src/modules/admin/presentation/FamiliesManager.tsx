@@ -31,7 +31,7 @@ export function FamiliesManager({ eventId, families, participants }: { eventId: 
             const count = participants.filter((p) => p.familyId === f.id).length;
             const color = FAMILY_COLORS[f.color];
             return (
-              <li key={f.id} className="overflow-hidden rounded-2xl border border-mist-200 bg-white shadow-card">
+              <li key={f.id} className="overflow-hidden rounded-2xl border-2 border-mist-300 bg-white shadow-card">
                 <div className="h-3" style={{ backgroundColor: FAMILY_THEMES[f.color].strong }} aria-hidden />
                 <div className="space-y-2 p-4">
                   <p className="text-lg font-bold" style={{ color: color.text }}>

@@ -37,13 +37,13 @@ export function WelcomePage() {
           Aquí tu familia registra los regalos que le gustaría recibir y se organiza para celebrar la Navidad juntos.
         </p>
         <ul className="grid grid-cols-3 gap-2 text-sm font-bold" aria-label="Qué puedes hacer">
-          <li className="flex flex-col items-center gap-1 rounded-2xl bg-berry-50 px-1 py-3 text-berry-700">
+          <li className="flex flex-col items-center gap-1 rounded-xl border-2 border-night-900 bg-berry-50 px-1 py-3 text-berry-700">
             <Gift className="size-7" aria-hidden /> Regalos
           </li>
-          <li className="flex flex-col items-center gap-1 rounded-2xl bg-night-50 px-1 py-3 text-night-700">
+          <li className="flex flex-col items-center gap-1 rounded-xl border-2 border-night-900 bg-night-50 px-1 py-3 text-night-700">
             <Dices className="size-7" aria-hidden /> Juegos
           </li>
-          <li className="flex flex-col items-center gap-1 rounded-2xl bg-pine-100 px-1 py-3 text-pine-700">
+          <li className="flex flex-col items-center gap-1 rounded-xl border-2 border-night-900 bg-pine-100 px-1 py-3 text-pine-700">
             <PartyPopper className="size-7" aria-hidden /> Celebración
           </li>
         </ul>

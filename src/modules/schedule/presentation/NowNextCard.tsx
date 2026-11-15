@@ -28,20 +28,20 @@ export function NowNextCard() {
   return (
     <Link
       to={`/e/${event.id}/celebracion?vista=cronograma`}
-      className="tap-card flex items-center gap-3 rounded-3xl border border-night-100 bg-night-50 p-4 shadow-card"
+      className="tap-card flex items-center gap-3 rounded-2xl border-[3px] border-night-900 bg-sky-100 p-4 shadow-block active:shadow-none"
       aria-label="Ver el cronograma completo"
     >
-      <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-night-800 text-gold-300" aria-hidden>
+      <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-night-900 bg-night-700 text-gold-300" aria-hidden>
         <Clock className="size-6" />
       </span>
       <span className="min-w-0 flex-1 space-y-0.5">
         {current && (
           <span className="block">
-            <span className="mr-2 inline-flex items-center gap-1.5 rounded-full bg-berry-600 px-2.5 py-0.5 text-sm font-black text-white">
+            <span className="font-display mr-2 inline-flex items-center gap-1.5 rounded-lg border-2 border-night-900 bg-berry-600 px-2 py-0.5 text-sm font-semibold text-white">
               <span className="size-2 rounded-full bg-white motion-safe:animate-pulse" aria-hidden />
               AHORA
             </span>
-            <span className="text-lg font-extrabold text-night-900">{current.title}</span>
+            <span className="font-display text-lg font-semibold text-night-900">{current.title}</span>
           </span>
         )}
         {next && (

@@ -143,7 +143,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 rounded-3xl border border-mist-200 bg-white p-4 shadow-card" noValidate>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 rounded-2xl border-[3px] border-night-900 bg-white p-4 shadow-block" noValidate>
         <h3 className="text-lg font-extrabold text-ink-900">Agregar a un familiar</h3>
 
         <TextField label="Nombre" autoComplete="off" error={errors.firstName?.message} {...register('firstName')} />

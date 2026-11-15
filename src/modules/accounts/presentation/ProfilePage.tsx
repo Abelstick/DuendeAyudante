@@ -120,7 +120,7 @@ export function ProfilePage() {
       {(myEvents.data?.length ?? 0) > 1 && (
         <Link
           to="/mis-navidades"
-          className="tap-card flex min-h-14 items-center justify-between gap-3 rounded-2xl border border-mist-200 bg-white px-5 text-lg font-bold text-brand shadow-card"
+          className="tap-card flex min-h-14 items-center justify-between gap-3 rounded-2xl border-2 border-mist-300 bg-white px-5 text-lg font-bold text-brand shadow-card"
         >
           Ver mis otras Navidades
           <ChevronRight className="size-6" aria-hidden />
