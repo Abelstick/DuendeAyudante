@@ -25,4 +25,20 @@ export interface IEventRepository {
   updateBudget(eventId: string, amount: number): Promise<void>;
   /** Cambia la descripción de la celebración (null la borra). */
   updateDescription(eventId: string, description: string | null): Promise<void>;
+  /** Cambia la dirección de la celebración (null la borra). */
+  updateAddress(eventId: string, address: string | null): Promise<void>;
+  /** Crea la Navidad del próximo año copiando lo elegido; devuelve su id. */
+  duplicate(data: DuplicateEventData): Promise<string>;
+}
+
+export interface DuplicateEventData {
+  sourceEventId: string;
+  name: string;
+  /** Ya normalizado: "GARCIA27" */
+  joinCode: string;
+  celebrationAt: Date;
+  copyMembers: boolean;
+  copyChecklist: boolean;
+  copyResponsibilities: boolean;
+  copySchedule: boolean;
 }

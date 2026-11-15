@@ -1,7 +1,7 @@
 import { AppError } from '@/shared/domain/errors';
 import { zonedDateTimeToInstant } from '@/shared/lib/datetime';
 import { isValidPersonName, JOIN_CODE_PATTERN, normalizeJoinCode } from '@/shared/validation/names';
-import type { CreateEventInput } from '../domain/Event';
+import type { CreateEventInput, DuplicateEventInput } from '../domain/Event';
 import type { IEventRepository } from '../domain/IEventRepository';
 
 export class EventService {
@@ -43,6 +43,32 @@ export class EventService {
     const text = description.trim();
     if (text.length > 1000) throw new AppError('DESCRIPTION_TOO_LONG');
     return this.events.updateDescription(eventId, text || null);
+  }
+
+  /** Dirección en una sola línea, hasta 300 letras; vacía la borra. */
+  updateAddress(eventId: string, address: string): Promise<void> {
+    const text = address.trim().replace(/\s+/g, ' ');
+    if (text.length > 300) throw new AppError('ADDRESS_TOO_LONG');
+    return this.events.updateAddress(eventId, text || null);
+  }
+
+  async duplicate(input: DuplicateEventInput): Promise<string> {
+    if (!input.name.trim()) throw new AppError('EVENT_NAME_INVALID');
+    const joinCode = normalizeJoinCode(input.joinCode);
+    if (!JOIN_CODE_PATTERN.test(joinCode)) throw new AppError('JOIN_CODE_INVALID');
+    const celebrationAt = zonedDateTimeToInstant(input.date, input.time, input.timezone);
+    if (Number.isNaN(celebrationAt.getTime())) throw new AppError('DATE_INVALID');
+    return this.events.duplicate({
+      sourceEventId: input.sourceEventId,
+      name: input.name.trim(),
+      joinCode,
+      celebrationAt,
+      copyMembers: input.copyMembers,
+      copyChecklist: input.copyChecklist,
+      // Los responsables son personas y familias: sin ellas no hay a quién asignarlos
+      copyResponsibilities: input.copyResponsibilities && input.copyMembers,
+      copySchedule: input.copySchedule,
+    });
   }
 
   async create(input: CreateEventInput): Promise<string> {

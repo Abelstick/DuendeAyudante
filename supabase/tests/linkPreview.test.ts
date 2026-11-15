@@ -1,0 +1,80 @@
+import { describe, expect, it } from 'vitest';
+import { decodeEntities, isSafePublicUrl, parseLinkMetadata, parsePrice } from '../functions/link-preview/parse';
+
+describe('vista previa de enlaces: precio', () => {
+  it.each([
+    ['S/ 59.90', 59.9],
+    ['1,299.90', 1299.9],
+    ['1.299,90', 1299.9],
+    ['59,9', 59.9],
+    ['1,299', 1299],
+    ['2.500', 2500],
+    [149, 149],
+    ['gratis', null],
+    ['0', null],
+  ])('%s → %s', (raw, expected) => {
+    expect(parsePrice(raw)).toBe(expected);
+  });
+});
+
+describe('vista previa de enlaces: datos de la página', () => {
+  it('prefiere el producto de JSON-LD (nombre, precio, moneda y foto)', () => {
+    const html = `
+      <html><head>
+        <title>Polo Azul | Tienda.pe</title>
+        <meta property="og:title" content="Otro título">
+        <meta property="og:site_name" content="Tienda">
+        <script type="application/ld+json">
+          {"@context":"https://schema.org","@graph":[{"@type":"WebPage"},{"@type":"Product","name":"Polo Azul Talla M","image":["/img/polo.jpg"],
+           "offers":{"@type":"Offer","price":"79.90","priceCurrency":"PEN"}}]}
+        </script>
+      </head></html>`;
+    expect(parseLinkMetadata(html, 'https://tienda.pe/p/1')).toEqual({
+      title: 'Polo Azul Talla M',
+      price: 79.9,
+      currency: 'PEN',
+      image: 'https://tienda.pe/img/polo.jpg',
+      siteName: 'Tienda',
+    });
+  });
+
+  it('usa Open Graph y quita el nombre de la tienda del título', () => {
+    const html = `<meta content="Audífonos Bluetooth &amp; Estuche - Tienda.com" property="og:title" />
+      <meta property="product:price:amount" content="1.299,00"><meta property="product:price:currency" content="pen">
+      <meta property='og:image' content='https://cdn.tienda.com/a.png'>`;
+    expect(parseLinkMetadata(html, 'https://tienda.com/x')).toMatchObject({
+      title: 'Audífonos Bluetooth & Estuche',
+      price: 1299,
+      currency: 'PEN',
+      image: 'https://cdn.tienda.com/a.png',
+    });
+  });
+
+  it('sin datos de producto, al menos el título de la página', () => {
+    expect(parseLinkMetadata('<title> Mi página </title>', 'https://x.com')).toEqual({ title: 'Mi página', price: null, currency: null, image: null, siteName: null });
+  });
+
+  it('decodifica entidades', () => {
+    expect(decodeEntities('Ni&ntilde;o &#233; &#x41; &quot;')).toBe('Ni&ntilde;o é A "');
+  });
+});
+
+describe('vista previa de enlaces: seguridad', () => {
+  it.each([
+    ['https://www.falabella.com.pe/producto/1', true],
+    ['http://tienda.pe', true],
+    ['ftp://tienda.pe', false],
+    ['http://localhost:3000', false],
+    ['http://127.0.0.1', false],
+    ['http://10.0.0.5', false],
+    ['http://192.168.1.1', false],
+    ['http://169.254.169.254/latest/meta-data', false],
+    ['http://[::1]/', false],
+    ['http://intranet/', false],
+    ['https://user:pass@tienda.pe', false],
+    ['https://tienda.pe:8080', false],
+    ['http://8.8.8.8', true],
+  ])('%s → %s', (url, ok) => {
+    expect(isSafePublicUrl(url)).toBe(ok);
+  });
+});

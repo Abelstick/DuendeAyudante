@@ -1,4 +1,6 @@
-import { ChevronRight, LayoutGrid, Settings, Users } from 'lucide-react';
+import { ChevronRight, LayoutGrid, Settings, Sparkles, Users } from 'lucide-react';
+import { MessagesHomeCard } from '@/modules/messages/presentation/MessagesHomeCard';
+import { AddressCard } from './AddressCard';
 import { Link } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { AnnouncementsHomeCard } from '@/modules/announcements/presentation/AnnouncementsHomeCard';
@@ -63,7 +65,26 @@ export function HomePage() {
       {/* 2 · Banner con la cuenta regresiva */}
       <Countdown target={event.celebrationAt} timezone={event.timezone} title={event.name} description={event.description} budget={budget} currency={event.currency} />
 
+      {/* Ya empezó la celebración: los recuerdos del año */}
+      {event.celebrationAt.getTime() <= Date.now() && (
+        <Link
+          to={`${base}/recuerdos`}
+          className="tap-card flex items-center gap-3 rounded-2xl border-2 border-night-900 bg-gold-50 p-4 shadow-block active:shadow-none"
+        >
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-night-900 bg-gold-400 text-night-900" aria-hidden>
+            <Sparkles className="size-6" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-lg font-extrabold text-ink-900">Recuerdos de esta Navidad</span>
+            <span className="block text-sm font-semibold text-ink-700">Cuántos fuimos, el juego favorito y más, para compartir</span>
+          </span>
+          <ChevronRight className="size-6 shrink-0 text-brand" aria-hidden />
+        </Link>
+      )}
+
       <NowNextCard />
+
+      <AddressCard />
 
       {/* 3 · Anuncios */}
       <AnnouncementsHomeCard />
@@ -82,6 +103,8 @@ export function HomePage() {
       <ChecklistCard />
 
       <SecretFriendCard />
+
+      <MessagesHomeCard />
 
       <MyResponsibilitiesCard />
 

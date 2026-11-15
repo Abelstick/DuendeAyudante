@@ -1005,3 +1005,219 @@ describe('Google Drive general de la celebración', () => {
     expect(trash.rows).toEqual([{ event_id: eventA, family_id: null }]);
   });
 });
+
+describe('dirección de la celebración', () => {
+  it('quien administra la cambia; los participantes no', async () => {
+    const upd = await as(ids.ownerA, (tx) => tx.query(`update public.events set address = 'Av. Larco 123, Miraflores' where id = $1`, [eventA]));
+    expect(upd.affectedRows).toBe(1);
+    const hack = await as(ids.rosa, (tx) => tx.query(`update public.events set address = 'X' where id = $1`, [eventA]));
+    expect(hack.affectedRows).toBe(0);
+    await expect(
+      as(ids.ownerA, (tx) => tx.query(`update public.events set address = repeat('a', 301) where id = $1`, [eventA])),
+    ).rejects.toThrow(/check constraint/);
+  });
+});
+
+describe('cuentas claras', () => {
+  const saveExpense = (userId: string, args: unknown[]) =>
+    as(userId, (tx) => tx.query<{ id: string }>(`select public.save_expense($1, $2, $3, $4, $5, $6::uuid[], $7, $8) as id`, args));
+  const people = (...list: (string | undefined)[]) => `{${list.join(',')}}`;
+  let pavo = '';
+
+  it('cada quien registra lo que pagó, dividido entre varias personas', async () => {
+    const r = await saveExpense(ids.rosa, [eventA, 'expense', 'Pavo', 120, participant.rosa, people(participant.rosa, participant.papa, participant.editor), null, null]);
+    pavo = r.rows[0]!.id;
+    const shares = await db.query(`select 1 from public.expense_shares where expense_id = $1`, [pavo]);
+    expect(shares.rows).toHaveLength(3);
+  });
+
+  it('el tutor registra lo que pagó su hijo; nadie registra pagos a nombre de otro', async () => {
+    await saveExpense(ids.papa, [eventA, 'expense', 'Panetón', 30, participant.nino, people(participant.nino, participant.papa), null, null]);
+    await expect(saveExpense(ids.rosa, [eventA, 'expense', 'Hack', 10, participant.papa, people(participant.rosa), null, null])).rejects.toThrow(/FORBIDDEN/);
+  });
+
+  it('editores y organizador registran cualquier gasto', async () => {
+    await saveExpense(ids.editor, [eventA, 'expense', 'Bebidas', 50, participant.papa, people(participant.papa, participant.rosa), null, null]);
+  });
+
+  it('valida montos, personas y pagos', async () => {
+    const mine = people(participant.rosa);
+    await expect(saveExpense(ids.rosa, [eventA, 'expense', 'X', 0, participant.rosa, mine, null, null])).rejects.toThrow(/AMOUNT_INVALID/);
+    await expect(saveExpense(ids.rosa, [eventA, 'expense', 'X', 10.555, participant.rosa, mine, null, null])).rejects.toThrow(/AMOUNT_INVALID/);
+    await expect(saveExpense(ids.rosa, [eventA, 'expense', ' ', 10, participant.rosa, mine, null, null])).rejects.toThrow(/EXPENSE_DESCRIPTION_INVALID/);
+    await expect(saveExpense(ids.rosa, [eventA, 'expense', 'X', 10, participant.rosa, '{}', null, null])).rejects.toThrow(/EXPENSE_SHARES_REQUIRED/);
+    await expect(saveExpense(ids.rosa, [eventA, 'payment', 'Pago', 10, participant.rosa, mine, null, null])).rejects.toThrow(/PAYMENT_RECEIVER_INVALID/);
+    const otherEvent = await db.query<{ id: string }>(`select id from public.participants where event_id = $1 limit 1`, [eventB]);
+    await expect(saveExpense(ids.rosa, [eventA, 'expense', 'X', 10, participant.rosa, people(otherEvent.rows[0]!.id), null, null])).rejects.toThrow(
+      /PARTICIPANT_NOT_FOUND/,
+    );
+  });
+
+  it('quien recibe un pago también puede registrarlo', async () => {
+    // Papá le pagó a Rosa; lo anota Rosa
+    await saveExpense(ids.rosa, [eventA, 'payment', 'Pago', 40, participant.papa, people(participant.rosa), null, null]);
+  });
+
+  it('solo lo edita o borra quien puede escribirlo', async () => {
+    await expect(saveExpense(ids.papa, [eventA, 'expense', 'Pavo', 999, participant.papa, people(participant.papa), null, pavo])).rejects.toThrow(/FORBIDDEN/);
+    await expect(as(ids.papa, (tx) => tx.query(`select public.delete_expense($1)`, [pavo]))).rejects.toThrow(/FORBIDDEN/);
+    await saveExpense(ids.rosa, [eventA, 'expense', 'Pavo grande', 150, participant.rosa, people(participant.rosa, participant.papa), null, pavo]);
+    const shares = await db.query(`select 1 from public.expense_shares where expense_id = $1`, [pavo]);
+    expect(shares.rows).toHaveLength(2);
+  });
+
+  it('nadie escribe directo en las tablas; la otra Navidad no ve nada', async () => {
+    await expectDenied(
+      as(ids.rosa, (tx) =>
+        tx.query(`insert into public.expenses (event_id, description, amount, paid_by_participant_id) values ($1, 'X', 1, $2)`, [eventA, participant.rosa]),
+      ),
+    );
+    const visible = await as(ids.papa, (tx) => tx.query(`select 1 from public.expenses`));
+    expect(visible.rows).toHaveLength(4);
+    const other = await as(ids.ownerB, (tx) => tx.query(`select 1 from public.expenses union all select 1 from public.expense_shares`));
+    expect(other.rows).toHaveLength(0);
+    await expect(as(ids.ownerB, (tx) => tx.query(`select public.delete_expense($1)`, [pavo]))).rejects.toThrow(/NOT_FOUND/);
+  });
+});
+
+describe('mensajes navideños', () => {
+  const write = (userId: string, from: string | undefined, to: string | undefined, body = '¡Feliz Navidad!', anonymous = false) =>
+    as(userId, (tx) =>
+      tx.query(`insert into public.holiday_messages (event_id, from_participant_id, to_participant_id, body, anonymous) values ($1, $2, $3, $4, $5)`, [
+        eventA,
+        from,
+        to,
+        body,
+        anonymous,
+      ]),
+    );
+  const received = (userId: string) =>
+    as(userId, (tx) =>
+      tx.query<{ to_participant_id: string; from_name: string | null; body: string | null; unlocked: boolean }>(
+        `select to_participant_id, from_name, body, unlocked from public.list_received_messages($1)`,
+        [eventA],
+      ),
+    );
+  const setCelebration = (when: string) => db.query(`update public.events set celebration_at = $1 where id = $2`, [when, eventA]);
+
+  it('la hora de apertura es la medianoche siguiente al día de la celebración, en la zona del evento', async () => {
+    const r = await db.query<{ at: Date }>(`select app.event_unlock_at($1) as at`, [eventA]);
+    expect(new Date(r.rows[0]!.at).toISOString()).toBe('2026-12-25T05:00:00.000Z'); // 25 dic 00:00 en Lima
+  });
+
+  it('cada quien escribe a nombre suyo (o de su hijo), nunca a nombre de otro', async () => {
+    await write(ids.rosa, participant.rosa, participant.papa, 'Te quiero, papá');
+    await write(ids.papa, participant.nino, participant.rosa, 'De tu sobrino', true);
+    await write(ids.editor, participant.editor, participant.nino, 'Para Pedrito');
+    await expectDenied(write(ids.rosa, participant.editor, participant.papa));
+    await expect(write(ids.rosa, participant.rosa, participant.rosa)).rejects.toThrow(/check constraint/);
+  });
+
+  it('antes de la medianoche quien recibe solo sabe que tiene mensajes', async () => {
+    const r = await received(ids.papa); // Papá y Pedrito (a su cargo)
+    expect(r.rows).toHaveLength(2);
+    expect(r.rows.every((m) => m.body === null && m.from_name === null && m.unlocked === false)).toBe(true);
+  });
+
+  it('nadie más los lee: ni el organizador ni otros participantes', async () => {
+    for (const user of [ids.ownerA, ids.editor]) {
+      const direct = await as(user, (tx) => tx.query(`select 1 from public.holiday_messages where from_participant_id = $1`, [participant.rosa]));
+      expect(direct.rows).toHaveLength(0);
+    }
+    const owner = await received(ids.ownerA);
+    expect(owner.rows).toHaveLength(0);
+    await expect(as(ids.ownerB, (tx) => tx.query(`select * from public.list_received_messages($1)`, [eventA]))).rejects.toThrow(/NOT_A_MEMBER/);
+  });
+
+  it('desde la medianoche se leen, con firma salvo los anónimos', async () => {
+    await setCelebration('2020-12-24 19:00-05');
+    const rosa = await received(ids.rosa);
+    expect(rosa.rows).toEqual([{ to_participant_id: participant.rosa, from_name: null, body: 'De tu sobrino', unlocked: true }]);
+    const papa = await received(ids.papa);
+    expect(papa.rows.find((m) => m.to_participant_id === participant.papa)).toMatchObject({ from_name: 'ROSA GARCÍA', body: 'Te quiero, papá' });
+    await setCelebration('2026-12-24 19:00-05');
+  });
+
+  it('quien escribió lo cambia o lo borra; quien recibe no', async () => {
+    const upd = await as(ids.rosa, (tx) => tx.query(`update public.holiday_messages set body = 'Te quiero mucho' where from_participant_id = $1`, [participant.rosa]));
+    expect(upd.affectedRows).toBe(1);
+    const del = await as(ids.papa, (tx) => tx.query(`delete from public.holiday_messages where from_participant_id = $1`, [participant.rosa]));
+    expect(del.affectedRows).toBe(0);
+  });
+});
+
+describe('Navidad del próximo año', () => {
+  const duplicate = (userId: string, code: string) =>
+    as(userId, (tx) =>
+      tx.query<{ id: string }>(`select public.duplicate_event($1, 'Navidad García 2027', $2, '2027-12-24 19:00-05', true, true, true, true) as id`, [
+        eventA,
+        code,
+      ]),
+    );
+  let next = '';
+
+  it('solo el organizador puede crearla', async () => {
+    await expectDenied(duplicate(ids.editor, 'GARCIA27X'));
+    await expectDenied(duplicate(ids.ownerB, 'GARCIA27Y'));
+  });
+
+  it('copia familias, integrantes con sus usuarios y roles, tutores, checklist, aportes y cronograma', async () => {
+    const fam = await db.query<{ id: string }>(`insert into public.families (event_id, name, color_key) values ($1, 'GARCÍA', 'red') returning id`, [eventA]);
+    await db.query(`update public.participants set family_id = $1 where id = $2`, [fam.rows[0]!.id, participant.rosa]);
+    await db.query(`insert into public.checklist_items (event_id, title, scope, family_id) values ($1, 'Traer luces', 'family', $2)`, [eventA, fam.rows[0]!.id]);
+    await as(ids.ownerA, (tx) =>
+      tx.query(`select public.save_responsibility($1, 'contribution', 'food', 'Pavo navideño', null, '2026-12-23', 'done', null, $2::uuid[], '{}'::uuid[], null)`, [
+        eventA,
+        `{${participant.rosa}}`,
+      ]),
+    );
+
+    next = (await duplicate(ids.ownerA, 'garcia 27')).rows[0]!.id;
+
+    const ev = await db.query<{ join_code: string; address: string | null; owner_user_id: string }>(
+      `select join_code, address, owner_user_id from public.events where id = $1`,
+      [next],
+    );
+    expect(ev.rows[0]).toEqual({ join_code: 'GARCIA27', address: 'Av. Larco 123, Miraflores', owner_user_id: ids.ownerA });
+
+    const copied = await db.query<{ full_name: string; user_id: string | null; family: string | null }>(
+      `select p.full_name, p.user_id, f.name as family
+         from public.participants p left join public.families f on f.id = p.family_id
+        where p.event_id = $1 order by p.full_name`,
+      [next],
+    );
+    const original = await db.query(`select 1 from public.participants where event_id = $1 and status = 'active'`, [eventA]);
+    expect(copied.rows).toHaveLength(original.rows.length);
+    expect(copied.rows.find((p) => p.full_name === 'ROSA GARCÍA')).toEqual({ full_name: 'ROSA GARCÍA', user_id: ids.rosa, family: 'GARCÍA' });
+
+    const roles = await db.query<{ user_id: string; role: string }>(`select user_id, role from public.event_members where event_id = $1`, [next]);
+    expect(roles.rows.find((r) => r.user_id === ids.editor)?.role).toBe('editor');
+    expect(roles.rows.filter((r) => r.role === 'owner')).toEqual([{ user_id: ids.ownerA, role: 'owner' }]);
+
+    const wards = await db.query(`select 1 from public.guardianships where event_id = $1`, [next]);
+    expect(wards.rows).toHaveLength(1);
+
+    const checklist = await db.query<{ title: string }>(`select title from public.checklist_items where event_id = $1`, [next]);
+    expect(checklist.rows.map((c) => c.title)).toContain('Traer luces');
+
+    const resp = await db.query<{ status: string; due_date: string }>(
+      `select status, to_char(due_date, 'YYYY-MM-DD') as due_date from public.responsibilities where event_id = $1 and title = 'Pavo navideño'`,
+      [next],
+    );
+    expect(resp.rows[0]).toEqual({ status: 'pending', due_date: '2027-12-23' });
+
+    const sched = await db.query<{ starts_at: Date }>(`select starts_at from public.schedule_items where event_id = $1`, [next]);
+    expect(sched.rows.map((s) => new Date(s.starts_at).toISOString())).toContain('2027-12-25T01:00:00.000Z');
+  });
+
+  it('los familiares ven la nueva Navidad con su misma cuenta; no se copian regalos', async () => {
+    const mine = await as(ids.rosa, (tx) => tx.query(`select 1 from public.events where id = $1`, [next]));
+    expect(mine.rows).toHaveLength(1);
+    const wishes = await db.query(`select 1 from public.wishlist_items where event_id = $1`, [next]);
+    expect(wishes.rows).toHaveLength(0);
+  });
+
+  it('respeta el código único', async () => {
+    await expect(duplicate(ids.ownerA, 'GARCIA27')).rejects.toThrow(/JOIN_CODE_TAKEN/);
+  });
+});

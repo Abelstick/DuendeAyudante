@@ -98,6 +98,25 @@ const MESSAGES: Record<string, string> = {
   OWNER_NEEDS_SUCCESSOR: 'Antes de borrar tu cuenta, elige quién queda a cargo de cada celebración que organizas (o bórrala).',
   SUCCESSOR_INVALID: 'La persona elegida ya no es administradora de esa celebración. Cierra esta ventana, vuelve a abrirla y elige de nuevo.',
 
+  ADDRESS_TOO_LONG: 'La dirección es muy larga (máximo 300 letras). Deja solo calle, número, distrito y una referencia corta.',
+
+  EXPENSE_DESCRIPTION_INVALID: 'Escribe en qué se gastó (ej. Pavo, Bebidas).',
+  AMOUNT_INVALID: 'Escribe el monto solo con números, mayor a cero (ej. 45 o 45.50).',
+  EXPENSE_SHARES_REQUIRED: 'Elige entre quiénes se divide el gasto.',
+  PAYMENT_RECEIVER_INVALID: 'Elige a quién se le pagó (una persona distinta de quien paga).',
+  EXPENSE_KIND_INVALID: 'Ese tipo de registro no es válido.',
+  PARTICIPANT_NOT_FOUND: 'Una de las personas elegidas ya no está en esta Navidad. Vuelve a elegir.',
+
+  MESSAGE_EMPTY: 'Escribe tu mensaje.',
+  MESSAGE_TOO_LONG: 'El mensaje es muy largo (máximo 1000 letras).',
+  MESSAGE_RECIPIENT_REQUIRED: 'Elige para quién es el mensaje.',
+  MESSAGE_TO_SELF: 'El mensaje tiene que ser para otra persona 🙂.',
+  TOO_MANY_MESSAGES: 'Llegaste al máximo de 30 mensajes. Puedes cambiar o quitar alguno.',
+
+  LINK_NOT_ALLOWED: 'Ese enlace no se puede leer. Copia el enlace de la página de la tienda.',
+  LINK_PREVIEW_FAILED: 'No pudimos leer esa página (algunas tiendas no lo permiten). Llena los datos a mano; el enlace sí se guarda.',
+  LINK_PREVIEW_EMPTY: 'Esa página no tiene datos del producto. Llena los datos a mano; el enlace sí se guarda.',
+
   FORBIDDEN: 'No tienes permiso para hacer esto.',
   NOT_FOUND_OR_FORBIDDEN: 'No puedes cambiar este regalo.',
   NOT_FOUND: 'No encontramos lo que buscas.',

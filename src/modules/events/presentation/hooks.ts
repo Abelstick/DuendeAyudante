@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useServices } from '@/app/ContainerContext';
-import type { CreateEventInput } from '../domain/Event';
+import type { CreateEventInput, DuplicateEventInput } from '../domain/Event';
 
 export const eventKeys = {
   mine: ['events', 'mine'] as const,
@@ -69,6 +69,27 @@ export function useCreateEvent() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: CreateEventInput) => events.create(input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: eventKeys.mine }),
+  });
+}
+
+export function useUpdateAddress(eventId: string) {
+  const { events } = useServices();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (address: string) => events.updateAddress(eventId, address),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
+      void qc.invalidateQueries({ queryKey: eventKeys.mine });
+    },
+  });
+}
+
+export function useDuplicateEvent() {
+  const { events } = useServices();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: DuplicateEventInput) => events.duplicate(input),
     onSuccess: () => qc.invalidateQueries({ queryKey: eventKeys.mine }),
   });
 }

@@ -28,6 +28,12 @@ import { SecretFriendService } from '@/modules/secret-friend/application/SecretF
 import { SupabaseSecretFriendRepository } from '@/modules/secret-friend/infrastructure/SupabaseSecretFriendRepository';
 import { WishlistService } from '@/modules/wishlist/application/WishlistService';
 import { SupabaseWishlistRepository } from '@/modules/wishlist/infrastructure/SupabaseWishlistRepository';
+import { EdgeFunctionLinkPreviewService } from '@/modules/wishlist/infrastructure/EdgeFunctionLinkPreviewService';
+import type { ILinkPreviewService } from '@/modules/wishlist/domain/LinkPreview';
+import { ExpenseService } from '@/modules/expenses/application/ExpenseService';
+import { SupabaseExpenseRepository } from '@/modules/expenses/infrastructure/SupabaseExpenseRepository';
+import { MessageService } from '@/modules/messages/application/MessageService';
+import { SupabaseMessageRepository } from '@/modules/messages/infrastructure/SupabaseMessageRepository';
 import type { IAuthService } from '@/shared/application/ports/IAuthService';
 import { env } from '@/shared/config/env';
 import { SupabaseAuthService } from '@/shared/infrastructure/auth/SupabaseAuthService';
@@ -47,6 +53,9 @@ export interface Container {
   secretFriend: SecretFriendService;
   schedule: ScheduleService;
   announcements: AnnouncementService;
+  expenses: ExpenseService;
+  messages: MessageService;
+  linkPreview: ILinkPreviewService;
 }
 
 export function createContainer(): Container {
@@ -65,5 +74,8 @@ export function createContainer(): Container {
     secretFriend: new SecretFriendService(new SupabaseSecretFriendRepository(supabase)),
     schedule: new ScheduleService(new SupabaseScheduleRepository(supabase)),
     announcements: new AnnouncementService(new SupabaseAnnouncementRepository(supabase)),
+    expenses: new ExpenseService(new SupabaseExpenseRepository(supabase)),
+    messages: new MessageService(new SupabaseMessageRepository(supabase)),
+    linkPreview: new EdgeFunctionLinkPreviewService(supabase),
   };
 }

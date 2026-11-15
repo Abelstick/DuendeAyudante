@@ -1,8 +1,11 @@
-import { CalendarDays, Camera, Check, ChevronRight, ClipboardPlus, ListChecks, Settings, Table2, UserPlus, Users } from 'lucide-react';
+import { BellRing, CalendarDays, CalendarPlus, Camera, Check, ChevronRight, ClipboardPlus, ListChecks, Settings, Table2, Tv, UserPlus, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { canManageEvent } from '@/modules/events/domain/Event';
+import { DuplicateEventModal } from '@/modules/events/presentation/DuplicateEventModal';
+import { RemindersPanel } from '@/modules/reminders/presentation/RemindersPanel';
+import { AddressEditor } from './AddressEditor';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { useMembers } from '@/modules/members/presentation/hooks';
 import { formatEventDate } from '@/shared/lib/datetime';
@@ -30,6 +33,7 @@ export function OrganizePage() {
   const [editingBudget, setEditingBudget] = useState(false);
   const [adding, setAdding] = useState<'one' | 'many' | null>(null);
   const [assigning, setAssigning] = useState<{ kind: ResponsibilityKind; participantIds: string[] } | null>(null);
+  const [duplicating, setDuplicating] = useState(false);
 
   if (!canManageEvent(context.role)) return <Navigate to={`/e/${event.id}`} replace />;
   if (families.isLoading || members.isLoading) return <Spinner label="Cargando…" />;
@@ -57,6 +61,9 @@ export function OrganizePage() {
           )}
           <li className="sm:col-span-2">
             <DescriptionEditor />
+          </li>
+          <li className="sm:col-span-2">
+            <AddressEditor />
           </li>
         </ul>
       </Card>
@@ -139,6 +146,39 @@ export function OrganizePage() {
         <CardTitle icon={<ListChecks className="size-6" />}>Checklist de preparación</CardTitle>
         <ChecklistManager eventId={event.id} families={familyList} members={memberList} />
       </section>
+
+      <section className="space-y-3">
+        <CardTitle icon={<BellRing className="size-6" />} tone="berry">
+          Recordatorios por WhatsApp
+        </CardTitle>
+        <RemindersPanel members={memberList} />
+      </section>
+
+      <section className="space-y-3">
+        <CardTitle icon={<Tv className="size-6" />} tone="night">
+          Pantalla para la tele
+        </CardTitle>
+        <p className="text-base text-ink-700">
+          Ábrela en la tele o en una computadora conectada: muestra la cuenta regresiva, qué actividad sigue y los avisos. Se actualiza sola.
+        </p>
+        <ButtonLink to={`/e/${event.id}/tv`} variant="secondary" icon={<Tv className="size-5" aria-hidden />}>
+          Abrir pantalla para la tele
+        </ButtonLink>
+      </section>
+
+      {context.role === 'owner' && (
+        <section className="space-y-3">
+          <CardTitle icon={<CalendarPlus className="size-6" />} tone="gold">
+            El próximo año
+          </CardTitle>
+          <p className="text-base text-ink-700">Crea la Navidad del año que viene copiando familias, integrantes, checklist y más.</p>
+          <Button variant="gold" onClick={() => setDuplicating(true)} icon={<CalendarPlus className="size-5" aria-hidden />}>
+            Crear la Navidad del próximo año
+          </Button>
+        </section>
+      )}
+
+      {duplicating && <DuplicateEventModal event={event} onClose={() => setDuplicating(false)} />}
 
       {adding === 'one' && (
         <Modal open title="Agregar a un familiar" onClose={() => setAdding(null)}>

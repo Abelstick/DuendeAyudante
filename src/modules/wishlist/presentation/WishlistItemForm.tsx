@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link2, ListPlus, Plus, Save, Sparkles, Tag, X } from 'lucide-react';
+import { Lightbulb, Link2, ListPlus, Plus, Save, Sparkles, Tag, Wand2, X } from 'lucide-react';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -7,6 +7,10 @@ import type { PhotoUploadStatus } from '@/modules/family-drive/domain/FamilyDriv
 import { formatMoney, parseMoney } from '@/shared/lib/money';
 import { Button } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Card';
+import { errorMessage } from '@/shared/ui/errorMessages';
+import type { GiftIdea } from '../domain/GiftIdeas';
+import { GiftIdeasModal } from './GiftIdeasModal';
+import { useLinkPreview } from './hooks';
 import { SegmentedTabs } from '@/shared/ui/Tabs';
 import { TextArea, TextField } from '@/shared/ui/TextField';
 import {
@@ -110,10 +114,71 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
     reset,
     watch,
     setValue,
+    getValues,
     setFocus,
     formState: { errors },
   } = useForm<WishFormValues>({ resolver: zodResolver(schema), defaultValues: toDefaults(initial) });
   const { fields, append, remove } = useFieldArray({ control, name: 'links' });
+  const preview = useLinkPreview();
+  const [linkDraft, setLinkDraft] = useState('');
+  const [linkNote, setLinkNote] = useState<{ tone: 'success' | 'warning' | 'error'; text: string } | null>(null);
+  const [ideasOpen, setIdeasOpen] = useState(false);
+  const [ideaTip, setIdeaTip] = useState<string | null>(null);
+
+  /** Agrega el enlace a la lista (en el primer espacio vacío), sin repetirlo. */
+  const addLink = (url: string) => {
+    const links = getValues('links');
+    if (links.some((l) => normalizeUrl(l.url) === url)) return;
+    const empty = links.findIndex((l) => !l.url.trim());
+    if (empty >= 0) setValue(`links.${empty}.url`, url, { shouldDirty: true });
+    else if (links.length < MAX_LINKS_PER_ITEM) append({ url });
+  };
+
+  /** Pega el enlace de la tienda: guarda el enlace y llena nombre y precio si la página los publica. */
+  const fillFromLink = async () => {
+    setLinkNote(null);
+    const url = normalizeUrl(linkDraft);
+    if (!isValidHttpUrl(url)) {
+      setLinkNote({ tone: 'error', text: 'Ese enlace no es válido. Cópialo de nuevo desde la tienda.' });
+      return;
+    }
+    addLink(url);
+    setLinkDraft('');
+    try {
+      const data = await preview.mutateAsync(url);
+      const filled: string[] = [];
+      if (data.title && !getValues('title').trim()) {
+        setValue('title', data.title, { shouldDirty: true, shouldValidate: true });
+        filled.push('el nombre');
+      }
+      const sameCurrency = !data.currency || data.currency === currency;
+      if (data.price !== null && sameCurrency && !getValues('priceMin').trim() && !getValues('priceMax').trim()) {
+        setValue('priceMin', String(data.price), { shouldDirty: true, shouldValidate: true });
+        filled.push(`el precio (${formatMoney(data.price, currency)})`);
+      }
+      setLinkNote({
+        tone: 'success',
+        text:
+          filled.length > 0
+            ? `¡Listo! Llenamos ${filled.join(' y ')} y guardamos el enlace.${easy && filled.length > 1 ? ' El precio y el enlace se ven en «Completo».' : ''} Revisa que esté bien.`
+            : 'Guardamos el enlace. El nombre ya estaba escrito: revísalo.',
+      });
+    } catch (err) {
+      setLinkNote({ tone: 'warning', text: errorMessage(err) });
+    }
+  };
+
+  const pickIdea = (idea: GiftIdea) => {
+    setValue('title', idea.title, { shouldDirty: true, shouldValidate: true });
+    // En modo completo también un precio aproximado (en modo fácil no se ve, mejor no llenarlo)
+    if (!easy && currency === 'PEN' && !getValues('priceMin').trim() && !getValues('priceMax').trim()) {
+      setValue('priceMin', String(idea.min), { shouldDirty: true });
+      setValue('priceMax', String(idea.max), { shouldDirty: true });
+    }
+    setIdeaTip(`${idea.emoji} En «Detalles» cuéntanos: ${idea.detail.charAt(0).toLowerCase()}${idea.detail.slice(1)}.`);
+    setIdeasOpen(false);
+    setTimeout(() => setFocus('description'), 0);
+  };
 
   // Está sobre el presupuesto si hasta el precio más bajo lo supera
   const lowest = parseMoney(watch('priceMin'));
@@ -151,6 +216,9 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
     if (ok && !initial) {
       reset(toDefaults());
       setBrandDraft('');
+      setLinkDraft('');
+      setLinkNote(null);
+      setIdeaTip(null);
       setSavedCount((c) => c + 1);
       setTimeout(() => setFocus('title'), 0);
     }
@@ -184,6 +252,37 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
 
       {savedCount > 0 && !initial && <Notice tone="success">✅ ¡Regalo guardado! Ya aparece en tu lista. Si quieres, agrega otro aquí.</Notice>}
 
+      {/* Atajos: pegar el enlace de la tienda o elegir una idea */}
+      <div className="space-y-3 rounded-2xl border-2 border-dashed border-mist-300 bg-mist-100/60 p-3">
+        <div className="flex items-end gap-2">
+          <div className="min-w-0 flex-1">
+            <TextField
+              label="¿Lo viste en una tienda? Pega el enlace"
+              optional
+              type="url"
+              inputMode="url"
+              autoCapitalize="none"
+              placeholder="https://…"
+              value={linkDraft}
+              onChange={(e) => setLinkDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault(); // no enviar el formulario
+                  void fillFromLink();
+                }
+              }}
+            />
+          </div>
+          <Button variant="secondary" onClick={() => void fillFromLink()} loading={preview.isPending} disabled={!linkDraft.trim()} icon={<Wand2 className="size-5" aria-hidden />}>
+            Llenar
+          </Button>
+        </div>
+        {linkNote && <Notice tone={linkNote.tone}>{linkNote.text}</Notice>}
+        <Button variant="ghost" onClick={() => setIdeasOpen(true)} icon={<Lightbulb className="size-5" aria-hidden />}>
+          ¿No sabes qué pedir? Ver ideas
+        </Button>
+      </div>
+
       <TextField
         label={easy ? '1. ¿Qué regalo te gustaría?' : '¿Qué regalo te gustaría?'}
         placeholder="ej. Polo, Colonia, Billetera, Juguete"
@@ -200,6 +299,7 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
         error={errors.description?.message}
         {...register('description')}
       />
+      {ideaTip && <p className="-mt-3 text-sm font-semibold text-ink-700">{ideaTip}</p>}
 
       <WishPhotosField
         step={easy ? 3 : undefined}
@@ -354,6 +454,8 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
           {savedCount > 0 ? 'Listo, terminé' : 'Cancelar'}
         </Button>
       </div>
+
+      {ideasOpen && <GiftIdeasModal budget={budget} currency={currency} onPick={pickIdea} onClose={() => setIdeasOpen(false)} />}
     </form>
   );
 }

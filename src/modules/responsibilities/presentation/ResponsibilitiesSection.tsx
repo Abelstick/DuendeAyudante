@@ -9,6 +9,10 @@ import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { formatDateOnly } from '@/shared/lib/datetime';
 import { applySort, DEFAULT_LIST_PREFS, matchesSearch, toggleSort, type ListPrefs, type SortValue } from '@/shared/lib/listing';
 import { useSessionState } from '@/shared/lib/useSessionState';
+import { eventAppLink } from '@/shared/lib/appLink';
+import { whatsappShareUrl } from '@/shared/lib/whatsapp';
+import { toTitleCase } from '@/shared/validation/names';
+import { responsibilityReminderMessage } from '@/modules/reminders/domain/Reminders';
 import { Button, Spinner } from '@/shared/ui/Button';
 import { EmptyState, Notice } from '@/shared/ui/Card';
 import { DataTable, RowAction, type Column } from '@/shared/ui/DataTable';
@@ -76,6 +80,13 @@ export function ResponsibilitiesSection() {
     prefs.dir,
   );
   const patch = (p: Partial<ListPrefs>) => setPrefs((prev) => ({ ...prev, ...p }));
+  const remindHref = (r: Responsibility) => {
+    const names = [
+      ...r.familyIds.map((id) => familyList.find((f) => f.id === id)).filter((f) => f !== undefined).map((f) => `familia ${toTitleCase(f.name)}`),
+      ...r.participantIds.map((id) => people.find((p) => p.id === id)).filter((p) => p !== undefined).map((p) => toTitleCase(p.firstName)),
+    ];
+    return whatsappShareUrl(responsibilityReminderMessage(r, names, event.name, eventAppLink(event.id, '/celebracion')));
+  };
   const hasFilters = Boolean(prefs.q) || JSON.stringify(filters) !== JSON.stringify(DEFAULT_FILTERS);
   const reset = () => {
     setFilters(DEFAULT_FILTERS);
@@ -297,6 +308,7 @@ export function ResponsibilitiesSection() {
               busy={busyId === r.id}
               onStatus={(s) => change(r, s)}
               onEdit={() => setEditing({ item: r, kind: r.kind })}
+              remindHref={isEditor ? remindHref(r) : undefined}
             />
           ))}
         </div>

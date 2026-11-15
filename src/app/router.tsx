@@ -15,6 +15,9 @@ import { AnnouncementsPage } from '@/modules/announcements/presentation/Announce
 import { CelebrationPage } from '@/modules/events/presentation/CelebrationPage';
 import { GiftsPage } from '@/modules/wishlist/presentation/GiftsPage';
 import { PersonGiftsPage } from '@/modules/wishlist/presentation/PersonGiftsPage';
+import { MessagesPage } from '@/modules/messages/presentation/MessagesPage';
+import { RecapPage } from '@/modules/events/presentation/RecapPage';
+import { TvPage } from '@/modules/events/presentation/TvPage';
 import { RequireAuth } from './AuthContext';
 import { EventLayout } from './layout/EventLayout';
 
@@ -49,6 +52,15 @@ export const router = createBrowserRouter([
       </RequireAuth>
     ),
   },
+  // Pantalla para la tele: a pantalla completa, sin menús
+  {
+    path: '/e/:eventId/tv',
+    element: (
+      <RequireAuth>
+        <TvPage />
+      </RequireAuth>
+    ),
+  },
   {
     path: '/e/:eventId',
     element: (
@@ -63,6 +75,8 @@ export const router = createBrowserRouter([
       { path: 'juegos', element: <GamesPage /> },
       { path: 'celebracion', element: <CelebrationPage /> },
       { path: 'anuncios', element: <AnnouncementsPage /> },
+      { path: 'mensajes', element: <MessagesPage /> },
+      { path: 'recuerdos', element: <RecapPage /> },
       { path: 'organizar', element: <OrganizePage /> },
       { path: 'perfil', element: <ProfilePage /> },
     ],

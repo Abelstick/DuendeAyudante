@@ -9,6 +9,8 @@ export interface ChristmasEvent {
   joinCode: string;
   organizerName: string;
   description: string | null;
+  /** Dónde es la celebración (texto libre: calle, número, distrito, referencia). */
+  address: string | null;
   celebrationAt: Date;
   timezone: string;
   currency: string;
@@ -59,4 +61,36 @@ export interface CreateEventInput {
   timezone: string;
   budget: number;
   description: string | null;
+}
+
+/** Qué copiar al crear la Navidad del próximo año a partir de una anterior. */
+export interface DuplicateEventInput {
+  sourceEventId: string;
+  name: string;
+  joinCode: string;
+  /** "YYYY-MM-DD" en la zona del evento */
+  date: string;
+  /** "HH:mm" en la zona del evento */
+  time: string;
+  timezone: string;
+  copyMembers: boolean;
+  copyChecklist: boolean;
+  copyResponsibilities: boolean;
+  copySchedule: boolean;
+}
+
+const YEAR_RE = /\b(19|20)\d{2}\b/;
+
+/** "Navidad García 2026" → "Navidad García 2027"; sin año, se le agrega. */
+export function nextYearName(name: string, nextYear: number): string {
+  const trimmed = name.trim();
+  return YEAR_RE.test(trimmed) ? trimmed.replace(YEAR_RE, String(nextYear)) : `${trimmed} ${nextYear}`;
+}
+
+/** "GARCIA2026" → "GARCIA2027"; "GARCIA26" → "GARCIA27"; sin número al final, se agrega el año corto. */
+export function nextYearJoinCode(code: string, nextYear: number): string {
+  const full = String(nextYear);
+  if (/(19|20)\d{2}$/.test(code)) return code.replace(/(19|20)\d{2}$/, full);
+  if (/\d{2}$/.test(code)) return code.replace(/\d{2}$/, full.slice(2));
+  return `${code.slice(0, 18)}${full.slice(2)}`;
 }

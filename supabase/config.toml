@@ -17,3 +17,7 @@ verify_jwt = false
 # Google llama por GET sin sesión al volver de conectar el Drive; los POST verifican la sesión dentro.
 [functions.google-drive]
 verify_jwt = false
+
+# Lee el enlace de una tienda para llenar un regalo (solo con sesión).
+[functions.link-preview]
+verify_jwt = true

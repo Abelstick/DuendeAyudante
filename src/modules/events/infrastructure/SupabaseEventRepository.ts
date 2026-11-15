@@ -3,7 +3,7 @@ import { mapParticipantRow, type ParticipantRow } from '@/modules/members/infras
 import { AppError } from '@/shared/domain/errors';
 import { fromFunctionError, fromPostgrestError } from '@/shared/infrastructure/supabase/errors';
 import type { ChristmasEvent, EventContext, EventRole, MyEventSummary } from '../domain/Event';
-import type { CreateEventData, IEventRepository } from '../domain/IEventRepository';
+import type { CreateEventData, DuplicateEventData, IEventRepository } from '../domain/IEventRepository';
 
 interface EventRow {
   id: string;
@@ -11,13 +11,14 @@ interface EventRow {
   join_code: string;
   organizer_name: string;
   description: string | null;
+  address: string | null;
   celebration_at: string;
   timezone: string;
   currency: string;
   gift_exchanges: { id: string; budget_max: number | string }[] | null;
 }
 
-const EVENT_COLUMNS = 'id, name, join_code, organizer_name, description, celebration_at, timezone, currency, gift_exchanges(id, budget_max)';
+const EVENT_COLUMNS = 'id, name, join_code, organizer_name, description, address, celebration_at, timezone, currency, gift_exchanges(id, budget_max)';
 
 function mapEvent(row: EventRow): ChristmasEvent {
   const exchange = row.gift_exchanges?.[0];
@@ -27,6 +28,7 @@ function mapEvent(row: EventRow): ChristmasEvent {
     joinCode: row.join_code,
     organizerName: row.organizer_name,
     description: row.description,
+    address: row.address,
     celebrationAt: new Date(row.celebration_at),
     timezone: row.timezone,
     currency: row.currency.trim(),
@@ -104,6 +106,27 @@ export class SupabaseEventRepository implements IEventRepository {
     const { data, error } = await this.supabase.from('events').update({ description }).eq('id', eventId).select('id');
     if (error) throw fromPostgrestError(error);
     if (!data || data.length === 0) throw new AppError('FORBIDDEN');
+  }
+
+  async updateAddress(eventId: string, address: string | null): Promise<void> {
+    const { data, error } = await this.supabase.from('events').update({ address }).eq('id', eventId).select('id');
+    if (error) throw fromPostgrestError(error);
+    if (!data || data.length === 0) throw new AppError('FORBIDDEN');
+  }
+
+  async duplicate(data: DuplicateEventData): Promise<string> {
+    const { data: id, error } = await this.supabase.rpc('duplicate_event', {
+      p_source_event_id: data.sourceEventId,
+      p_name: data.name,
+      p_join_code: data.joinCode,
+      p_celebration_at: data.celebrationAt.toISOString(),
+      p_copy_members: data.copyMembers,
+      p_copy_checklist: data.copyChecklist,
+      p_copy_responsibilities: data.copyResponsibilities,
+      p_copy_schedule: data.copySchedule,
+    });
+    if (error) throw fromPostgrestError(error);
+    return id as string;
   }
 
   async getMyContext(eventId: string): Promise<EventContext> {

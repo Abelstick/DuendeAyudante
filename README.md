@@ -17,6 +17,14 @@ participa sin aprender a usar una aplicación complicada.
 | Amigo secreto (opcional: cada persona anota el suyo, en privado) | ✅ |
 | Checklist de preparación (automático + tareas del organizador) | ✅ |
 | Cronograma (con «AHORA») y anuncios (compartibles por WhatsApp) | ✅ |
+| Dirección del evento con Google Maps y Waze | ✅ |
+| Recordatorios por WhatsApp (por persona, al grupo y por aporte) | ✅ |
+| Cuentas claras: gastos compartidos y quién le paga a quién | ✅ |
+| Pantalla para la tele (cuenta regresiva a la celebración y a la medianoche) | ✅ |
+| Crear la Navidad del próximo año copiando familias, integrantes y más | ✅ |
+| Recuerdos del año (resumen para compartir) | ✅ |
+| Mensajes navideños que se abren a la medianoche (pueden ser anónimos) | ✅ |
+| Ideas de regalo por edad y presupuesto · llenar un regalo pegando el enlace | ✅ |
 | Publicar en Render | ⏳ |
 | Mascotas e ilustraciones por familia | ⏳ (la identidad de color por familia ya está) |
 

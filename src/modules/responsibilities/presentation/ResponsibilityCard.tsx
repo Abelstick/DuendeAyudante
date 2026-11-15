@@ -1,9 +1,9 @@
-import { Check, Pencil, RotateCcw, Timer } from 'lucide-react';
+import { Check, MessageCircle, Pencil, RotateCcw, Timer } from 'lucide-react';
 import type { Family } from '@/modules/families/domain/Family';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { displayName, type Participant } from '@/modules/members/domain/Participant';
 import { formatDateOnly } from '@/shared/lib/datetime';
-import { Button } from '@/shared/ui/Button';
+import { Button, buttonClasses } from '@/shared/ui/Button';
 import { CATEGORY_LABELS, KIND_LABELS, STATUS_LABELS, type Responsibility, type ResponsibilityStatus } from '../domain/Responsibility';
 
 const statusStyles: Record<ResponsibilityStatus, string> = {
@@ -29,9 +29,11 @@ interface Props {
   compact?: boolean;
   onStatus: (status: ResponsibilityStatus) => void;
   onEdit?: () => void;
+  /** Enlace de WhatsApp con el recordatorio para los responsables (solo para quien edita y si falta hacerlo). */
+  remindHref?: string;
 }
 
-export function ResponsibilityCard({ item, families, participants, canChangeStatus, canEdit, busy, compact, onStatus, onEdit }: Props) {
+export function ResponsibilityCard({ item, families, participants, canChangeStatus, canEdit, busy, compact, onStatus, onEdit, remindHref }: Props) {
   const category = CATEGORY_LABELS[item.category];
   const status = STATUS_LABELS[item.status];
   const people = item.participantIds.map((id) => participants.find((p) => p.id === id)).filter((p): p is Participant => Boolean(p));
@@ -95,6 +97,12 @@ export function ResponsibilityCard({ item, families, participants, canChangeStat
             <Button variant="ghost" onClick={onEdit} icon={<Pencil className="size-5" aria-hidden />}>
               Editar
             </Button>
+          )}
+          {remindHref && item.status !== 'done' && (
+            <a href={remindHref} target="_blank" rel="noopener noreferrer" className={buttonClasses('ghost', 'md')}>
+              <MessageCircle className="size-5" aria-hidden />
+              Recordar por WhatsApp
+            </a>
           )}
         </div>
       )}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { countdownTo, instantToZonedParts, zonedDateTimeToInstant } from './datetime';
+import { addDays, countdownTo, instantToZonedParts, midnightAfter, zonedDateTimeToInstant } from './datetime';
 
 describe('zona horaria del evento', () => {
   it('24/12 7:00 p. m. en Lima es 25/12 00:00 UTC', () => {
@@ -32,5 +32,17 @@ describe('fecha límite', () => {
   it('muestra el día correcto sin desfases de zona horaria', async () => {
     const { formatDateOnly } = await import('./datetime');
     expect(formatDateOnly('2026-12-23')).toBe('miércoles, 23 de diciembre');
+  });
+});
+
+describe('medianoche de la celebración', () => {
+  it('es el inicio del día siguiente en la zona del evento', () => {
+    expect(midnightAfter(new Date('2026-12-25T00:00:00Z'), 'America/Lima').toISOString()).toBe('2026-12-25T05:00:00.000Z');
+    expect(midnightAfter(new Date('2026-12-24T12:00:00Z'), 'Europe/Madrid').toISOString()).toBe('2026-12-24T23:00:00.000Z');
+  });
+
+  it('suma días cruzando meses y años', () => {
+    expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
+    expect(addDays('2027-03-01', -1)).toBe('2027-02-28');
   });
 });

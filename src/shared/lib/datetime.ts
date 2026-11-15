@@ -89,3 +89,18 @@ export function formatTime(instant: Date, timeZone: string): string {
 export function formatShortDateTime(instant: Date, timeZone: string): string {
   return new Intl.DateTimeFormat('es-PE', { timeZone, day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }).format(instant);
 }
+
+/** "2026-12-24" → "2026-12-25" (calendario, sin zona horaria). */
+export function addDays(date: string, days: number): string {
+  const [y, m, d] = date.split('-').map(Number);
+  return new Date(Date.UTC(y ?? 0, (m ?? 1) - 1, (d ?? 1) + days)).toISOString().slice(0, 10);
+}
+
+/**
+ * Medianoche que sigue al día de la celebración, en la zona del evento
+ * (celebración el 24 a las 7 p. m. → 25 a las 00:00). Igual que app.event_unlock_at en la base de datos.
+ */
+export function midnightAfter(instant: Date, timeZone: string): Date {
+  const { date } = instantToZonedParts(instant, timeZone);
+  return zonedDateTimeToInstant(addDays(date, 1), '00:00', timeZone);
+}
