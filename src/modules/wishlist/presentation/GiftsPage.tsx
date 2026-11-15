@@ -246,27 +246,30 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
                 <li key={p.id}>
                   <Link
                     to={`/e/${event.id}/regalos/persona/${p.id}`}
-                    className="tap-card flex min-h-16 items-center gap-3 rounded-2xl border-2 border-mist-300 bg-white px-4 py-3 shadow-card hover:border-brand"
+                    className="tap-card flex min-h-16 items-center gap-3 rounded-2xl border-2 border-mist-300 bg-white py-3 pl-3 pr-2 shadow-card hover:border-brand sm:pl-4"
                   >
                     <Avatar name={p.fullName} colors={g.family && { bg: FAMILY_COLORS[g.family.color].soft, fg: FAMILY_COLORS[g.family.color].text }} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-lg font-bold leading-tight">{displayName(p)}</span>
+                    {/* El nombre usa todo el ancho; el contador va debajo, junto a lo que le gustaría */}
+                    <span className="min-w-0 flex-1 space-y-1">
+                      <span className="block text-lg font-bold leading-tight wrap-break-word">{displayName(p)}</span>
                       {count === 0 ? (
                         <span className="block text-sm text-ink-700">Todavía no agregó regalos</span>
                       ) : (
-                        <span className="block truncate text-sm text-ink-700">
-                          <span className="sr-only">Le gustaría: </span>
-                          {preview.join(' · ')}
-                          {count > preview.length && <strong className="text-ink-900"> y {count - preview.length} más</strong>}
+                        <span className="flex min-w-0 items-center gap-1.5 text-sm text-ink-700">
+                          <Pill tone="berry">
+                            🎁 {count}
+                            <span className="sr-only">{count === 1 ? ' regalo' : ' regalos'}</span>
+                          </Pill>
+                          <span className="min-w-0 truncate">
+                            <span className="sr-only">Le gustaría: </span>
+                            {preview.join(' · ')}
+                            {count > preview.length && <strong className="text-ink-900"> y {count - preview.length} más</strong>}
+                          </span>
                         </span>
                       )}
                     </span>
-                    {cover && <DrivePhoto driveFileId={cover.driveFileId} alt="" width={160} className="size-14 shrink-0 rounded-lg border-2 border-night-900/15" />}
-                    {count > 0 && (
-                      <Pill tone="berry">
-                        🎁 {count}
-                        <span className="sr-only">{count === 1 ? ' regalo' : ' regalos'}</span>
-                      </Pill>
+                    {cover && (
+                      <DrivePhoto driveFileId={cover.driveFileId} alt="" width={200} className="ml-1 size-16 shrink-0 rounded-xl border-2 border-night-900/15 bg-mist-100" />
                     )}
                     <ChevronRight className="size-6 shrink-0 text-brand" aria-hidden />
                   </Link>
