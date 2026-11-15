@@ -8,10 +8,10 @@ import { errorMessage } from '@/shared/ui/errorMessages';
 import { Modal } from '@/shared/ui/Modal';
 import { useToast } from '@/shared/ui/Toast';
 import type { WishlistItem } from '../domain/WishlistItem';
-import type { WishlistPhoto } from '../domain/WishlistPhoto';
+import { MAX_PHOTOS_PER_ITEM, type WishlistPhoto } from '../domain/WishlistPhoto';
 import { useWishlistMutations } from './hooks';
 import { WishlistItemCard } from './WishlistItemCard';
-import { WishlistItemForm, type WishFormPhotos, type WishFormResult } from './WishlistItemForm';
+import { WishlistItemForm, type UploadProgress, type WishFormPhotos, type WishFormResult } from './WishlistItemForm';
 
 interface Props {
   eventId: string;
@@ -32,7 +32,7 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
   const [adding, setAdding] = useState(startAdding);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
-  const [progress, setProgress] = useState<string | null>(null);
+  const [upload, setUpload] = useState<UploadProgress | null>(null);
 
   // Las fotos van al Google Drive de la familia de esta persona o, si no tiene, al general
   const familyId = participants.data?.find((p) => p.id === participantId)?.familyId;
@@ -41,12 +41,14 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
   /** Sube las fotos nuevas. Devuelve false si alguna falló (el regalo ya quedó guardado). */
   const sendPhotos = async (itemId: string, files: File[], alreadyAttached: number): Promise<boolean> => {
     if (files.length === 0) return true;
+    // Se muestra desde ya: antes de subir, las fotos se achican en el dispositivo
+    setUpload({ done: 0, total: Math.min(files.length, Math.max(0, MAX_PHOTOS_PER_ITEM - alreadyAttached)) });
     try {
       const r = await uploadPhotos.mutateAsync({
         itemId,
         files,
         alreadyAttached,
-        onProgress: (done, total) => setProgress(done < total ? `Subiendo foto ${done + 1} de ${total}…` : null),
+        onProgress: (done, total) => setUpload({ done, total }),
       });
       if (r.failed === 0) return true;
       setFormError(
@@ -57,7 +59,7 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
       setFormError(`El regalo se guardó, pero las fotos no se pudieron subir. ${errorMessage(err)}`);
       return false;
     } finally {
-      setProgress(null);
+      setUpload(null);
     }
   };
 
@@ -149,7 +151,7 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
             currency={currency}
             forName={forName}
             submitting={busy}
-            progress={progress}
+            upload={upload}
             error={formError}
             photos={photos}
             onSubmit={(data) => handleSave(null, data)}
@@ -167,7 +169,7 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
             currency={currency}
             forName={forName}
             submitting={busy}
-            progress={progress}
+            upload={upload}
             error={formError}
             photos={photos}
             onSubmit={(data) => handleSave(editing, data)}

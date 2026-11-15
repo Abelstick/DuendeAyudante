@@ -1,4 +1,4 @@
-import { Camera, ImagePlus, Loader2, X } from 'lucide-react';
+import { Camera, Check, ImagePlus, Loader2, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { PhotoUploadStatus } from '@/modules/family-drive/domain/FamilyDrive';
 import { Button } from '@/shared/ui/Button';
@@ -14,6 +14,8 @@ interface Props {
   /** Fotos elegidas que se subirán al guardar. */
   pending: File[];
   onPendingChange: (files: File[]) => void;
+  /** Mientras se suben: cuántas de las nuevas ya subieron (en orden). */
+  upload: { done: number; total: number } | null;
 }
 
 const BLOCKED: Record<Exclude<PhotoUploadStatus, 'ready'>, string> = {
@@ -26,7 +28,8 @@ function hasTouchCamera(): boolean {
   return typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches === true;
 }
 
-export function WishPhotosField({ status, existing, removingId, onRemoveExisting, pending, onPendingChange }: Props) {
+export function WishPhotosField({ status, existing, removingId, onRemoveExisting, pending, onPendingChange, upload }: Props) {
+  const uploading = upload !== null;
   const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
   const [showCamera] = useState(hasTouchCamera);
@@ -37,7 +40,7 @@ export function WishPhotosField({ status, existing, removingId, onRemoveExisting
 
   const used = existing.length + pending.length;
   const room = MAX_PHOTOS_PER_ITEM - used;
-  const canAdd = status === 'ready' && room > 0;
+  const canAdd = status === 'ready' && room > 0 && !uploading;
 
   const addFiles = (list: FileList | null) => {
     const images = Array.from(list ?? []).filter((f) => f.type.startsWith('image/') || f.type === '');
@@ -66,10 +69,14 @@ export function WishPhotosField({ status, existing, removingId, onRemoveExisting
                 <img src={previews[t.index]} alt={`Foto nueva ${i + 1}`} className="size-full object-cover" />
               )}
               {i === 0 && <span className="absolute left-1 top-1 rounded-md bg-night-900/80 px-1.5 text-xs font-bold text-white">Portada</span>}
-              {t.kind === 'new' && <span className="absolute bottom-1 left-1 rounded-md bg-gold-400 px-1.5 text-xs font-bold text-night-900">Nueva</span>}
+              {t.kind === 'new' && !uploading && (
+                <span className="absolute bottom-1 left-1 rounded-md bg-gold-400 px-1.5 text-xs font-bold text-night-900">Nueva</span>
+              )}
+              {t.kind === 'new' && upload && <UploadOverlay state={t.index < upload.done ? 'done' : t.index === upload.done ? 'uploading' : 'waiting'} />}
               <button
                 type="button"
-                disabled={t.kind === 'saved' && removingId === t.photo.id}
+                hidden={uploading && t.kind === 'new'}
+                disabled={uploading || (t.kind === 'saved' && removingId === t.photo.id)}
                 onClick={() => (t.kind === 'saved' ? onRemoveExisting(t.photo) : onPendingChange(pending.filter((_, j) => j !== t.index)))}
                 aria-label={`Quitar foto ${i + 1}`}
                 className="absolute right-1 top-1 flex size-9 items-center justify-center rounded-full border-2 border-night-900 bg-white text-berry-700 shadow-card disabled:opacity-60"
@@ -126,5 +133,31 @@ export function WishPhotosField({ status, existing, removingId, onRemoveExisting
       />
       {pending.length > 0 && <p className="text-sm text-ink-700">Las fotos nuevas se suben al tocar «Guardar».</p>}
     </fieldset>
+  );
+}
+
+/** Estado de una foto nueva mientras se suben: en cola, subiendo (animado) o lista. */
+function UploadOverlay({ state }: { state: 'waiting' | 'uploading' | 'done' }) {
+  if (state === 'done') {
+    return (
+      <span className="animate-pop-in absolute inset-0 flex items-center justify-center bg-pine-600/45" aria-label="Subida">
+        <span className="flex size-10 items-center justify-center rounded-full border-2 border-night-900 bg-white text-pine-700 shadow-card">
+          <Check className="size-6" strokeWidth={3} aria-hidden />
+        </span>
+      </span>
+    );
+  }
+  if (state === 'uploading') {
+    return (
+      <span className="photo-shimmer absolute inset-0 flex flex-col items-center justify-center gap-1 bg-night-900/45 text-white" aria-label="Subiendo">
+        <Loader2 className="size-8 motion-safe:animate-spin" aria-hidden />
+        <span className="rounded-md bg-night-900/70 px-1.5 text-xs font-bold">Subiendo…</span>
+      </span>
+    );
+  }
+  return (
+    <span className="absolute inset-0 flex items-end justify-center bg-white/55 pb-1" aria-label="En espera">
+      <span className="rounded-md bg-night-900/70 px-1.5 text-xs font-bold text-white">En cola</span>
+    </span>
   );
 }

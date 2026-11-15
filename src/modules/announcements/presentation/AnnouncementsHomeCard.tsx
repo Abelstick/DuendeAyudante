@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { canEditContent } from '@/modules/events/domain/Event';
 import { Button, ButtonLink } from '@/shared/ui/Button';
-import { Card, CardTitle, Pill } from '@/shared/ui/Card';
+import { Pill } from '@/shared/ui/Card';
+import { CollapsibleCard } from '@/shared/ui/CollapsibleCard';
 import { announcementsForHome } from '../domain/Announcement';
 import { AnnouncementFormModal } from './AnnouncementFormModal';
 import { AnnouncementItem } from './AnnouncementItem';
@@ -21,10 +22,13 @@ export function AnnouncementsHomeCard() {
   const shown = announcementsForHome(all);
 
   return (
-    <Card className="space-y-3">
-      <CardTitle icon={<Megaphone className="size-6" />} tone="night" action={all.length > 0 ? <Pill tone="night">{all.length}</Pill> : undefined}>
-        Anuncios
-      </CardTitle>
+    <CollapsibleCard
+      id="inicio:anuncios"
+      icon={<Megaphone className="size-6" />}
+      tone="night"
+      title="Anuncios"
+      action={all.length > 0 ? <Pill tone="night">{all.length}</Pill> : undefined}
+    >
       {shown.length === 0 ? (
         <p className="text-base text-ink-700">Todavía no publicaste anuncios. Úsalos para avisar cambios de horario, vestimenta o recordatorios.</p>
       ) : (
@@ -47,6 +51,6 @@ export function AnnouncementsHomeCard() {
         )}
       </div>
       {creating && <AnnouncementFormModal eventId={event.id} initial={null} onClose={() => setCreating(false)} />}
-    </Card>
+    </CollapsibleCard>
   );
 }

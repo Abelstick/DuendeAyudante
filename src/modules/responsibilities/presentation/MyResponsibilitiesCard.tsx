@@ -4,7 +4,8 @@ import { actingParticipants, canEditContent } from '@/modules/events/domain/Even
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { ButtonLink } from '@/shared/ui/Button';
-import { Card, CardTitle, Pill } from '@/shared/ui/Card';
+import { Pill } from '@/shared/ui/Card';
+import { CollapsibleCard } from '@/shared/ui/CollapsibleCard';
 import { ResponsibilityService } from '../application/ResponsibilityService';
 import { useResponsibilities, useStatusChanger } from './hooks';
 import { ResponsibilityCard } from './ResponsibilityCard';
@@ -27,13 +28,21 @@ export function MyResponsibilitiesCard() {
   const shown = (pending.length > 0 ? pending : mine).slice(0, 3);
 
   return (
-    <Card className="space-y-3">
-      <CardTitle icon={<ClipboardList className="size-6" />} action={pending.length > 0 ? <Pill tone="gold">
+    <CollapsibleCard
+      id="inicio:responsabilidades"
+      icon={<ClipboardList className="size-6" />}
+      title="Mis responsabilidades"
+      action={
+        pending.length > 0 ? (
+          <Pill tone="gold">
             {pending.length}
             <span className="sr-only"> por hacer</span>
-          </Pill> : <Pill tone="success">Al día</Pill>}>
-        Mis responsabilidades
-      </CardTitle>
+          </Pill>
+        ) : (
+          <Pill tone="success">Al día</Pill>
+        )
+      }
+    >
       <p className="text-base">
         {pending.length === 0 ? (
           <strong>🎉 ¡Cumpliste todo lo que te tocaba!</strong>
@@ -65,6 +74,6 @@ export function MyResponsibilitiesCard() {
       >
         {canEditContent(context.role) ? 'Ver y organizar todo' : 'Ver todas las responsabilidades'}
       </ButtonLink>
-    </Card>
+    </CollapsibleCard>
   );
 }

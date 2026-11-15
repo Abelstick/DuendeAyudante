@@ -7,7 +7,8 @@ import { useResponsibilities } from '@/modules/responsibilities/presentation/hoo
 import { actingParticipants } from '@/modules/events/domain/Event';
 import { useEventWishlist } from '@/modules/wishlist/presentation/hooks';
 import { Spinner } from '@/shared/ui/Button';
-import { Card, CardTitle, Pill } from '@/shared/ui/Card';
+import { Pill } from '@/shared/ui/Card';
+import { CollapsibleCard } from '@/shared/ui/CollapsibleCard';
 import { ProgressBar } from '@/shared/ui/Progress';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { useToast } from '@/shared/ui/Toast';
@@ -58,14 +59,12 @@ export function ChecklistCard() {
   };
 
   return (
-    <Card className="space-y-4">
-      <CardTitle
-        icon={<ListChecks className="size-6" />}
-        action={checklist ? <Pill tone={checklist.done === checklist.total ? 'gold' : 'brand'}>{checklist.done} de {checklist.total}</Pill> : undefined}
-      >
-        Tu preparación
-      </CardTitle>
-
+    <CollapsibleCard
+      id="inicio:preparacion"
+      icon={<ListChecks className="size-6" />}
+      title="Tu preparación"
+      action={checklist ? <Pill tone={checklist.done === checklist.total ? 'gold' : 'brand'}>{checklist.done} de {checklist.total}</Pill> : undefined}
+    >
       {!checklist ? (
         <Spinner label="Cargando…" />
       ) : (
@@ -123,6 +122,6 @@ export function ChecklistCard() {
           </ul>
         </>
       )}
-    </Card>
+    </CollapsibleCard>
   );
 }

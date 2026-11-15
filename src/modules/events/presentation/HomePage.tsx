@@ -15,7 +15,7 @@ import { SecretFriendCard } from '@/modules/secret-friend/presentation/SecretFri
 import { formatMoney } from '@/shared/lib/money';
 import { Avatar } from '@/shared/ui/Avatar';
 import { ButtonLink } from '@/shared/ui/Button';
-import { Card, CardTitle } from '@/shared/ui/Card';
+import { CollapsibleCard } from '@/shared/ui/CollapsibleCard';
 import { toTitleCase } from '@/shared/validation/names';
 import { canManageEvent, ROLE_LABELS } from '../domain/Event';
 import { Countdown } from './Countdown';
@@ -84,8 +84,7 @@ export function HomePage() {
       <MyResponsibilitiesCard />
 
       {/* Mi familia y el grupo */}
-      <Card className="space-y-3">
-        <CardTitle icon={<Users className="size-6" />}>{myFamily ? 'Mi familia' : 'Nuestra Navidad'}</CardTitle>
+      <CollapsibleCard id="inicio:familia" icon={<Users className="size-6" />} title={myFamily ? 'Mi familia' : 'Nuestra Navidad'}>
         {myFamily && familyColor && (
           <div className="rounded-2xl p-4" style={{ backgroundColor: familyColor.soft, color: familyColor.text }}>
             <p className="flex items-center gap-2 text-lg font-extrabold">
@@ -111,19 +110,16 @@ export function HomePage() {
         <ButtonLink to={`${base}/celebracion?vista=familias`} variant="secondary" icon={<ChevronRight className="size-5" aria-hidden />}>
           Ver las familias
         </ButtonLink>
-      </Card>
+      </CollapsibleCard>
 
       {/* Solo para quien administra */}
       {isManager && (
-        <Card className="space-y-3 border-2 border-gold-400! bg-gold-50">
-          <CardTitle icon={<Settings className="size-6" />} tone="gold">
-            Organizar la Navidad
-          </CardTitle>
+        <CollapsibleCard id="inicio:organizar" icon={<Settings className="size-6" />} tone="gold" title="Organizar la Navidad" className="border-gold-400! bg-gold-50">
           <p className="text-base text-ink-700">Agrega familias e integrantes y envíales su acceso por WhatsApp.</p>
           <ButtonLink to={`${base}/organizar`} variant="gold" icon={<Settings className="size-5" aria-hidden />}>
             Ir a Organizar
           </ButtonLink>
-        </Card>
+        </CollapsibleCard>
       )}
     </div>
   );

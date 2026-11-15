@@ -10,7 +10,8 @@ import { useParticipants } from '@/modules/members/presentation/hooks';
 import { formatMoney } from '@/shared/lib/money';
 import { playSound } from '@/shared/lib/sound';
 import { Button, ButtonLink } from '@/shared/ui/Button';
-import { Card, CardTitle, Pill } from '@/shared/ui/Card';
+import { Pill } from '@/shared/ui/Card';
+import { CollapsibleCard } from '@/shared/ui/CollapsibleCard';
 import { GiftBox } from '@/shared/ui/illustrations';
 import { chipClasses } from '@/shared/ui/Tabs';
 import { errorMessage } from '@/shared/ui/errorMessages';
@@ -61,10 +62,7 @@ export function SecretFriendCard() {
   };
 
   return (
-    <Card className="space-y-3">
-      <CardTitle icon={<Gift className="size-6" />} tone="berry" action={<Pill tone="neutral">🔒 Privado</Pill>}>
-        Amigo secreto
-      </CardTitle>
+    <CollapsibleCard id="inicio:amigo-secreto" icon={<Gift className="size-6" />} tone="berry" title="Amigo secreto" action={<Pill tone="neutral">🔒 Privado</Pill>}>
 
       {people.length > 1 && (
         <div className="flex flex-wrap gap-2" role="group" aria-label="De quién">
@@ -195,6 +193,6 @@ export function SecretFriendCard() {
           onClose={() => setPicking(false)}
         />
       )}
-    </Card>
+    </CollapsibleCard>
   );
 }

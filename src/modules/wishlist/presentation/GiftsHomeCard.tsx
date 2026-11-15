@@ -10,7 +10,8 @@ import { useParticipants } from '@/modules/members/presentation/hooks';
 import { matchesSearch, sortBy } from '@/shared/lib/listing';
 import { Avatar } from '@/shared/ui/Avatar';
 import { ButtonLink } from '@/shared/ui/Button';
-import { Card, CardTitle, Pill } from '@/shared/ui/Card';
+import { Pill } from '@/shared/ui/Card';
+import { CollapsibleCard } from '@/shared/ui/CollapsibleCard';
 import { toTitleCase } from '@/shared/validation/names';
 import { WishlistService } from '../application/WishlistService';
 import { DrivePhoto } from './DrivePhoto';
@@ -49,20 +50,13 @@ export function GiftsHomeCard() {
   );
 
   return (
-    <Card className="space-y-4">
-      <CardTitle
-        icon={<Gift className="size-6" />}
-        tone="berry"
-        action={
-          <Link to={`${base}/regalos?vista=todos`} className="flex min-h-10 items-center gap-0.5 rounded-lg px-2 text-base font-bold text-brand hover:bg-brand-soft">
-            Ver todos
-            <ChevronRight className="size-5" aria-hidden />
-          </Link>
-        }
-      >
-        Regalos
-      </CardTitle>
-
+    <CollapsibleCard
+      id="inicio:regalos"
+      icon={<Gift className="size-6" />}
+      tone="berry"
+      title="Regalos"
+      action={withGifts.length > 0 ? <Pill tone="berry">{withGifts.length} con lista</Pill> : undefined}
+    >
       {/* Mi lista */}
       {context.me && (
         <div className="flex items-center gap-3 rounded-xl border-2 border-night-900 bg-berry-50 p-3">
@@ -159,6 +153,14 @@ export function GiftsHomeCard() {
           })}
         </ul>
       )}
-    </Card>
+
+      <Link
+        to={`${base}/regalos?vista=todos`}
+        className="inline-flex min-h-11 items-center gap-0.5 rounded-lg px-2 text-base font-bold text-brand underline decoration-2 underline-offset-4 hover:bg-brand-soft"
+      >
+        Ver los regalos de todos
+        <ChevronRight className="size-5" aria-hidden />
+      </Link>
+    </CollapsibleCard>
   );
 }

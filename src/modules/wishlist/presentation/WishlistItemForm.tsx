@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link2, Plus, Save, Tag, X } from 'lucide-react';
+import { Link2, Plus, Save, Tag, UploadCloud, X } from 'lucide-react';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -7,6 +7,7 @@ import type { PhotoUploadStatus } from '@/modules/family-drive/domain/FamilyDriv
 import { formatMoney, parseMoney } from '@/shared/lib/money';
 import { Button } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Card';
+import { ProgressBar } from '@/shared/ui/Progress';
 import { TextArea, TextField } from '@/shared/ui/TextField';
 import {
   isValidHttpUrl,
@@ -60,6 +61,12 @@ export interface WishFormResult {
   newPhotos: File[];
 }
 
+/** Avance de la subida de fotos: `done` ya subidas de `total`. */
+export interface UploadProgress {
+  done: number;
+  total: number;
+}
+
 export interface WishFormPhotos {
   status: PhotoUploadStatus;
   removingId: string | null;
@@ -72,8 +79,8 @@ interface Props {
   currency: string;
   forName?: string;
   submitting: boolean;
-  /** Texto de avance mientras se suben las fotos (ej. "Subiendo foto 1 de 3…"). */
-  progress?: string | null;
+  /** Avance mientras se suben las fotos (null si no se está subiendo). */
+  upload?: UploadProgress | null;
   error: string | null;
   photos: WishFormPhotos;
   onSubmit: (data: WishFormResult) => Promise<boolean>;
@@ -92,7 +99,7 @@ function toDefaults(item?: WishlistItem): WishFormValues {
   };
 }
 
-export function WishlistItemForm({ initial, budget, currency, forName, submitting, progress, error, photos, onSubmit, onCancel }: Props) {
+export function WishlistItemForm({ initial, budget, currency, forName, submitting, upload, error, photos, onSubmit, onCancel }: Props) {
   const [savedCount, setSavedCount] = useState(0);
   const [brandDraft, setBrandDraft] = useState('');
   const [newPhotos, setNewPhotos] = useState<File[]>([]);
@@ -271,6 +278,7 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
         onRemoveExisting={photos.onRemoveExisting}
         pending={newPhotos}
         onPendingChange={setNewPhotos}
+        upload={upload ?? null}
       />
 
       <fieldset className="space-y-2">
@@ -301,17 +309,34 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
         </div>
       </fieldset>
 
-      {progress && <Notice>📤 {progress}</Notice>}
+      {upload && <UploadPanel upload={upload} />}
       {error && <Notice tone="error">{error}</Notice>}
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button type="submit" size="lg" loading={submitting} icon={initial ? <Save className="size-6" aria-hidden /> : <Plus className="size-6" aria-hidden />}>
-          {initial ? 'Guardar cambios' : 'Guardar regalo'}
+          {upload ? 'Subiendo fotos…' : initial ? 'Guardar cambios' : 'Guardar regalo'}
         </Button>
-        <Button variant="secondary" size="lg" onClick={onCancel}>
+        <Button variant="secondary" size="lg" onClick={onCancel} disabled={submitting}>
           {savedCount > 0 ? 'Listo, terminé' : 'Cancelar'}
         </Button>
       </div>
     </form>
+  );
+}
+
+/** Panel de avance mientras se suben las fotos: ícono animado, texto y barra. */
+function UploadPanel({ upload }: { upload: UploadProgress }) {
+  const current = Math.min(upload.done + 1, upload.total);
+  // La barra avanza también a media foto, para que se note movimiento mientras sube cada una
+  const percent = upload.total === 0 ? 0 : ((upload.done + (upload.done < upload.total ? 0.5 : 0)) / upload.total) * 100;
+  return (
+    <div className="space-y-2 rounded-xl border-2 border-night-900 bg-sky-100 p-4" role="status" aria-live="polite">
+      <p className="flex items-center gap-2 text-base font-bold text-night-900">
+        <UploadCloud className="size-6 shrink-0 text-brand motion-safe:animate-bounce" aria-hidden />
+        {upload.done < upload.total ? `Subiendo foto ${current} de ${upload.total}…` : '¡Fotos subidas!'}
+      </p>
+      <ProgressBar percent={percent} label="Avance de la subida de fotos" size="md" />
+      <p className="text-sm text-ink-700">No cierres esta ventana hasta que termine.</p>
+    </div>
   );
 }
