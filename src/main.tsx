@@ -8,6 +8,7 @@ import { createContainer } from '@/app/container';
 import { ContainerProvider } from '@/app/ContainerContext';
 import { router } from '@/app/router';
 import { env } from '@/shared/config/env';
+import { PhotoQueueRunner } from '@/modules/wishlist/presentation/photoQueue';
 import { InstallPrompt } from '@/shared/pwa/InstallPrompt';
 import { setupPwa } from '@/shared/pwa/install';
 import { ToastProvider } from '@/shared/ui/Toast';
@@ -45,6 +46,8 @@ if (!env.isConfigured) {
               <AuthProvider>
                 <RouterProvider router={router} />
                 <InstallPrompt />
+                {/* Sube en segundo plano las fotos de los regalos (sigue aunque se cierre el formulario) */}
+                <PhotoQueueRunner />
               </AuthProvider>
             </ToastProvider>
           </MotionConfig>

@@ -1,12 +1,16 @@
-import { ChevronDown, ExternalLink, Images, Pencil, Tag, Trash2 } from 'lucide-react';
+import { ChevronDown, CloudUpload, ExternalLink, Images, Loader2, Pencil, Tag, Trash2 } from 'lucide-react';
 import { useId, useState } from 'react';
+import { AppError } from '@/shared/domain/errors';
+import { errorMessage } from '@/shared/ui/errorMessages';
 import { formatMoney } from '@/shared/lib/money';
 import { hostnameOf } from '@/shared/lib/whatsapp';
 import { Button } from '@/shared/ui/Button';
 import { GiftBox, type GiftTone } from '@/shared/ui/illustrations';
 import { describePrice, isOverBudget, PRIORITY_LABELS, type WishlistItem } from '../domain/WishlistItem';
 import { DrivePhoto } from './DrivePhoto';
+import { useQueuedPhotos } from './photoQueue';
 import { PhotoViewer } from './PhotoViewer';
+import { QueuedPhotoTile } from './QueuedPhotoTile';
 
 interface Props {
   item: WishlistItem;
@@ -38,6 +42,24 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
   const cover = item.photos[0];
   const photoCount = item.photos.length;
 
+  // Fotos de este regalo que esperan subir desde este dispositivo
+  const queued = useQueuedPhotos(item.id);
+  const failed = queued.filter((j) => j.status === 'failed');
+  const waiting = queued.length - failed.length;
+  const uploadingNow = queued.some((j) => j.status === 'uploading');
+  const queuedLabel =
+    waiting === 0
+      ? failed.length === 1
+        ? 'Una foto no se pudo subir'
+        : `${failed.length} fotos no se pudieron subir`
+      : uploadingNow
+        ? waiting === 1
+          ? 'Subiendo la foto…'
+          : `Subiendo fotos… (faltan ${waiting})`
+        : waiting === 1
+          ? 'Una foto en cola para subir'
+          : `${waiting} fotos en cola para subir`;
+
   return (
     <article className="group animate-pop-in space-y-3 rounded-2xl border-2 border-night-900 bg-white p-5 shadow-block">
       <div className="flex items-center gap-3">
@@ -68,6 +90,24 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
       </div>
 
       {item.description && <p className="whitespace-pre-line text-base text-ink-700">{item.description}</p>}
+
+      {/* Fotos que suben en segundo plano desde este dispositivo (siempre visibles, para saber cómo van) */}
+      {queued.length > 0 && (
+        <div className="space-y-2 rounded-xl border-2 border-dashed border-night-900/30 bg-sky-100 p-3">
+          <p className="flex items-center gap-2 text-sm font-bold text-night-900" aria-live="polite">
+            {uploadingNow ? <Loader2 className="size-4 shrink-0 text-brand motion-safe:animate-spin" aria-hidden /> : <CloudUpload className="size-4 shrink-0" aria-hidden />}
+            {queuedLabel}
+          </p>
+          <ul className="flex gap-2 overflow-x-auto pb-1">
+            {queued.map((job) => (
+              <li key={job.id} className="shrink-0">
+                <QueuedPhotoTile job={job} className="size-24" />
+              </li>
+            ))}
+          </ul>
+          {failed[0] && <p className="text-sm font-semibold text-berry-700">{errorMessage(new AppError(failed[0].error ?? 'UNEXPECTED'))}</p>}
+        </div>
+      )}
 
       {/* Fotos en un desplegable: se ven completas (sin recortar) y al tocar una se abre en grande */}
       {photoCount > 0 && (

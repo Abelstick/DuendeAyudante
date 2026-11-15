@@ -107,30 +107,9 @@ describe('WishlistService.byPriority', () => {
   });
 });
 
-describe('WishlistService.uploadPhotos', () => {
-  const blob = () => new Blob(['x'], { type: 'image/jpeg' });
-
-  it('sube de a una e informa el avance', async () => {
-    const { repo, service } = setup();
-    const progress: string[] = [];
-    const r = await service.uploadPhotos('item', [blob(), blob()], 0, (d, t) => progress.push(`${d}/${t}`));
-    expect(repo.uploadPhoto).toHaveBeenCalledTimes(2);
-    expect(r).toEqual({ uploaded: 2, failed: 0, skipped: 0, firstError: null });
-    expect(progress).toEqual(['0/2', '1/2', '2/2']);
-  });
-
-  it('no pasa del máximo de 6 por regalo', async () => {
-    const { repo, service } = setup();
-    const r = await service.uploadPhotos('item', [blob(), blob(), blob()], 5);
-    expect(repo.uploadPhoto).toHaveBeenCalledTimes(1);
-    expect(r).toMatchObject({ uploaded: 1, skipped: 2 });
-  });
-
-  it('si una falla, sigue con las demás y devuelve el primer error', async () => {
-    const { repo, service } = setup();
-    const boom = new Error('DRIVE_UPLOAD_FAILED');
-    vi.mocked(repo.uploadPhoto).mockRejectedValueOnce(boom);
-    const r = await service.uploadPhotos('item', [blob(), blob(), blob()], 0);
-    expect(r).toEqual({ uploaded: 2, failed: 1, skipped: 0, firstError: boom });
+describe('WishlistService.photoRoom', () => {
+  it('cuenta las guardadas y las que esperan en cola, sin bajar de cero', () => {
+    expect(WishlistService.photoRoom(2, 1)).toBe(3);
+    expect(WishlistService.photoRoom(5, 3)).toBe(0);
   });
 });

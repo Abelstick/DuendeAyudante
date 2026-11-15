@@ -8,10 +8,11 @@ import { errorMessage } from '@/shared/ui/errorMessages';
 import { Modal } from '@/shared/ui/Modal';
 import { useToast } from '@/shared/ui/Toast';
 import type { WishlistItem } from '../domain/WishlistItem';
-import { MAX_PHOTOS_PER_ITEM, type WishlistPhoto } from '../domain/WishlistPhoto';
+import type { WishlistPhoto } from '../domain/WishlistPhoto';
 import { useWishlistMutations } from './hooks';
+import { useEnqueuePhotos, usePhotoQueue } from './photoQueue';
 import { WishlistItemCard } from './WishlistItemCard';
-import { WishlistItemForm, type UploadProgress, type WishFormPhotos, type WishFormResult } from './WishlistItemForm';
+import { WishlistItemForm, type WishFormPhotos, type WishFormResult } from './WishlistItemForm';
 
 interface Props {
   eventId: string;
@@ -24,43 +25,29 @@ interface Props {
   startAdding?: boolean;
 }
 
-/** Lista de regalos de una persona. Agregar y cambiar se hacen en una ventana, para no alargar la pantalla. */
+/**
+ * Lista de regalos de una persona. Agregar y cambiar se hacen en una ventana.
+ * Al guardar, la ventana se cierra enseguida y las fotos suben en segundo plano
+ * (la tarjeta del regalo muestra cuáles están en cola o subiendo).
+ */
 export function EditableWishlist({ eventId, participantId, items, budget, currency, forName, startAdding = false }: Props) {
-  const { save, remove, uploadPhotos, removePhoto } = useWishlistMutations(eventId);
+  const { save, remove, removePhoto } = useWishlistMutations(eventId);
+  const queue = usePhotoQueue();
+  const enqueuePhotos = useEnqueuePhotos();
   const participants = useParticipants(eventId);
   const toast = useToast();
   const [adding, setAdding] = useState(startAdding);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
-  const [upload, setUpload] = useState<UploadProgress | null>(null);
 
   // Las fotos van al Google Drive de la familia de esta persona o, si no tiene, al general
   const familyId = participants.data?.find((p) => p.id === participantId)?.familyId;
   const status = usePhotoUploadStatus(eventId, familyId);
 
-  /** Sube las fotos nuevas. Devuelve false si alguna falló (el regalo ya quedó guardado). */
-  const sendPhotos = async (itemId: string, files: File[], alreadyAttached: number): Promise<boolean> => {
-    if (files.length === 0) return true;
-    // Se muestra desde ya: antes de subir, las fotos se achican en el dispositivo
-    setUpload({ done: 0, total: Math.min(files.length, Math.max(0, MAX_PHOTOS_PER_ITEM - alreadyAttached)) });
-    try {
-      const r = await uploadPhotos.mutateAsync({
-        itemId,
-        files,
-        alreadyAttached,
-        onProgress: (done, total) => setUpload({ done, total }),
-      });
-      if (r.failed === 0) return true;
-      setFormError(
-        `El regalo se guardó, pero ${r.failed === 1 ? 'una foto no se pudo subir' : `${r.failed} fotos no se pudieron subir`}. ${errorMessage(r.firstError)}`,
-      );
-      return false;
-    } catch (err) {
-      setFormError(`El regalo se guardó, pero las fotos no se pudieron subir. ${errorMessage(err)}`);
-      return false;
-    } finally {
-      setUpload(null);
-    }
+  const closeForm = () => {
+    setAdding(false);
+    setEditingId(null);
+    setFormError(null);
   };
 
   const handleSave = async (item: WishlistItem | null, { newPhotos, ...data }: WishFormResult): Promise<boolean> => {
@@ -72,19 +59,23 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
       setFormError(errorMessage(err));
       return false;
     }
-    const photosOk = await sendPhotos(itemId, newPhotos, item?.photos.length ?? 0);
-    if (item) {
-      if (photosOk) {
-        toast.success('¡Cambios guardados!');
-        setEditingId(null);
-      }
-    } else if (photosOk) {
-      toast.celebrate('¡Regalo guardado! 🎁');
-    } else {
-      // Se pasa a "cambiar" ese regalo para que pueda reintentar las fotos
-      setAdding(false);
-      setEditingId(itemId);
+
+    closeForm();
+    if (newPhotos.length === 0) {
+      if (item) toast.success('¡Cambios guardados!');
+      else toast.celebrate('¡Regalo guardado! 🎁');
+      return true;
     }
+
+    toast.celebrate(
+      `${item ? '¡Cambios guardados!' : '¡Regalo guardado! 🎁'} ${newPhotos.length === 1 ? 'La foto se está subiendo.' : 'Las fotos se están subiendo.'}`,
+    );
+    // Se achican y suben en segundo plano: no hace falta esperar con la ventana abierta
+    void enqueuePhotos(itemId, eventId, newPhotos)
+      .then((unreadable) => {
+        if (unreadable > 0) toast.error(unreadable === 1 ? 'Una foto no se pudo abrir. Prueba con otra.' : `${unreadable} fotos no se pudieron abrir. Prueba con otras.`);
+      })
+      .catch(() => toast.error('No pudimos preparar las fotos. Vuelve a intentarlo.'));
     return true;
   };
 
@@ -100,6 +91,7 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
   const handleDelete = async (item: WishlistItem) => {
     try {
       await remove.mutateAsync(item.id);
+      await queue.discardItem(item.id); // sus fotos en cola ya no tienen dónde ir
       toast.success(`Quitamos «${item.title}» de la lista.`);
     } catch (err) {
       toast.error(errorMessage(err));
@@ -107,12 +99,6 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
   };
 
   const editing = items.find((item) => item.id === editingId);
-  const closeForm = () => {
-    setAdding(false);
-    setEditingId(null);
-    setFormError(null);
-  };
-  const busy = save.isPending || uploadPhotos.isPending;
   const photos: WishFormPhotos = {
     status,
     removingId: removePhoto.isPending ? (removePhoto.variables ?? null) : null,
@@ -145,13 +131,12 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
       ))}
 
       {adding && (
-        <Modal open title="Nuevo regalo" onClose={busy ? () => undefined : closeForm}>
+        <Modal open title="Nuevo regalo" onClose={save.isPending ? () => undefined : closeForm}>
           <WishlistItemForm
             budget={budget}
             currency={currency}
             forName={forName}
-            submitting={busy}
-            upload={upload}
+            submitting={save.isPending}
             error={formError}
             photos={photos}
             onSubmit={(data) => handleSave(null, data)}
@@ -161,15 +146,14 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
       )}
 
       {editing && (
-        <Modal open title="Cambiar regalo" onClose={busy ? () => undefined : closeForm}>
+        <Modal open title="Cambiar regalo" onClose={save.isPending ? () => undefined : closeForm}>
           <WishlistItemForm
             key={editing.id}
             initial={editing}
             budget={budget}
             currency={currency}
             forName={forName}
-            submitting={busy}
-            upload={upload}
+            submitting={save.isPending}
             error={formError}
             photos={photos}
             onSubmit={(data) => handleSave(editing, data)}
