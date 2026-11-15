@@ -1,4 +1,4 @@
-import { LogOut, Type } from 'lucide-react';
+import { ChevronRight, KeyRound, LogOut, Type, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/AuthContext';
@@ -6,11 +6,13 @@ import { useServices } from '@/app/ContainerContext';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { ROLE_LABELS } from '@/modules/events/domain/Event';
 import { useMyEvents } from '@/modules/events/presentation/hooks';
+import { FAMILY_COLORS } from '@/modules/families/domain/Family';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { displayName } from '@/modules/members/domain/Participant';
+import { Avatar } from '@/shared/ui/Avatar';
 import { Button } from '@/shared/ui/Button';
-import { Card, PageTitle, SectionTitle } from '@/shared/ui/Card';
+import { Card, CardTitle, PageTitle, Pill } from '@/shared/ui/Card';
 import { applyTextSize, getTextSize, type TextSize } from '@/shared/ui/textSize';
 import { ChangePasswordForm } from './ChangePasswordForm';
 
@@ -39,28 +41,42 @@ export function ProfilePage() {
 
   return (
     <div className="space-y-5">
-      <PageTitle title="Mi perfil" />
+      <PageTitle icon={<UserRound className="size-8" aria-hidden />} title="Mi perfil" />
 
-      <Card className="space-y-2">
-        <p className="text-xl font-bold text-brand">{me ? displayName(me) : 'Organizador'}</p>
+      <Card className="space-y-4">
+        <div className="flex items-center gap-4">
+          <Avatar
+            name={me?.fullName ?? event.organizerName}
+            size="lg"
+            colors={family && { bg: FAMILY_COLORS[family.color].soft, fg: FAMILY_COLORS[family.color].text }}
+          />
+          <div className="min-w-0 space-y-1">
+            <p className="text-xl font-black leading-tight text-ink-900">{me ? displayName(me) : 'Organizador'}</p>
+            <Pill tone={context.role === 'participant' ? 'neutral' : 'gold'}>{ROLE_LABELS[context.role]}</Pill>
+          </div>
+        </div>
         {me && <FamilyBadge family={family} showColorName />}
-        <p className="text-base text-ink-700">
-          Código de tu Navidad: <strong className="tracking-wider">{event.joinCode}</strong>
-        </p>
-        <p className="text-base text-ink-700">
-          Tu usuario: <strong>{user?.loginName}</strong> · {ROLE_LABELS[context.role]}
-        </p>
+        <dl className="grid gap-2 sm:grid-cols-2">
+          <div className="rounded-2xl bg-mist-100 px-4 py-3">
+            <dt className="text-sm font-bold text-ink-500">Código de tu Navidad</dt>
+            <dd className="text-lg font-black tracking-wider text-ink-900">{event.joinCode}</dd>
+          </div>
+          <div className="rounded-2xl bg-mist-100 px-4 py-3">
+            <dt className="text-sm font-bold text-ink-500">Tu usuario</dt>
+            <dd className="break-all text-lg font-black text-ink-900">{user?.loginName}</dd>
+          </div>
+        </dl>
         {context.wards.length > 0 && (
-          <p className="text-base text-ink-700">A tu cargo: {context.wards.map((w) => displayName(w)).join(', ')}</p>
+          <p className="text-base text-ink-700">
+            <strong className="text-ink-900">A tu cargo:</strong> {context.wards.map((w) => displayName(w)).join(', ')}
+          </p>
         )}
       </Card>
 
       <Card className="space-y-3">
-        <SectionTitle>
-          <span className="flex items-center gap-2">
-            <Type className="size-6" aria-hidden /> Tamaño de la letra
-          </span>
-        </SectionTitle>
+        <CardTitle icon={<Type className="size-6" />} tone="night">
+          Tamaño de la letra
+        </CardTitle>
         <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Tamaño de la letra">
           {(
             [
@@ -74,8 +90,8 @@ export function ProfilePage() {
               role="radio"
               aria-checked={textSize === value}
               onClick={() => chooseSize(value)}
-              className={`min-h-14 rounded-2xl border-2 font-semibold ${
-                textSize === value ? 'border-brand bg-brand text-white' : 'border-cream-200 bg-white text-ink-900'
+              className={`min-h-14 rounded-2xl border-2 font-extrabold transition-colors ${
+                textSize === value ? 'border-brand bg-brand text-white' : 'border-mist-300 bg-white text-ink-900 hover:border-brand'
               } ${value === 'large' ? 'text-xl' : 'text-base'}`}
             >
               {textSize === value ? '✓ ' : ''}
@@ -86,7 +102,9 @@ export function ProfilePage() {
       </Card>
 
       <Card className="space-y-3">
-        <SectionTitle>Mi contraseña</SectionTitle>
+        <CardTitle icon={<KeyRound className="size-6" />} tone="night">
+          Mi contraseña
+        </CardTitle>
         {changing ? (
           <ChangePasswordForm onDone={() => setChanging(false)} />
         ) : (
@@ -100,12 +118,16 @@ export function ProfilePage() {
       </Card>
 
       {(myEvents.data?.length ?? 0) > 1 && (
-        <Link to="/mis-navidades" className="block min-h-12 text-lg font-semibold text-brand underline">
+        <Link
+          to="/mis-navidades"
+          className="tap-card flex min-h-14 items-center justify-between gap-3 rounded-2xl border border-mist-200 bg-white px-5 text-lg font-bold text-brand shadow-card"
+        >
           Ver mis otras Navidades
+          <ChevronRight className="size-6" aria-hidden />
         </Link>
       )}
 
-      <Button variant="secondary" size="lg" onClick={signOut} icon={<LogOut className="size-6" aria-hidden />}>
+      <Button variant="secondary" size="lg" onClick={signOut} icon={<LogOut className="size-6" aria-hidden />} className="text-berry-700!">
         Cerrar sesión
       </Button>
     </div>

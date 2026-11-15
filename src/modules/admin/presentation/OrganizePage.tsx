@@ -1,4 +1,4 @@
-import { Settings } from 'lucide-react';
+import { CalendarDays, Check, ListChecks, Settings, UserPlus, Users, Wallet } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { canManageEvent } from '@/modules/events/domain/Event';
@@ -7,7 +7,7 @@ import { useMembers } from '@/modules/members/presentation/hooks';
 import { formatEventDate } from '@/shared/lib/datetime';
 import { formatMoney } from '@/shared/lib/money';
 import { Spinner } from '@/shared/ui/Button';
-import { Card, Notice, PageTitle, SectionTitle } from '@/shared/ui/Card';
+import { Card, CardTitle, Notice, PageTitle } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { AddMemberForm } from './AddMemberForm';
 import { ChecklistManager } from './ChecklistManager';
@@ -31,40 +31,62 @@ export function OrganizePage() {
 
   return (
     <div className="space-y-6">
-      <PageTitle icon={<Settings className="size-8 text-brand" aria-hidden />} title="Organizar" subtitle={event.name} />
+      <PageTitle tone="gold" icon={<Settings className="size-8" aria-hidden />} title="Organizar" subtitle={event.name} />
 
-      <Card className="space-y-1">
+      <Card className="space-y-3 border-2 border-gold-400! bg-gold-50">
         <JoinCodeEditor />
-        <p className="text-base capitalize text-ink-700">📅 {formatEventDate(event.celebrationAt, event.timezone)}</p>
-        {event.giftExchange && <p className="text-base text-ink-700">💰 Presupuesto: {formatMoney(event.giftExchange.budgetMax, event.currency)}</p>}
+        <ul className="grid gap-2 sm:grid-cols-2">
+          <li className="flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-base">
+            <CalendarDays className="size-5 shrink-0 text-night-700" aria-hidden />
+            <span className="first-letter:uppercase">{formatEventDate(event.celebrationAt, event.timezone)}</span>
+          </li>
+          {event.giftExchange && (
+            <li className="flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-base">
+              <Wallet className="size-5 shrink-0 text-night-700" aria-hidden />
+              <span>
+                Presupuesto: <strong>{formatMoney(event.giftExchange.budgetMax, event.currency)}</strong>
+              </span>
+            </li>
+          )}
+        </ul>
       </Card>
 
       <ol className="grid gap-2 sm:grid-cols-3" aria-label="Pasos para empezar">
         {['Crea las familias', 'Agrega a tus familiares', 'Envíales su acceso por WhatsApp'].map((label, i) => (
           <li
             key={label}
-            className={`rounded-2xl border-2 px-4 py-3 text-base font-semibold ${
-              i + 1 < step ? 'border-brand bg-brand-soft text-brand' : i + 1 === step ? 'border-gold-400 bg-gold-100' : 'border-cream-200 bg-white text-ink-700'
+            aria-current={i + 1 === step ? 'step' : undefined}
+            className={`flex items-center gap-3 rounded-2xl border-2 px-4 py-3 text-base font-bold ${
+              i + 1 < step ? 'border-pine-600/30 bg-pine-100 text-pine-700' : i + 1 === step ? 'border-gold-400 bg-gold-100 text-ink-900' : 'border-mist-200 bg-white text-ink-700'
             }`}
           >
-            {i + 1 < step ? '✓' : `${i + 1}.`} {label}
+            <span
+              className={`flex size-8 shrink-0 items-center justify-center rounded-full text-base font-black ${
+                i + 1 < step ? 'bg-pine-600 text-white' : i + 1 === step ? 'bg-gold-400 text-night-900' : 'bg-mist-200 text-ink-700'
+              }`}
+              aria-hidden
+            >
+              {i + 1 < step ? <Check className="size-5" strokeWidth={3} /> : i + 1}
+            </span>
+            <span className="sr-only">{i + 1 < step ? 'Hecho: ' : `Paso ${i + 1}: `}</span>
+            {label}
           </li>
         ))}
       </ol>
 
-      <section>
-        <SectionTitle>👨‍👩‍👧‍👦 Familias</SectionTitle>
+      <section className="space-y-3">
+        <CardTitle icon={<Users className="size-6" />}>Familias</CardTitle>
         <FamiliesManager eventId={event.id} families={familyList} participants={memberList} />
       </section>
 
       <section className="space-y-4">
-        <SectionTitle>🧑‍🤝‍🧑 Familiares ({memberList.length})</SectionTitle>
+        <CardTitle icon={<UserPlus className="size-6" />}>Familiares ({memberList.length})</CardTitle>
         <AddMemberForm families={familyList} members={memberList} myRole={context.role} />
         <MembersList members={memberList} families={familyList} myRole={context.role} />
       </section>
 
-      <section>
-        <SectionTitle>✅ Checklist de preparación</SectionTitle>
+      <section className="space-y-3">
+        <CardTitle icon={<ListChecks className="size-6" />}>Checklist de preparación</CardTitle>
         <ChecklistManager eventId={event.id} families={familyList} members={memberList} />
       </section>
     </div>

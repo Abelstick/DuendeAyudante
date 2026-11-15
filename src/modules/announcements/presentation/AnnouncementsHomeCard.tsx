@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { canEditContent } from '@/modules/events/domain/Event';
 import { Button, ButtonLink } from '@/shared/ui/Button';
-import { Card } from '@/shared/ui/Card';
+import { Card, CardTitle, Pill } from '@/shared/ui/Card';
 import { announcementsForHome } from '../domain/Announcement';
 import { AnnouncementFormModal } from './AnnouncementFormModal';
 import { AnnouncementItem } from './AnnouncementItem';
@@ -22,9 +22,9 @@ export function AnnouncementsHomeCard() {
 
   return (
     <Card className="space-y-3">
-      <h2 className="flex items-center gap-2 text-xl font-bold text-brand">
-        <Megaphone className="size-6" aria-hidden /> Anuncios
-      </h2>
+      <CardTitle icon={<Megaphone className="size-6" />} tone="night" action={all.length > 0 ? <Pill tone="night">{all.length}</Pill> : undefined}>
+        Anuncios
+      </CardTitle>
       {shown.length === 0 ? (
         <p className="text-base text-ink-700">Todavía no publicaste anuncios. Úsalos para avisar cambios de horario, vestimenta o recordatorios.</p>
       ) : (
@@ -36,12 +36,12 @@ export function AnnouncementsHomeCard() {
       )}
       <div className="flex flex-col gap-2 sm:flex-row">
         {isEditor && (
-          <Button onClick={() => setCreating(true)} icon={<Megaphone className="size-5" aria-hidden />}>
+          <Button variant={shown.length === 0 ? 'primary' : 'secondary'} onClick={() => setCreating(true)} icon={<Megaphone className="size-5" aria-hidden />}>
             Publicar anuncio
           </Button>
         )}
         {all.length > 0 && (
-          <ButtonLink to={`/e/${event.id}/anuncios`} variant="secondary" icon={<ChevronRight className="size-5" aria-hidden />}>
+          <ButtonLink to={`/e/${event.id}/anuncios`} variant="ghost" icon={<ChevronRight className="size-5" aria-hidden />}>
             {all.length > shown.length ? `Ver los ${all.length} anuncios` : 'Ver anuncios'}
           </ButtonLink>
         )}

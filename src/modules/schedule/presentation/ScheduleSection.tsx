@@ -55,8 +55,8 @@ export function ScheduleSection() {
       ) : (
         [...days.entries()].map(([day, dayItems]) => (
           <section key={day} className="space-y-2">
-            {days.size > 1 && <h3 className="text-lg font-bold capitalize text-brand">{formatDateOnly(day)}</h3>}
-            <ol className="relative space-y-3 border-l-4 border-brand-soft pl-4">
+            {days.size > 1 && <h3 className="text-lg font-extrabold text-ink-900 first-letter:uppercase">{formatDateOnly(day)}</h3>}
+            <ol className="stagger relative space-y-3 border-l-4 border-night-100 pl-5">
               {dayItems.map((item) => {
                 const isNow = item.id === currentId;
                 const responsible = people.find((p) => p.id === item.responsibleId);
@@ -65,26 +65,29 @@ export function ScheduleSection() {
                 return (
                   <li
                     key={item.id}
-                    className={`relative rounded-2xl border-2 bg-white p-4 shadow-sm ${isNow ? 'border-brand' : 'border-transparent'} ${muted ? 'opacity-75' : ''}`}
+                    className={`relative rounded-2xl border-2 p-4 shadow-card ${isNow ? 'border-berry-600 bg-berry-50' : 'border-mist-200 bg-white'} ${muted ? 'opacity-70' : ''}`}
                     aria-current={isNow ? 'step' : undefined}
                   >
-                    <span className={`absolute -left-[1.6rem] top-5 size-4 rounded-full border-4 border-white ${isNow ? 'bg-brand' : 'bg-cream-200'}`} aria-hidden />
+                    <span className={`absolute -left-[2.05rem] top-5 size-5 rounded-full border-4 border-white shadow-card ${isNow ? 'bg-berry-600' : item.status === 'done' ? 'bg-pine-600' : 'bg-night-600'}`} aria-hidden />
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-lg font-bold text-brand">
+                      <p className="rounded-full bg-night-800 px-3 py-0.5 text-base font-extrabold text-white">
                         {formatTime(item.startsAt, event.timezone)}
-                        {item.endsAt && <span className="font-semibold text-ink-700"> – {formatTime(item.endsAt, event.timezone)}</span>}
+                        {item.endsAt && <span className="font-semibold text-white/85"> – {formatTime(item.endsAt, event.timezone)}</span>}
                       </p>
                       {isNow ? (
-                        <span className="rounded-full bg-brand px-3 py-1 text-sm font-bold text-white">▶️ AHORA</span>
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-berry-600 px-3 py-1 text-sm font-black text-white">
+                          <span className="size-2 rounded-full bg-white motion-safe:animate-pulse" aria-hidden />
+                          AHORA
+                        </span>
                       ) : (
                         item.status !== 'pending' && (
-                          <span className="rounded-full bg-cream-200 px-3 py-1 text-sm font-semibold">
+                          <span className="rounded-full bg-mist-200 px-3 py-1 text-sm font-bold text-ink-700">
                             <span aria-hidden>{status.emoji}</span> {status.label}
                           </span>
                         )
                       )}
                     </div>
-                    <p className={`text-lg font-semibold ${item.status === 'cancelled' ? 'line-through' : ''}`}>{item.title}</p>
+                    <p className={`mt-2 text-lg font-extrabold leading-snug ${item.status === 'cancelled' ? 'line-through' : ''}`}>{item.title}</p>
                     {item.description && <p className="whitespace-pre-line text-base text-ink-700">{item.description}</p>}
                     {responsible && <p className="text-sm text-ink-700">🎤 Responsable: {displayName(responsible)}</p>}
                     {isEditor && (

@@ -1,18 +1,27 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Link, type LinkProps } from 'react-router-dom';
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'whatsapp';
+type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'whatsapp' | 'gold';
 type Size = 'md' | 'lg';
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-2xl font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed select-none text-center';
+  'inline-flex items-center justify-center gap-2 rounded-2xl font-extrabold select-none text-center disabled:opacity-55 disabled:cursor-not-allowed';
 
+/**
+ * Jerarquía de acciones:
+ *  · primary   → la acción principal de la pantalla (una sola por bloque).
+ *  · secondary → acciones complementarias.
+ *  · ghost     → acciones menores (editar, volver, cancelar).
+ *  · danger    → quitar / borrar (siempre con confirmación).
+ *  · gold      → momentos especiales (ruleta, sorteos, premios).
+ */
 const variants: Record<Variant, string> = {
-  primary: 'bg-brand text-white hover:bg-brand-strong active:bg-brand-strong shadow-sm',
-  secondary: 'bg-white text-brand border-2 border-brand hover:bg-brand-soft',
-  danger: 'bg-berry-600 text-white hover:bg-berry-700',
-  ghost: 'bg-transparent text-brand hover:bg-brand-soft underline-offset-4',
-  whatsapp: 'bg-[#1f8f4e] text-white hover:bg-[#187540] shadow-sm',
+  primary: 'btn-3d bg-brand text-white hover:bg-brand-strong [--btn-edge:var(--brand-strong)]',
+  secondary: 'btn-3d bg-white text-brand border-2 border-mist-300 hover:border-brand hover:bg-brand-soft [--btn-edge:var(--color-mist-300)]',
+  danger: 'btn-3d bg-berry-600 text-white hover:bg-berry-700 [--btn-edge:var(--color-berry-700)]',
+  ghost: 'bg-transparent text-brand hover:bg-brand-soft active:bg-brand-soft transition-colors',
+  whatsapp: 'btn-3d bg-[#1f8f4e] text-white hover:bg-[#187540] [--btn-edge:#14633a]',
+  gold: 'btn-3d bg-gold-400 text-night-900 hover:bg-gold-300 [--btn-edge:var(--color-gold-600)]',
 };
 
 // Áreas táctiles de 48 px o más
@@ -34,7 +43,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function Button({ variant, size, icon, loading, children, className = '', disabled, type = 'button', ...rest }: ButtonProps) {
   return (
-    <button type={type} className={buttonClasses(variant, size, className)} disabled={disabled || loading} {...rest}>
+    <button type={type} className={buttonClasses(variant, size, className)} disabled={disabled || loading} aria-busy={loading || undefined} {...rest}>
       {loading ? <Spinner /> : icon}
       <span>{loading ? 'Un momento…' : children}</span>
     </button>

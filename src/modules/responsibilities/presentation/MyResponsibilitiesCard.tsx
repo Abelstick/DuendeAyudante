@@ -4,7 +4,7 @@ import { actingParticipants, canEditContent } from '@/modules/events/domain/Even
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { ButtonLink } from '@/shared/ui/Button';
-import { Card } from '@/shared/ui/Card';
+import { Card, CardTitle, Pill } from '@/shared/ui/Card';
 import { ResponsibilityService } from '../application/ResponsibilityService';
 import { useResponsibilities, useStatusChanger } from './hooks';
 import { ResponsibilityCard } from './ResponsibilityCard';
@@ -28,9 +28,12 @@ export function MyResponsibilitiesCard() {
 
   return (
     <Card className="space-y-3">
-      <h2 className="flex items-center gap-2 text-xl font-bold text-brand">
-        <ClipboardList className="size-6" aria-hidden /> Mis responsabilidades
-      </h2>
+      <CardTitle icon={<ClipboardList className="size-6" />} action={pending.length > 0 ? <Pill tone="gold">
+            {pending.length}
+            <span className="sr-only"> por hacer</span>
+          </Pill> : <Pill tone="success">Al día</Pill>}>
+        Mis responsabilidades
+      </CardTitle>
       <p className="text-base">
         {pending.length === 0 ? (
           <strong>🎉 ¡Cumpliste todo lo que te tocaba!</strong>
@@ -57,7 +60,7 @@ export function MyResponsibilitiesCard() {
       </div>
       <ButtonLink
         to={`/e/${event.id}/celebracion`}
-        variant="secondary"
+        variant="ghost"
         icon={<ChevronRight className="size-5" aria-hidden />}
       >
         {canEditContent(context.role) ? 'Ver y organizar todo' : 'Ver todas las responsabilidades'}

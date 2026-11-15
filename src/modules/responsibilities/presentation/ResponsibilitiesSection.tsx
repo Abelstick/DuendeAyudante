@@ -7,6 +7,7 @@ import { displayName } from '@/modules/members/domain/Participant';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { Button, Spinner } from '@/shared/ui/Button';
 import { EmptyState, Notice } from '@/shared/ui/Card';
+import { chipClasses, selectClasses } from '@/shared/ui/Tabs';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { DEFAULT_FILTERS, ResponsibilityService, type ResponsibilityFilters } from '../application/ResponsibilityService';
 import { isAssignedTo, STATUS_LABELS, type Responsibility, type ResponsibilityKind, type ResponsibilityStatus } from '../domain/Responsibility';
@@ -39,21 +40,27 @@ export function ResponsibilitiesSection() {
   const counts = (['pending', 'in_progress', 'done'] as ResponsibilityStatus[]).map((s) => ({ s, n: all.filter((r) => r.status === s).length }));
 
   const set = <K extends keyof ResponsibilityFilters>(key: K, value: ResponsibilityFilters[K]) => setFilters((f) => ({ ...f, [key]: value }));
-  const chip = (active: boolean) =>
-    `min-h-12 rounded-full border-2 px-4 text-base font-semibold ${active ? 'border-brand bg-brand text-white' : 'border-cream-200 bg-white'}`;
-  const selectClass = 'min-h-12 w-full rounded-xl border-2 border-cream-200 bg-white px-3 text-base text-ink-900';
+  const chip = chipClasses;
+  const selectClass = selectClasses;
+  const countStyles: Record<ResponsibilityStatus, string> = {
+    pending: 'bg-gold-100 text-gold-700',
+    in_progress: 'bg-night-50 text-night-700',
+    done: 'bg-pine-100 text-pine-700',
+  };
 
   return (
     <div className="space-y-5">
       {all.length > 0 && (
-        <p className="flex flex-wrap gap-x-4 gap-y-1 text-base text-ink-700">
+        <ul className="grid grid-cols-3 gap-2" aria-label="Resumen">
           {counts.map(({ s, n }) => (
-            <span key={s}>
-              <span aria-hidden>{STATUS_LABELS[s].emoji}</span> {n}{' '}
-              {s === 'in_progress' ? 'en progreso' : `${STATUS_LABELS[s].label.toLowerCase()}${n === 1 ? '' : 's'}`}
-            </span>
+            <li key={s} className={`rounded-2xl px-2 py-3 text-center ${countStyles[s]}`}>
+              <span className="block text-2xl font-black tabular-nums leading-none">{n}</span>
+              <span className="block text-sm font-bold leading-tight">
+                {s === 'in_progress' ? 'en progreso' : `${STATUS_LABELS[s].label.toLowerCase()}${n === 1 ? '' : 's'}`}
+              </span>
+            </li>
           ))}
-        </p>
+        </ul>
       )}
 
       {isEditor && (
@@ -68,7 +75,7 @@ export function ResponsibilitiesSection() {
       )}
 
       {/* Filtros: siempre visibles, sin menús escondidos */}
-      <section aria-label="Filtros" className="space-y-3 rounded-3xl bg-white p-4 shadow-sm">
+      <section aria-label="Filtros" className="space-y-3 rounded-3xl border border-mist-200 bg-white p-4 shadow-card">
         <div className="flex flex-wrap gap-2" role="group" aria-label="Qué mostrar">
           {(
             [
@@ -138,7 +145,7 @@ export function ResponsibilitiesSection() {
       ) : visible.length === 0 ? (
         <Notice>No hay nada con esos filtros.</Notice>
       ) : (
-        <div className="space-y-3">
+        <div className="stagger space-y-3">
           {visible.map((r) => (
             <ResponsibilityCard
               key={r.id}

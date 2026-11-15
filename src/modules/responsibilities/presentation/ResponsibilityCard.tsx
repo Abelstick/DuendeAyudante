@@ -7,9 +7,16 @@ import { Button } from '@/shared/ui/Button';
 import { CATEGORY_LABELS, KIND_LABELS, STATUS_LABELS, type Responsibility, type ResponsibilityStatus } from '../domain/Responsibility';
 
 const statusStyles: Record<ResponsibilityStatus, string> = {
-  pending: 'bg-gold-100 text-ink-900 border-gold-400',
-  in_progress: 'bg-brand-soft text-brand border-brand',
-  done: 'bg-brand text-white border-brand',
+  pending: 'bg-gold-100 text-gold-700',
+  in_progress: 'bg-night-50 text-night-700',
+  done: 'bg-pine-600 text-white',
+};
+
+/** Franja lateral de color según el estado (el estado también va escrito). */
+const statusStripe: Record<ResponsibilityStatus, string> = {
+  pending: 'bg-gold-400',
+  in_progress: 'bg-night-600',
+  done: 'bg-pine-600',
 };
 
 interface Props {
@@ -31,15 +38,16 @@ export function ResponsibilityCard({ item, families, participants, canChangeStat
   const fams = item.familyIds.map((id) => families.find((f) => f.id === id)).filter((f): f is Family => Boolean(f));
 
   return (
-    <article className={`animate-pop-in space-y-3 rounded-3xl border bg-white p-4 shadow-sm ${item.status === 'done' ? 'border-brand-soft' : 'border-cream-200'}`}>
+    <article className={`animate-pop-in relative space-y-3 overflow-hidden rounded-3xl border border-mist-200 p-4 pl-5 shadow-card ${item.status === 'done' ? 'bg-pine-50' : 'bg-white'}`}>
+      <span className={`absolute inset-y-0 left-0 w-1.5 ${statusStripe[item.status]}`} aria-hidden />
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-ink-700">
+          <p className="text-sm font-bold text-ink-500">
             <span aria-hidden>{category.emoji}</span> {KIND_LABELS[item.kind].one} · {category.label}
           </p>
-          <h3 className={`text-lg font-bold ${item.status === 'done' ? 'text-ink-700' : 'text-ink-900'}`}>{item.title}</h3>
+          <h3 className={`text-lg font-extrabold leading-snug ${item.status === 'done' ? 'text-ink-700' : 'text-ink-900'}`}>{item.title}</h3>
         </div>
-        <span className={`shrink-0 rounded-full border-2 px-3 py-1 text-sm font-bold ${statusStyles[item.status]}`}>
+        <span className={`shrink-0 rounded-full px-3 py-1 text-sm font-bold ${statusStyles[item.status]}`}>
           <span aria-hidden>{status.emoji}</span> {status.label}
         </span>
       </div>
@@ -52,7 +60,7 @@ export function ResponsibilityCard({ item, families, participants, canChangeStat
           <FamilyBadge key={f.id} family={f} />
         ))}
         {people.map((p) => (
-          <span key={p.id} className="rounded-full bg-cream-200 px-3 py-1 text-sm font-semibold">
+          <span key={p.id} className="rounded-full bg-mist-200 px-3 py-1 text-sm font-bold text-ink-700">
             {displayName(p)}
           </span>
         ))}
@@ -64,7 +72,7 @@ export function ResponsibilityCard({ item, families, participants, canChangeStat
           📅 Para el <strong>{formatDateOnly(item.dueDate)}</strong>
         </p>
       )}
-      {item.notes && !compact && <p className="rounded-xl bg-cream-50 px-3 py-2 text-base text-ink-700">📝 {item.notes}</p>}
+      {item.notes && !compact && <p className="rounded-xl bg-mist-100 px-3 py-2 text-base text-ink-700">📝 {item.notes}</p>}
 
       {(canChangeStatus || canEdit) && (
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">

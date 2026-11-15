@@ -73,7 +73,7 @@ export function JoinCodeEditor() {
   }
 
   return (
-    <div className="animate-pop-in space-y-3 rounded-2xl border-2 border-gold-400 bg-gold-100/50 p-4">
+    <div className="animate-pop-in space-y-3 rounded-2xl border-2 border-gold-400 bg-white p-4">
       <TextField
         label="Nuevo código"
         hint="Una palabra sencilla, sin espacios (ej. GARCIA, NAVIDAD2026)."

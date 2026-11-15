@@ -105,7 +105,7 @@ export function ResponsibilityFormModal({ eventId, initial, defaultKind, familie
   };
 
   const chip = (active: boolean) =>
-    `min-h-12 rounded-xl border-2 px-3 text-base font-semibold ${active ? 'border-brand bg-brand text-white' : 'border-cream-200 bg-white'}`;
+    `min-h-12 rounded-xl border-2 px-3 text-base font-semibold ${active ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-white'}`;
 
   return (
     <Modal
@@ -175,7 +175,7 @@ export function ResponsibilityFormModal({ eventId, initial, defaultKind, familie
                     aria-pressed={on}
                     onClick={() => setFamilyIds((ids) => toggle(ids, f.id))}
                     className={`flex min-h-12 items-center gap-2 rounded-full border-2 px-4 text-base font-semibold ${
-                      on ? 'border-ink-900 ring-2 ring-gold-400' : 'border-cream-200'
+                      on ? 'border-ink-900 ring-2 ring-gold-400' : 'border-mist-200'
                     }`}
                     style={{ backgroundColor: FAMILY_COLORS[f.color].soft, color: FAMILY_COLORS[f.color].text }}
                   >
@@ -190,7 +190,7 @@ export function ResponsibilityFormModal({ eventId, initial, defaultKind, familie
           )}
           <div className="max-h-64 space-y-2 overflow-y-auto rounded-xl">
             {visiblePeople.map((p) => (
-              <label key={p.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-cream-200 bg-white px-3">
+              <label key={p.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-white px-3">
                 <input
                   type="checkbox"
                   className="size-5 accent-brand"
@@ -224,7 +224,7 @@ export function ResponsibilityFormModal({ eventId, initial, defaultKind, familie
         {formError && <Notice tone="error">{formError}</Notice>}
 
         {initial && (
-          <div className="border-t border-cream-200 pt-4">
+          <div className="border-t border-mist-200 pt-4">
             {confirmingDelete ? (
               <div className="space-y-2 rounded-xl bg-berry-50 p-3" role="alert">
                 <p className="font-semibold text-berry-700">¿Quitar «{initial.title}»?</p>
@@ -238,7 +238,7 @@ export function ResponsibilityFormModal({ eventId, initial, defaultKind, familie
                 </div>
               </div>
             ) : (
-              <Button variant="ghost" onClick={() => setConfirmingDelete(true)} icon={<Trash2 className="size-5" aria-hidden />} className="!text-berry-700">
+              <Button variant="ghost" onClick={() => setConfirmingDelete(true)} icon={<Trash2 className="size-5" aria-hidden />} className="text-berry-700! hover:bg-berry-50!">
                 Quitar
               </Button>
             )}

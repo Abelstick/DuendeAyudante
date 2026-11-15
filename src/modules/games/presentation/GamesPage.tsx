@@ -1,11 +1,13 @@
-import { Dices, Merge, Plus, RotateCcw, Vote } from 'lucide-react';
+import { Dices, Merge, Plus, RotateCcw, Settings, Vote } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { actingParticipants, canEditContent } from '@/modules/events/domain/Event';
 import type { Participant } from '@/modules/members/domain/Participant';
+import { useFamilies } from '@/modules/families/presentation/hooks';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { Button, Spinner } from '@/shared/ui/Button';
-import { Card, EmptyState, Notice, PageTitle, SectionTitle } from '@/shared/ui/Card';
+import { Card, CardTitle, EmptyState, Notice, PageTitle, Pill, SectionTitle } from '@/shared/ui/Card';
+import { chipClasses, selectClasses } from '@/shared/ui/Tabs';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { useToast } from '@/shared/ui/Toast';
 import { toTitleCase } from '@/shared/validation/names';
@@ -14,6 +16,7 @@ import { GameCard } from './GameCard';
 import { GameFormModal } from './GameFormModal';
 import { useGameMutations, useGamePoll, useGames, useGameVotes } from './hooks';
 import { MergeGamesModal } from './MergeGamesModal';
+import { ParticipantDraw } from './ParticipantDraw';
 import { Roulette } from './Roulette';
 
 type Editing = { game: Game | null } | null;
@@ -24,6 +27,7 @@ export function GamesPage() {
   const poll = useGamePoll(event.id);
   const votes = useGameVotes(event.id);
   const participants = useParticipants(event.id);
+  const families = useFamilies(event.id);
   const mutations = useGameMutations(event.id);
   const toast = useToast();
 
@@ -71,7 +75,7 @@ export function GamesPage() {
 
   return (
     <div className="space-y-5 pb-20">
-      <PageTitle icon={<Dices className="size-8 text-brand" aria-hidden />} title="Juegos y actividades" subtitle="Propón ideas, vota y ¡a jugar!" />
+      <PageTitle tone="night" icon={<Dices className="size-8" aria-hidden />} title="Juegos y actividades" subtitle="Propón ideas, vota y ¡a jugar!" />
 
       <Roulette
         games={active}
@@ -82,13 +86,13 @@ export function GamesPage() {
 
       {/* Estado de la votación */}
       {pollStatus === 'open' && voter && (
-        <Card className="space-y-3 border-2 border-brand">
-          <p className="flex items-center gap-2 text-lg font-bold text-brand">
-            <Vote className="size-6" aria-hidden /> ¡La votación está abierta!
-          </p>
+        <Card className="space-y-3 border-2 border-brand!">
+          <CardTitle icon={<Vote className="size-6" />} action={<Pill tone={remaining > 0 ? 'brand' : 'success'}>{pollMax - remaining} de {pollMax}</Pill>}>
+            ¡La votación está abierta!
+          </CardTitle>
           {acting.length > 1 && (
             <fieldset>
-              <legend className="mb-2 text-base font-semibold">¿Por quién votas?</legend>
+              <legend className="mb-2 text-base font-bold">¿Por quién votas?</legend>
               <div className="flex flex-wrap gap-2">
                 {acting.map((p: Participant) => (
                   <button
@@ -96,9 +100,7 @@ export function GamesPage() {
                     type="button"
                     aria-pressed={voter.id === p.id}
                     onClick={() => setVoterId(p.id)}
-                    className={`min-h-12 rounded-full border-2 px-4 text-base font-semibold ${
-                      voter.id === p.id ? 'border-brand bg-brand text-white' : 'border-cream-200 bg-white'
-                    }`}
+                    className={chipClasses(voter.id === p.id)}
                   >
                     {p.id === context.me?.id ? 'Por mí' : `Por ${toTitleCase(p.firstName)}`}
                   </button>
@@ -122,8 +124,10 @@ export function GamesPage() {
 
       {/* Herramientas del organizador / editores */}
       {isEditor && (
-        <Card className="space-y-3 border-2 border-gold-400 bg-gold-100/40">
-          <SectionTitle>Organizar juegos</SectionTitle>
+        <Card className="space-y-3 border-2 border-gold-400! bg-gold-50">
+          <CardTitle icon={<Settings className="size-6" />} tone="gold">
+            Organizar juegos
+          </CardTitle>
           {pollStatus === 'open' ? (
             <Button
               variant="secondary"
@@ -139,7 +143,7 @@ export function GamesPage() {
                 <select
                   value={maxVotes}
                   onChange={(e) => setMaxVotes(Number(e.target.value))}
-                  className="min-h-12 rounded-xl border-2 border-cream-200 bg-white px-3 text-base"
+                  className={selectClasses}
                 >
                   {[1, 2, 3, 4, 5].map((n) => (
                     <option key={n} value={n}>
@@ -184,6 +188,10 @@ export function GamesPage() {
         </EmptyState>
       ) : (
         <div className="space-y-3">
+          <h2 className="flex items-center justify-between gap-2 text-xl font-extrabold text-ink-900">
+            {showVotes ? 'Ranking de juegos' : 'Catálogo de juegos'}
+            <Pill tone="night">{active.length}</Pill>
+          </h2>
           {ranked.map(({ game, votes: n, percent }, i) => {
             const hasVoted = myVotes.some((v) => v.gameId === game.id);
             const busy =
@@ -223,13 +231,15 @@ export function GamesPage() {
         </div>
       )}
 
+      <ParticipantDraw participants={people} families={families.data ?? []} />
+
       {played.length > 0 && (
         <section className="space-y-2">
           <SectionTitle>✅ Ya jugamos</SectionTitle>
           <ul className="space-y-2">
             {played.map((g) => (
-              <li key={g.id} className="flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-white px-4 py-3">
-                <span className="text-base font-semibold">{g.name}</span>
+              <li key={g.id} className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-mist-200 bg-white px-4 py-3">
+                <span className="text-base font-bold text-ink-700">{g.name}</span>
                 {isEditor && (
                   <Button
                     variant="ghost"
@@ -247,9 +257,9 @@ export function GamesPage() {
 
       {/* Barra fija para unir juegos */}
       {selecting && (
-        <div className="fixed inset-x-0 bottom-20 z-30 px-4 md:bottom-6">
-          <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 rounded-2xl bg-ink-900 px-4 py-3 text-white shadow-xl">
-            <span className="text-base font-semibold">{selected.length} elegidos</span>
+        <div className="fixed inset-x-0 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-30 px-4 md:bottom-6 md:pl-64">
+          <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 rounded-2xl bg-night-800 px-4 py-3 text-white shadow-lift">
+            <span className="text-base font-bold">{selected.length} elegidos</span>
             <Button disabled={selected.length < 2} onClick={() => setMerging(true)} icon={<Merge className="size-5" aria-hidden />}>
               Unir
             </Button>

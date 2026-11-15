@@ -93,7 +93,7 @@ export function AnnouncementFormModal({ eventId, initial, onClose }: { eventId: 
                 aria-pressed={priority === value}
                 onClick={() => setPriority(value)}
                 className={`min-h-13 rounded-xl border-2 px-3 text-base font-semibold ${
-                  priority === value ? 'border-brand bg-brand text-white' : 'border-cream-200 bg-white'
+                  priority === value ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-white'
                 }`}
               >
                 {label}
@@ -105,7 +105,7 @@ export function AnnouncementFormModal({ eventId, initial, onClose }: { eventId: 
         {formError && <Notice tone="error">{formError}</Notice>}
 
         {initial && (
-          <div className="border-t border-cream-200 pt-4">
+          <div className="border-t border-mist-200 pt-4">
             {confirmingDelete ? (
               <div className="space-y-2 rounded-xl bg-berry-50 p-3" role="alert">
                 <p className="font-semibold text-berry-700">¿Quitar este anuncio?</p>
@@ -119,7 +119,7 @@ export function AnnouncementFormModal({ eventId, initial, onClose }: { eventId: 
                 </div>
               </div>
             ) : (
-              <Button variant="ghost" onClick={() => setConfirmingDelete(true)} icon={<Trash2 className="size-5" aria-hidden />} className="!text-berry-700">
+              <Button variant="ghost" onClick={() => setConfirmingDelete(true)} icon={<Trash2 className="size-5" aria-hidden />} className="text-berry-700! hover:bg-berry-50!">
                 Quitar anuncio
               </Button>
             )}

@@ -100,7 +100,7 @@ export function GameFormModal({ eventId, initial, allGames, participants, propos
                   aria-pressed={proposedBy === p.id}
                   onClick={() => setProposedBy(p.id)}
                   className={`min-h-12 rounded-full border-2 px-4 text-base font-semibold ${
-                    proposedBy === p.id ? 'border-brand bg-brand text-white' : 'border-cream-200 bg-white'
+                    proposedBy === p.id ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-white'
                   }`}
                 >
                   {p.id === meId ? 'Mía' : `De ${toTitleCase(p.firstName)}`}
@@ -142,7 +142,7 @@ export function GameFormModal({ eventId, initial, allGames, participants, propos
         {formError && <Notice tone="error">{formError}</Notice>}
 
         {initial && canDelete && (
-          <div className="border-t border-cream-200 pt-4">
+          <div className="border-t border-mist-200 pt-4">
             {confirmingDelete ? (
               <div className="space-y-2 rounded-xl bg-berry-50 p-3" role="alert">
                 <p className="font-semibold text-berry-700">¿Quitar «{initial.name}»? También se borran sus votos.</p>
@@ -156,7 +156,7 @@ export function GameFormModal({ eventId, initial, allGames, participants, propos
                 </div>
               </div>
             ) : (
-              <Button variant="ghost" onClick={() => setConfirmingDelete(true)} icon={<Trash2 className="size-5" aria-hidden />} className="!text-berry-700">
+              <Button variant="ghost" onClick={() => setConfirmingDelete(true)} icon={<Trash2 className="size-5" aria-hidden />} className="text-berry-700! hover:bg-berry-50!">
                 Quitar este juego
               </Button>
             )}

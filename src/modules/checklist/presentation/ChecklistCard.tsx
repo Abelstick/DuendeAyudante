@@ -7,7 +7,8 @@ import { useResponsibilities } from '@/modules/responsibilities/presentation/hoo
 import { actingParticipants } from '@/modules/events/domain/Event';
 import { useEventWishlist } from '@/modules/wishlist/presentation/hooks';
 import { Spinner } from '@/shared/ui/Button';
-import { Card } from '@/shared/ui/Card';
+import { Card, CardTitle, Pill } from '@/shared/ui/Card';
+import { ProgressBar } from '@/shared/ui/Progress';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { useToast } from '@/shared/ui/Toast';
 import { ChecklistService } from '../application/ChecklistService';
@@ -46,7 +47,11 @@ export function ChecklistCard() {
     if (!entry.itemId) return;
     try {
       await setDone.mutateAsync({ itemId: entry.itemId, participantId: entry.participantId, done: !entry.done });
-      if (!entry.done) toast.success('¡Bien hecho! Tarea completada.');
+      if (!entry.done) {
+        const wasLast = checklist !== null && checklist.total - checklist.done === 1;
+        if (wasLast) toast.celebrate('🎉 ¡Completaste toda tu preparación!');
+        else toast.success('¡Bien hecho! Tarea completada.');
+      }
     } catch (err) {
       toast.error(errorMessage(err));
     }
@@ -54,39 +59,25 @@ export function ChecklistCard() {
 
   return (
     <Card className="space-y-4">
-      <h2 className="flex items-center gap-2 text-xl font-bold text-brand">
-        <ListChecks className="size-6" aria-hidden /> Tu preparación
-      </h2>
+      <CardTitle
+        icon={<ListChecks className="size-6" />}
+        action={checklist ? <Pill tone={checklist.done === checklist.total ? 'gold' : 'brand'}>{checklist.done} de {checklist.total}</Pill> : undefined}
+      >
+        Tu preparación
+      </CardTitle>
 
       {!checklist ? (
         <Spinner label="Cargando…" />
       ) : (
         <>
           <div>
-            <p className="mb-1 text-base">
-              {checklist.done === checklist.total ? (
-                <strong>🎉 ¡Completaste todo! </strong>
-              ) : (
-                <>
-                  Llevas <strong>{checklist.done}</strong> de <strong>{checklist.total}</strong>
-                </>
-              )}
-            </p>
-            <div
-              className="h-4 overflow-hidden rounded-full bg-cream-200"
-              role="progressbar"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={checklist.percent}
-              aria-label="Progreso de tu preparación"
-            >
-              <div className="h-full rounded-full bg-brand transition-[width] duration-500" style={{ width: `${checklist.percent}%` }} />
-            </div>
+            {checklist.done === checklist.total && <p className="mb-2 text-base font-bold text-gold-700">🎉 ¡Completaste todo! Ya estás listo para la fiesta.</p>}
+            <ProgressBar percent={checklist.percent} label="Progreso de tu preparación" tone={checklist.done === checklist.total ? 'gold' : 'brand'} />
           </div>
 
           <ul className="space-y-2">
             {checklist.entries.map((entry) => (
-              <li key={entry.key} className={`rounded-2xl border-2 p-3 ${entry.done ? 'border-brand-soft bg-brand-soft' : 'border-cream-200 bg-white'}`}>
+              <li key={entry.key} className={`rounded-2xl border-2 p-3 transition-colors ${entry.done ? 'border-brand-soft bg-brand-soft' : 'border-mist-200 bg-white'}`}>
                 <div className="flex items-start gap-3">
                   {entry.kind === 'manual' ? (
                     <button
@@ -96,11 +87,11 @@ export function ChecklistCard() {
                       aria-label={entry.title}
                       disabled={setDone.isPending}
                       onClick={() => toggle(entry)}
-                      className={`flex size-12 shrink-0 items-center justify-center rounded-xl border-2 ${
-                        entry.done ? 'border-brand bg-brand text-white' : 'border-ink-500 bg-white'
+                      className={`flex size-12 shrink-0 items-center justify-center rounded-xl border-2 transition-all active:scale-90 ${
+                        entry.done ? 'border-brand bg-brand text-white' : 'border-ink-500 bg-white hover:border-brand'
                       }`}
                     >
-                      {entry.done && <Check className="size-7" strokeWidth={3} aria-hidden />}
+                      {entry.done && <Check className="size-7 animate-pop-in" strokeWidth={3} aria-hidden />}
                     </button>
                   ) : (
                     <span
@@ -120,7 +111,7 @@ export function ChecklistCard() {
                     {entry.description && !entry.done && <p className="text-sm text-ink-700">{entry.description}</p>}
                     {entry.kind === 'manual' && !entry.done && <p className="text-sm text-ink-500">Toca el cuadro cuando lo hayas hecho.</p>}
                     {entry.link && !entry.done && (
-                      <Link to={entry.link} className="mt-1 inline-flex min-h-12 items-center gap-1 text-base font-semibold text-brand underline">
+                      <Link to={entry.link} className="mt-1 inline-flex min-h-12 items-center gap-1 text-base font-bold text-brand underline underline-offset-4">
                         {entry.linkLabel}
                         <ChevronRight className="size-5" aria-hidden />
                       </Link>

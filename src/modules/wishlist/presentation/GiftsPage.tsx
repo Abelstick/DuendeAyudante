@@ -1,16 +1,18 @@
-import { ChevronRight, Gift, Users } from 'lucide-react';
+import { ChevronRight, Gift, Users, Wallet } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { actingParticipants } from '@/modules/events/domain/Event';
-import type { Family } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS, type Family } from '@/modules/families/domain/Family';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { displayName, type Participant } from '@/modules/members/domain/Participant';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { formatMoney } from '@/shared/lib/money';
+import { Avatar } from '@/shared/ui/Avatar';
 import { Spinner } from '@/shared/ui/Button';
-import { Notice, PageTitle } from '@/shared/ui/Card';
+import { Notice, PageTitle, Pill } from '@/shared/ui/Card';
+import { chipClasses, SegmentedTabs } from '@/shared/ui/Tabs';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { TextField } from '@/shared/ui/TextField';
 import { toTitleCase } from '@/shared/validation/names';
@@ -30,31 +32,26 @@ export function GiftsPage() {
 
   return (
     <div className="space-y-5">
-      <PageTitle icon={<Gift className="size-8 text-berry-600" aria-hidden />} title="Regalos" />
+      <PageTitle tone="berry" icon={<Gift className="size-8" aria-hidden />} title="Regalos" subtitle="Tu lista de deseos y la de tu familia" />
 
-      <div className="grid grid-cols-2 gap-2 rounded-2xl bg-cream-200 p-1.5" role="tablist" aria-label="Qué regalos ver">
-        {(
-          [
-            ['mine', 'Mis regalos'],
-            ['all', 'Regalos de todos'],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            aria-selected={view === value}
-            onClick={() => setView(value)}
-            className={`min-h-13 rounded-xl text-base font-bold ${view === value ? 'bg-white text-brand shadow' : 'text-ink-700'}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <SegmentedTabs
+        label="Qué regalos ver"
+        value={view}
+        onChange={setView}
+        options={[
+          { value: 'mine', label: 'Mis regalos', icon: <Gift className="size-5" aria-hidden /> },
+          { value: 'all', label: 'Regalos de todos', icon: <Users className="size-5" aria-hidden /> },
+        ]}
+      />
 
       {budget != null && (
-        <p className="rounded-2xl bg-gold-100 px-4 py-3 text-base">
-          💰 Presupuesto del intercambio: <strong>{formatMoney(budget, event.currency)}</strong>
+        <p className="flex items-center gap-3 rounded-2xl border border-gold-300 bg-gold-50 px-4 py-3 text-base">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gold-400 text-night-900" aria-hidden>
+            <Wallet className="size-5" />
+          </span>
+          <span>
+            Presupuesto del intercambio: <strong className="text-lg">{formatMoney(budget, event.currency)}</strong>
+          </span>
         </p>
       )}
 
@@ -87,7 +84,7 @@ function MyGifts({ items, startAdding }: { items: WishlistItem[]; startAdding: b
     <div className="space-y-4">
       {people.length > 1 && (
         <fieldset>
-          <legend className="mb-2 text-lg font-semibold">¿De quién son estos regalos?</legend>
+          <legend className="mb-2 text-lg font-extrabold">¿De quién son estos regalos?</legend>
           <div className="flex flex-wrap gap-2">
             {people.map((p) => (
               <button
@@ -95,9 +92,7 @@ function MyGifts({ items, startAdding }: { items: WishlistItem[]; startAdding: b
                 type="button"
                 aria-pressed={p.id === selected.id}
                 onClick={() => setSelectedId(p.id)}
-                className={`min-h-12 rounded-full border-2 px-5 text-base font-semibold ${
-                  p.id === selected.id ? 'border-brand bg-brand text-white' : 'border-cream-200 bg-white'
-                }`}
+                className={chipClasses(p.id === selected.id)}
               >
                 {p.id === context.me?.id ? 'Yo' : toTitleCase(p.firstName)}
               </button>
@@ -151,21 +146,26 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
       {groups.map((g) => (
         <section key={g.key} className="space-y-2">
           <h2 className="text-lg font-bold">{g.family ? <FamilyBadge family={g.family} /> : 'Sin familia'}</h2>
-          <ul className="space-y-2">
+          <ul className="stagger space-y-2">
             {g.people.map((p) => {
               const count = byPerson.get(p.id)?.length ?? 0;
               return (
                 <li key={p.id}>
                   <Link
                     to={`/e/${event.id}/regalos/persona/${p.id}`}
-                    className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-cream-200 bg-white px-4 py-3 hover:border-brand"
+                    className="tap-card flex min-h-16 items-center gap-3 rounded-2xl border border-mist-200 bg-white px-4 py-3 shadow-card hover:border-brand"
                   >
-                    <span>
-                      <span className="block text-lg font-semibold">{displayName(p)}</span>
-                      <span className="block text-sm text-ink-700">
-                        {count === 0 ? 'Todavía no agregó regalos' : `${count} ${count === 1 ? 'regalo' : 'regalos'}`}
-                      </span>
+                    <Avatar name={p.fullName} colors={g.family && { bg: FAMILY_COLORS[g.family.color].soft, fg: FAMILY_COLORS[g.family.color].text }} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-lg font-bold leading-tight">{displayName(p)}</span>
+                      <span className="block text-sm text-ink-700">{count === 0 ? 'Todavía no agregó regalos' : 'Toca para ver su lista'}</span>
                     </span>
+                    {count > 0 && (
+                      <Pill tone="berry">
+                        🎁 {count}
+                        <span className="sr-only">{count === 1 ? ' regalo' : ' regalos'}</span>
+                      </Pill>
+                    )}
                     <ChevronRight className="size-6 shrink-0 text-brand" aria-hidden />
                   </Link>
                 </li>

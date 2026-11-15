@@ -1,36 +1,81 @@
 @import 'tailwindcss';
 
-@theme {
-  --color-pine-50: #eef6f1;
-  --color-pine-100: #d6eadd;
-  --color-pine-600: #2a6b47;
-  --color-pine-700: #1f5236;
-  --color-pine-800: #183f2a;
-  --color-pine-900: #112e1f;
-  --color-berry-50: #fdeeee;
-  --color-berry-600: #b3262e;
-  --color-berry-700: #8f1d24;
-  --color-gold-100: #fbf1cf;
-  --color-gold-400: #e0bb3e;
-  --color-gold-600: #a8841a;
-  --color-cream-50: #fffdf8;
-  --color-cream-100: #fbf6ec;
-  --color-cream-200: #f3ead6;
-  --color-ink-900: #1c1a17;
-  --color-ink-700: #4a453d;
-  --color-ink-500: #6f685d;
+/* ==========================================================================
+   SISTEMA DE DISEÑO · Navidad en Familia
+   --------------------------------------------------------------------------
+   Roles de color
+     · brand  → color de la familia de la persona (verde pino por defecto).
+                Acción principal, selección y títulos.
+     · berry  → rojo navideño: detalles festivos, regalos y acciones de riesgo.
+     · gold   → premios, momentos especiales y avisos importantes.
+     · night  → azul noche: navegación, banners "mágicos" e información.
+     · mist   → fondos y bordes neutros (descansan la vista).
+     · ink    → textos.
+   Radios: 12 px (campos) · 16 px (botones, chips) · 24 px (tarjetas) · 28 px (banners)
+   Espaciado: múltiplos de 4 px; 16 px de margen lateral; 20 px entre tarjetas.
+   ========================================================================== */
 
-  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+@theme {
+  --color-pine-50: #eef8f2;
+  --color-pine-100: #ddf2e5;
+  --color-pine-600: #176b45;
+  --color-pine-700: #125538;
+  --color-pine-800: #0e432c;
+  --color-pine-900: #0a301f;
+
+  --color-berry-50: #fdeeee;
+  --color-berry-100: #f9d6d6;
+  --color-berry-500: #de4343;
+  --color-berry-600: #c62828;
+  --color-berry-700: #a31f1f;
+
+  --color-gold-50: #fef9ea;
+  --color-gold-100: #fcf0cd;
+  --color-gold-300: #f2d27d;
+  --color-gold-400: #e7b84b;
+  --color-gold-600: #8a6410;
+  --color-gold-700: #6b4d0b;
+
+  --color-night-50: #eef2f9;
+  --color-night-100: #dbe4f3;
+  --color-night-600: #2c4a7c;
+  --color-night-700: #223a63;
+  --color-night-800: #172b4d;
+  --color-night-900: #0f1e38;
+
+  --color-mist-50: #fafbfe;
+  --color-mist-100: #f7f8fc;
+  --color-mist-200: #e4e7ef;
+  --color-mist-300: #cfd4e0;
+
+  --color-ink-900: #202938;
+  --color-ink-700: #4b5565;
+  --color-ink-500: #667085;
+
+  --font-sans: 'Nunito', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* Sombras suaves, teñidas de azul noche */
+  --shadow-card: 0 1px 2px rgb(23 43 77 / 0.05), 0 6px 16px -6px rgb(23 43 77 / 0.1);
+  --shadow-lift: 0 2px 4px rgb(23 43 77 / 0.06), 0 14px 28px -10px rgb(23 43 77 / 0.22);
+  --shadow-glow: 0 0 0 4px rgb(231 184 75 / 0.28);
+
+  --animate-pop-in: pop-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  --animate-rise: rise 0.4s ease-out both;
+  --animate-twinkle: twinkle 3.2s ease-in-out infinite;
+  --animate-float: float 5s ease-in-out infinite;
+  --animate-wiggle: wiggle 0.5s ease-in-out;
+  --animate-tick: tick 0.35s ease-out;
+  --animate-sheet-up: sheet-up 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) both;
 }
 
 /* Identidad de color de la familia: EventLayout cambia estas variables
    según la familia de la persona (rojo, verde, blanco…). */
 :root {
-  --brand: #1f5236;
-  --brand-strong: #183f2a;
-  --brand-soft: #eef6f1;
-  --brand-page: #fbf6ec;
-  --brand-accent: #e0bb3e;
+  --brand: #176b45;
+  --brand-strong: #125538;
+  --brand-soft: #ddf2e5;
+  --brand-page: #f7f8fc;
+  --brand-accent: #e7b84b;
 }
 
 @theme inline {
@@ -45,6 +90,7 @@
 html {
   font-size: 112.5%;
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 html[data-text-size='large'] {
   font-size: 131.25%;
@@ -56,6 +102,29 @@ body {
   color: var(--color-ink-900);
   font-family: var(--font-sans);
   line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+button,
+a,
+select,
+label {
+  touch-action: manipulation;
+}
+
+button:not(:disabled),
+select,
+summary,
+[role='button'] {
+  cursor: pointer;
 }
 
 /* Foco siempre visible para quien navega con teclado */
@@ -64,28 +133,205 @@ body {
   outline-offset: 2px;
 }
 
-/* Nieve sutil decorativa en el encabezado */
-.snow-bg {
+/* --------------------------------------------------------------------------
+   Decoración
+   -------------------------------------------------------------------------- */
+
+/* Cielo nocturno: del azul noche al color de la familia */
+.sky-bg {
+  background-color: var(--color-night-800);
   background-image:
-    radial-gradient(circle at 12% 30%, rgb(255 255 255 / 0.22) 0 2px, transparent 3px),
-    radial-gradient(circle at 78% 18%, rgb(255 255 255 / 0.18) 0 2px, transparent 3px),
-    radial-gradient(circle at 45% 70%, rgb(255 255 255 / 0.16) 0 1.5px, transparent 2.5px),
-    radial-gradient(circle at 90% 75%, rgb(255 255 255 / 0.2) 0 2px, transparent 3px),
-    radial-gradient(circle at 25% 85%, rgb(255 255 255 / 0.14) 0 1.5px, transparent 2.5px);
+    radial-gradient(120% 90% at 85% -10%, rgb(231 184 75 / 0.2), transparent 55%),
+    linear-gradient(165deg, var(--color-night-900) 0%, var(--color-night-800) 45%, color-mix(in srgb, var(--brand) 70%, var(--color-night-800)) 100%);
 }
 
+/* Nieve / estrellas estáticas (no consumen batería) */
+.snow-bg {
+  background-image:
+    radial-gradient(circle at 12% 30%, rgb(255 255 255 / 0.3) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 18%, rgb(255 255 255 / 0.24) 0 2px, transparent 3px),
+    radial-gradient(circle at 45% 70%, rgb(255 255 255 / 0.2) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 90% 75%, rgb(255 255 255 / 0.26) 0 2px, transparent 3px),
+    radial-gradient(circle at 25% 85%, rgb(255 255 255 / 0.18) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 60% 40%, rgb(255 255 255 / 0.16) 0 1px, transparent 2px);
+}
+
+/* Borde inferior "de nieve" para encabezados */
+.snow-cap {
+  position: relative;
+}
+.snow-cap::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px 0;
+  height: 14px;
+  background: var(--brand-page);
+  -webkit-mask: radial-gradient(14px 14px at 14px 14px, #000 98%, transparent) -14px 0 / 28px 100% repeat-x;
+  mask: radial-gradient(14px 14px at 14px 14px, #000 98%, transparent) -14px 0 / 28px 100% repeat-x;
+  pointer-events: none;
+}
+
+/* Botón con "relieve": se hunde al presionarlo (feedback táctil visible) */
+.btn-3d {
+  box-shadow: 0 4px 0 0 var(--btn-edge, rgb(0 0 0 / 0.18));
+  transition:
+    transform 0.08s ease-out,
+    box-shadow 0.08s ease-out,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+.btn-3d:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 var(--btn-edge, rgb(0 0 0 / 0.18));
+}
+
+/* Tarjeta tocable: se eleva un poco al pasar o presionar */
+.tap-card {
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.15s ease-out,
+    border-color 0.15s ease-out;
+}
+@media (hover: hover) {
+  .tap-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+  }
+}
+.tap-card:active {
+  transform: scale(0.98);
+}
+
+/* Aparición escalonada de los hijos directos (listas de tarjetas) */
+.stagger > * {
+  animation: rise 0.4s ease-out both;
+}
+.stagger > *:nth-child(2) {
+  animation-delay: 50ms;
+}
+.stagger > *:nth-child(3) {
+  animation-delay: 100ms;
+}
+.stagger > *:nth-child(4) {
+  animation-delay: 150ms;
+}
+.stagger > *:nth-child(5) {
+  animation-delay: 200ms;
+}
+.stagger > *:nth-child(n + 6) {
+  animation-delay: 240ms;
+}
+
+/* Confeti: se usa en momentos especiales (completar todo, ganar, guardar un regalo) */
+.confetti-piece {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 10px;
+  height: 14px;
+  border-radius: 3px;
+  opacity: 0;
+  animation: confetti 1.5s cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
+  animation-delay: var(--delay, 0ms);
+  will-change: transform, opacity;
+}
+
+/* Ventanas: fondo y entrada */
+dialog::backdrop {
+  background: rgb(15 30 56 / 0.55);
+  backdrop-filter: blur(2px);
+}
+dialog[open] > div {
+  animation: sheet-up 0.28s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+/* --------------------------------------------------------------------------
+   Animaciones
+   -------------------------------------------------------------------------- */
 @keyframes pop-in {
   from {
     opacity: 0;
-    transform: translateY(6px) scale(0.98);
+    transform: translateY(6px) scale(0.97);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-.animate-pop-in {
-  animation: pop-in 0.25s ease-out both;
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-7deg);
+  }
+  75% {
+    transform: rotate(7deg);
+  }
+}
+@keyframes tick {
+  from {
+    transform: translateY(-18%);
+    opacity: 0.4;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes confetti {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, 0) rotate(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--dx)), var(--dy)) rotate(var(--rot));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -93,6 +339,11 @@ body {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
+  }
+  .confetti-piece {
+    display: none;
   }
 }

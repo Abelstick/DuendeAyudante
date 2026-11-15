@@ -31,7 +31,7 @@ export function FamiliesManager({ eventId, families, participants }: { eventId: 
             const count = participants.filter((p) => p.familyId === f.id).length;
             const color = FAMILY_COLORS[f.color];
             return (
-              <li key={f.id} className="overflow-hidden rounded-2xl border border-cream-200 bg-white shadow-sm">
+              <li key={f.id} className="overflow-hidden rounded-2xl border border-mist-200 bg-white shadow-card">
                 <div className="h-3" style={{ backgroundColor: FAMILY_THEMES[f.color].strong }} aria-hidden />
                 <div className="space-y-2 p-4">
                   <p className="text-lg font-bold" style={{ color: color.text }}>
@@ -172,7 +172,7 @@ function FamilyFormModal({ eventId, editing, families, memberCount, onClose }: F
                   aria-pressed={color === c}
                   onClick={() => setColor(c)}
                   className={`flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl border-2 text-sm font-semibold ${
-                    color === c ? 'border-ink-900 ring-2 ring-gold-400' : 'border-cream-200'
+                    color === c ? 'border-ink-900 ring-2 ring-gold-400' : 'border-mist-200'
                   }`}
                   style={{ backgroundColor: FAMILY_COLORS[c].soft, color: FAMILY_COLORS[c].text }}
                 >
@@ -189,7 +189,7 @@ function FamilyFormModal({ eventId, editing, families, memberCount, onClose }: F
         </fieldset>
 
         {/* Vista previa de cómo verán la aplicación los integrantes */}
-        <div className="overflow-hidden rounded-2xl border border-cream-200" aria-hidden>
+        <div className="overflow-hidden rounded-2xl border border-mist-200" aria-hidden>
           <div className="snow-bg px-4 py-3 text-base font-bold text-white" style={{ backgroundColor: FAMILY_THEMES[color].strong }}>
             🎄 Así verán la aplicación sus integrantes
           </div>
@@ -208,7 +208,7 @@ function FamilyFormModal({ eventId, editing, families, memberCount, onClose }: F
         {formError && <Notice tone="error">{formError}</Notice>}
 
         {initial && (
-          <div className="border-t border-cream-200 pt-4">
+          <div className="border-t border-mist-200 pt-4">
             {confirmingDelete ? (
               <div className="space-y-2 rounded-xl bg-berry-50 p-3" role="alert">
                 <p className="font-semibold text-berry-700">
@@ -224,7 +224,7 @@ function FamilyFormModal({ eventId, editing, families, memberCount, onClose }: F
                 </div>
               </div>
             ) : (
-              <Button variant="ghost" onClick={() => setConfirmingDelete(true)} icon={<Trash2 className="size-5" aria-hidden />} className="!text-berry-700">
+              <Button variant="ghost" onClick={() => setConfirmingDelete(true)} icon={<Trash2 className="size-5" aria-hidden />} className="text-berry-700! hover:bg-berry-50!">
                 Quitar esta familia
               </Button>
             )}

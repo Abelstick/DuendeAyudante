@@ -2,10 +2,12 @@ import { ArrowLeft } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { actingParticipants, canManageEvent } from '@/modules/events/domain/Event';
+import { FAMILY_COLORS } from '@/modules/families/domain/Family';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { displayName } from '@/modules/members/domain/Participant';
 import { useParticipants } from '@/modules/members/presentation/hooks';
+import { Avatar } from '@/shared/ui/Avatar';
 import { ButtonLink, Spinner } from '@/shared/ui/Button';
 import { EmptyState, Notice } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
@@ -31,6 +33,7 @@ export function PersonGiftsPage() {
   const person = participants.data?.find((p) => p.id === participantId);
   if (!person) return <Notice tone="error">No encontramos a esta persona.</Notice>;
 
+  const family = families.data?.find((f) => f.id === person.familyId);
   const items = (wishlist.data ?? []).filter((w) => w.participantId === person.id);
   const canEdit = canManageEvent(context.role) || actingParticipants(context).some((p) => p.id === person.id);
 
@@ -39,9 +42,13 @@ export function PersonGiftsPage() {
       <ButtonLink to={`/e/${event.id}/regalos?vista=todos`} variant="ghost" icon={<ArrowLeft className="size-5" aria-hidden />}>
         Volver a Regalos de todos
       </ButtonLink>
-      <header className="space-y-2">
-        <h1 className="text-2xl font-bold text-brand">{displayName(person)}</h1>
-        <FamilyBadge family={families.data?.find((f) => f.id === person.familyId)} showColorName />
+      <header className="flex items-center gap-4 rounded-3xl border border-mist-200 bg-white p-5 shadow-card">
+        <Avatar name={person.fullName} size="lg" colors={family && { bg: FAMILY_COLORS[family.color].soft, fg: FAMILY_COLORS[family.color].text }} />
+        <div className="min-w-0 space-y-1">
+          <p className="text-sm font-bold uppercase tracking-wide text-ink-500">Lista de deseos de</p>
+          <h1 className="text-2xl font-black leading-tight text-ink-900">{displayName(person)}</h1>
+          <FamilyBadge family={family} showColorName />
+        </div>
       </header>
 
       {secretNotes.data?.some((n) => n.receiverId === person.id) && (
@@ -60,7 +67,7 @@ export function PersonGiftsPage() {
       ) : items.length === 0 ? (
         <EmptyState emoji="🎁" title="Todavía no agregó regalos." />
       ) : (
-        <div className="space-y-4">
+        <div className="stagger space-y-4">
           {items.map((item) => (
             <WishlistItemCard key={item.id} item={item} budget={budget} currency={event.currency} canEdit={false} />
           ))}

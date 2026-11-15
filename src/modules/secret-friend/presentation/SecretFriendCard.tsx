@@ -8,7 +8,9 @@ import { displayName } from '@/modules/members/domain/Participant';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { formatMoney } from '@/shared/lib/money';
 import { Button, ButtonLink } from '@/shared/ui/Button';
-import { Card } from '@/shared/ui/Card';
+import { Card, CardTitle, Pill } from '@/shared/ui/Card';
+import { GiftBox } from '@/shared/ui/illustrations';
+import { chipClasses } from '@/shared/ui/Tabs';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { useToast } from '@/shared/ui/Toast';
 import { toTitleCase } from '@/shared/validation/names';
@@ -54,9 +56,9 @@ export function SecretFriendCard() {
 
   return (
     <Card className="space-y-3">
-      <h2 className="flex items-center gap-2 text-xl font-bold text-brand">
-        <Gift className="size-6" aria-hidden /> Amigo secreto
-      </h2>
+      <CardTitle icon={<Gift className="size-6" />} tone="berry" action={<Pill tone="neutral">🔒 Privado</Pill>}>
+        Amigo secreto
+      </CardTitle>
 
       {people.length > 1 && (
         <div className="flex flex-wrap gap-2" role="group" aria-label="De quién">
@@ -70,9 +72,7 @@ export function SecretFriendCard() {
                 setRevealed(false);
                 setConfirmingClear(false);
               }}
-              className={`min-h-12 rounded-full border-2 px-4 text-base font-semibold ${
-                giver.id === p.id ? 'border-brand bg-brand text-white' : 'border-cream-200 bg-white'
-              }`}
+              className={chipClasses(giver.id === p.id)}
             >
               {p.id === context.me?.id ? 'El mío' : `El de ${toTitleCase(p.firstName)}`}
             </button>
@@ -87,37 +87,43 @@ export function SecretFriendCard() {
             a mano.
           </p>
           <p className="text-sm text-ink-700">🔒 Es opcional y privado: nadie más lo verá, ni el organizador.</p>
-          <Button variant="secondary" onClick={() => setPicking(true)}>
+          <Button variant="secondary" onClick={() => setPicking(true)} icon={<Gift className="size-5" aria-hidden />}>
             Anotar amigo secreto
           </Button>
         </>
       ) : (
         <>
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-brand-soft p-4">
-            <div>
-              <p className="text-sm text-ink-700">{forName ? `${forName} le regala a:` : 'Le regalas a:'}</p>
+          {/* El nombre queda dentro del regalo hasta que la persona decide abrirlo */}
+          <div className={`flex items-center gap-4 rounded-2xl border-2 p-4 transition-colors ${revealed ? 'border-gold-400 bg-gold-50' : 'border-berry-100 bg-berry-50'}`}>
+            <GiftBox tone="berry" open={revealed} className={`size-20 shrink-0 ${revealed ? '' : 'motion-safe:animate-float'}`} />
+            <div className="min-w-0 flex-1 space-y-1">
+              <p className="text-sm font-semibold text-ink-700">{forName ? `${forName} le regala a:` : 'Le regalas a:'}</p>
               {revealed ? (
-                <div className="space-y-1">
-                  <p className="text-xl font-bold text-brand">{displayName(receiver)}</p>
+                <div className="animate-pop-in space-y-1">
+                  <p className="text-xl font-black leading-tight text-ink-900">{displayName(receiver)}</p>
                   <FamilyBadge family={families.data?.find((f) => f.id === receiver.familyId)} />
                 </div>
               ) : (
-                <p className="text-xl font-bold tracking-widest text-ink-500" aria-label="Nombre oculto">
-                  ● ● ● ● ● ●
+                <p className="text-lg font-extrabold text-berry-700" aria-label="Nombre oculto">
+                  Está guardado en secreto 🤫
                 </p>
               )}
             </div>
-            <Button
-              variant="ghost"
-              onClick={() => setRevealed((v) => !v)}
-              aria-pressed={revealed}
-              icon={revealed ? <EyeOff className="size-5" aria-hidden /> : <Eye className="size-5" aria-hidden />}
-            >
-              {revealed ? 'Ocultar' : 'Mostrar'}
-            </Button>
           </div>
+          <Button
+            variant={revealed ? 'ghost' : 'secondary'}
+            onClick={() => setRevealed((v) => !v)}
+            aria-pressed={revealed}
+            icon={revealed ? <EyeOff className="size-5" aria-hidden /> : <Eye className="size-5" aria-hidden />}
+          >
+            {revealed ? 'Ocultar el nombre' : 'Mostrar el nombre'}
+          </Button>
 
-          {budget != null && <p className="text-base text-ink-700">💰 Presupuesto: {formatMoney(budget, event.currency)}</p>}
+          {budget != null && (
+            <p className="text-base text-ink-700">
+              💰 Presupuesto: <strong className="text-ink-900">{formatMoney(budget, event.currency)}</strong>
+            </p>
+          )}
 
           <ButtonLink to={`/e/${event.id}/regalos/persona/${receiver.id}`} icon={<Gift className="size-5" aria-hidden />}>
             Ver qué le gustaría recibir

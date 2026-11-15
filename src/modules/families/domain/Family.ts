@@ -35,11 +35,11 @@ export interface FamilyTheme {
 }
 
 export const DEFAULT_THEME: FamilyTheme = {
-  strong: '#1f5236',
-  strongHover: '#183f2a',
-  soft: '#eef6f1',
-  page: '#fbf6ec',
-  accent: '#e0bb3e',
+  strong: '#176b45',
+  strongHover: '#125538',
+  soft: '#ddf2e5',
+  page: '#f7f8fc',
+  accent: '#e7b84b',
 };
 
 export const FAMILY_THEMES: Record<FamilyColor, FamilyTheme> = {

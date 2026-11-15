@@ -113,12 +113,12 @@ export function CreateEventPage() {
   return (
     <PublicLayout>
       <Card>
-        <h1 className="mb-1 text-2xl font-bold text-brand">Crea tu Navidad 🎄</h1>
+        <h1 className="mb-1 text-2xl font-extrabold text-ink-900">Crea tu Navidad 🎄</h1>
         <p className="mb-5 text-lg text-ink-700">Solo necesitamos unos datos. Podrás cambiarlos después.</p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
           <TextField label="Nombre de la celebración" error={errors.name?.message} {...register('name')} />
 
-          <div className="space-y-2 rounded-2xl border-2 border-gold-400 bg-gold-100/50 p-4">
+          <div className="space-y-2 rounded-2xl border-2 border-gold-400 bg-gold-50 p-4">
             <TextField
               label="Código de tu Navidad"
               hint="Tus familiares lo usarán para entrar (va incluido en el mensaje de WhatsApp). Elige una palabra sencilla, sin espacios. No se podrá cambiar después."
@@ -136,8 +136,8 @@ export function CreateEventPage() {
             )}
           </div>
 
-          <fieldset className="space-y-4 rounded-2xl bg-cream-50 p-4">
-            <legend className="px-1 text-lg font-bold text-brand">¿Quién organiza?</legend>
+          <fieldset className="space-y-4 rounded-2xl bg-mist-100 p-4">
+            <legend className="px-1 text-lg font-extrabold text-ink-900">¿Quién organiza?</legend>
             <TextField label="Tu nombre" autoComplete="given-name" error={errors.firstName?.message} {...register('firstName')} />
             <TextField label="Tu apellido paterno" autoComplete="family-name" error={errors.paternalSurname?.message} {...register('paternalSurname')} />
             <TextField label="Tu apellido materno" optional error={errors.maternalSurname?.message} {...register('maternalSurname')} />

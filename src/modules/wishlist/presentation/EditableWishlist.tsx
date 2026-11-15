@@ -32,7 +32,8 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
     setFormError(null);
     try {
       await save.mutateAsync({ id, eventId, participantId, ...data });
-      toast.success(id ? '¡Cambios guardados!' : '¡Regalo guardado! 🎁');
+      if (id) toast.success('¡Cambios guardados!');
+      else toast.celebrate('¡Regalo guardado! 🎁');
       if (id) setEditingId(null);
       return true;
     } catch (err) {

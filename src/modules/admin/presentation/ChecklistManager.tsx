@@ -51,7 +51,7 @@ export function ChecklistManager({ eventId, families, members }: Props) {
             const target = active.filter((m) => appliesTo(item, m));
             const done = target.filter((m) => progress.data?.some((p) => p.itemId === item.id && p.participantId === m.id)).length;
             return (
-              <li key={item.id} className="space-y-2 rounded-2xl border border-cream-200 bg-white p-4">
+              <li key={item.id} className="space-y-2 rounded-2xl border border-mist-200 bg-white p-4">
                 <p className="text-lg font-semibold">{item.title}</p>
                 {item.description && <p className="text-sm text-ink-700">{item.description}</p>}
                 <div className="flex flex-wrap items-center gap-2 text-sm text-ink-700">
@@ -91,9 +91,9 @@ function ScopeLabel({ item, families, members }: { item: ChecklistItem; families
   if (item.scope === 'family') return <FamilyBadge family={families.find((f) => f.id === item.familyId)} />;
   if (item.scope === 'participant') {
     const m = members.find((x) => x.id === item.participantId);
-    return <span className="rounded-full bg-cream-200 px-3 py-1 font-semibold">Para {m ? displayName(m) : 'una persona'}</span>;
+    return <span className="rounded-full bg-mist-200 px-3 py-1 font-semibold">Para {m ? displayName(m) : 'una persona'}</span>;
   }
-  return <span className="rounded-full bg-cream-200 px-3 py-1 font-semibold">Para todos</span>;
+  return <span className="rounded-full bg-mist-200 px-3 py-1 font-semibold">Para todos</span>;
 }
 
 const schema = z.object({
@@ -159,7 +159,7 @@ function ChecklistItemModal({ eventId, editing, families, members, onClose }: Mo
     }
   };
 
-  const selectClass = 'min-h-13 w-full rounded-xl border-2 border-cream-200 bg-white px-3 text-lg text-ink-900';
+  const selectClass = 'min-h-13 w-full rounded-xl border-2 border-mist-300 bg-white px-3 text-lg text-ink-900';
 
   return (
     <Modal
@@ -199,7 +199,7 @@ function ChecklistItemModal({ eventId, editing, families, members, onClose }: Mo
                   aria-pressed={scope === s}
                   onClick={() => setScope(s)}
                   className={`min-h-13 rounded-xl border-2 px-3 text-base font-semibold ${
-                    scope === s ? 'border-brand bg-brand text-white' : 'border-cream-200 bg-white'
+                    scope === s ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-white'
                   }`}
                 >
                   {scope === s ? '✓ ' : ''}
@@ -239,7 +239,7 @@ function ChecklistItemModal({ eventId, editing, families, members, onClose }: Mo
         {formError && <Notice tone="error">{formError}</Notice>}
 
         {initial && (
-          <div className="border-t border-cream-200 pt-4">
+          <div className="border-t border-mist-200 pt-4">
             {confirmingDelete ? (
               <div className="space-y-2 rounded-xl bg-berry-50 p-3" role="alert">
                 <p className="font-semibold text-berry-700">¿Quitar esta tarea del checklist de todos?</p>
@@ -253,7 +253,7 @@ function ChecklistItemModal({ eventId, editing, families, members, onClose }: Mo
                 </div>
               </div>
             ) : (
-              <Button variant="ghost" onClick={() => setConfirmingDelete(true)} icon={<Trash2 className="size-5" aria-hidden />} className="!text-berry-700">
+              <Button variant="ghost" onClick={() => setConfirmingDelete(true)} icon={<Trash2 className="size-5" aria-hidden />} className="text-berry-700! hover:bg-berry-50!">
                 Quitar esta tarea
               </Button>
             )}

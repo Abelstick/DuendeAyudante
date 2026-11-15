@@ -49,7 +49,7 @@ export function SignUpPage() {
           <p className="text-5xl" aria-hidden>
             📬
           </p>
-          <h1 className="text-2xl font-bold text-brand">Revisa tu correo</h1>
+          <h1 className="text-2xl font-extrabold text-ink-900">Revisa tu correo</h1>
           <p className="text-lg text-ink-700">
             Te enviamos un enlace a <strong>{sentTo}</strong>. Ábrelo para confirmar tu cuenta y luego entra.
           </p>
@@ -64,7 +64,7 @@ export function SignUpPage() {
   return (
     <PublicLayout>
       <Card>
-        <h1 className="mb-1 text-2xl font-bold text-brand">Crear mi Navidad</h1>
+        <h1 className="mb-1 text-2xl font-extrabold text-ink-900">Crear mi Navidad</h1>
         <p className="mb-5 text-lg text-ink-700">
           Primero crea tu cuenta de organizador. Después podrás agregar a tu familia; ellos no necesitan correo.
         </p>

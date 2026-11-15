@@ -62,17 +62,17 @@ export function MembersList({ members, families, myRole }: Props) {
   };
 
   return (
-    <ul className="space-y-3">
+    <ul className="stagger space-y-3">
       {members.map((m) => {
         const isOpen = panel?.memberId === m.id;
         const guardians = m.guardianIds.map((id) => byId.get(id)).filter((g): g is Member => Boolean(g));
         return (
-          <li key={m.id} className="space-y-3 rounded-2xl border border-cream-200 bg-white p-4">
+          <li key={m.id} className="space-y-3 rounded-3xl border border-mist-200 bg-white p-4 shadow-card">
             <div className="space-y-1">
               <p className="text-lg font-bold">{displayName(m)}</p>
               <div className="flex flex-wrap items-center gap-2">
                 <FamilyBadge family={families.find((f) => f.id === m.familyId)} />
-                <span className="rounded-full bg-cream-200 px-3 py-1 text-sm font-semibold">{m.role ? ROLE_LABELS[m.role] : 'Sin usuario'}</span>
+                <span className="rounded-full bg-mist-200 px-3 py-1 text-sm font-semibold">{m.role ? ROLE_LABELS[m.role] : 'Sin usuario'}</span>
               </div>
               {m.username && (
                 <p className="text-base text-ink-700">
@@ -88,7 +88,7 @@ export function MembersList({ members, families, myRole }: Props) {
                 <select
                   value={m.familyId ?? ''}
                   onChange={(e) => changeFamily(m, e.target.value)}
-                  className="min-h-12 rounded-xl border-2 border-cream-200 bg-white px-3 text-base text-ink-900"
+                  className="min-h-12 rounded-xl border-2 border-mist-300 bg-white px-3 text-base text-ink-900"
                 >
                   <option value="">Sin familia</option>
                   {families.map((f) => (

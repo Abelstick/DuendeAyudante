@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { areNamesSimilar, findSimilarGames, type Game, gameCredits, gameNameKey, pickRandomGame, rankGames } from './Game';
+import { areNamesSimilar, findSimilarGames, type Game, gameCredits, gameNameKey, pickRandomGame, pickRandomPeople, rankGames } from './Game';
 
 const game = (id: string, name: string, over: Partial<Game> = {}): Game => ({
   id,
@@ -79,5 +79,26 @@ describe('ranking y ruleta', () => {
     const games = [game('a', 'A'), game('b', 'B')];
     expect(pickRandomGame(games, () => 0.99)?.id).toBe('b');
     expect(pickRandomGame([], () => 0.5)).toBeNull();
+  });
+});
+
+describe('sorteo de participantes', () => {
+  const people = ['ana', 'juan', 'rosa', 'luis', 'eva'];
+
+  it('elige la cantidad pedida, sin repetir a nadie', () => {
+    const chosen = pickRandomPeople(people, 3);
+    expect(chosen).toHaveLength(3);
+    expect(new Set(chosen).size).toBe(3);
+    chosen.forEach((p) => expect(people).toContain(p));
+  });
+
+  it('nunca elige más personas de las que hay ni cambia la lista original', () => {
+    expect(pickRandomPeople(people, 99)).toHaveLength(people.length);
+    expect(pickRandomPeople(people, 0)).toEqual([]);
+    expect(people).toEqual(['ana', 'juan', 'rosa', 'luis', 'eva']);
+  });
+
+  it('depende solo del azar que recibe (resultado reproducible)', () => {
+    expect(pickRandomPeople(people, 2, () => 0)).toEqual(pickRandomPeople(people, 2, () => 0));
   });
 });

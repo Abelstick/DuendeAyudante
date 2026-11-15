@@ -15,19 +15,19 @@ export function MyEventsPage() {
 
   return (
     <PublicLayout>
-      <h1 className="mb-4 text-2xl font-bold text-brand">Mis Navidades</h1>
+      <h1 className="mb-4 rounded-3xl bg-white px-5 py-4 text-2xl font-black text-ink-900 shadow-card">Mis Navidades</h1>
       {events.error && <Notice tone="error">{errorMessage(events.error)}</Notice>}
-      <ul className="space-y-3">
+      <ul className="stagger space-y-3">
         {(events.data ?? []).map(({ event, role }) => (
           <li key={event.id}>
             <Link
               to={`/e/${event.id}`}
-              className="flex min-h-20 items-center justify-between gap-3 rounded-3xl border border-cream-200 bg-white p-5 shadow-sm hover:border-brand"
+              className="tap-card flex min-h-20 items-center justify-between gap-3 rounded-3xl border border-mist-200 bg-white p-5 shadow-card hover:border-brand"
             >
               <span>
-                <span className="block text-lg font-bold text-brand">🎄 {event.name}</span>
-                <span className="block text-base capitalize text-ink-700">{formatEventDate(event.celebrationAt, event.timezone)}</span>
-                <span className="block text-sm text-ink-500">{ROLE_LABELS[role]}</span>
+                <span className="block text-lg font-extrabold text-ink-900">🎄 {event.name}</span>
+                <span className="block text-base text-ink-700 first-letter:uppercase">{formatEventDate(event.celebrationAt, event.timezone)}</span>
+                <span className="mt-1 inline-block rounded-full bg-brand-soft px-3 py-0.5 text-sm font-bold text-brand">{ROLE_LABELS[role]}</span>
               </span>
               <ChevronRight className="size-7 shrink-0 text-brand" aria-hidden />
             </Link>

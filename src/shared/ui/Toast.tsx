@@ -1,47 +1,66 @@
-import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, PartyPopper, XCircle } from 'lucide-react';
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
+import { ConfettiBurst } from './Confetti';
 
 interface ToastItem {
   id: number;
   message: string;
-  tone: 'success' | 'error';
+  tone: 'success' | 'error' | 'celebrate';
 }
 
 interface ToastApi {
   success(message: string): void;
   error(message: string): void;
+  /** Como `success`, pero con confeti: para logros (completar todo, guardar un regalo, ganar). */
+  celebrate(message: string): void;
 }
 
 const ToastContext = createContext<ToastApi | null>(null);
 
+const toneStyles: Record<ToastItem['tone'], string> = {
+  success: 'bg-pine-700 text-white',
+  error: 'bg-berry-600 text-white',
+  celebrate: 'bg-night-800 text-white ring-2 ring-gold-400',
+};
+
 /** Confirmaciones claras y visibles después de cada acción (sin ventanas emergentes). */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<ToastItem[]>([]);
+  const [burst, setBurst] = useState<number | null>(null);
   const nextId = useRef(1);
 
   const push = useCallback((message: string, tone: ToastItem['tone']) => {
     const id = nextId.current++;
     setItems((prev) => [...prev, { id, message, tone }]);
     setTimeout(() => setItems((prev) => prev.filter((t) => t.id !== id)), tone === 'error' ? 7000 : 4000);
+    if (tone === 'celebrate') {
+      setBurst(id);
+      setTimeout(() => setBurst((current) => (current === id ? null : current)), 1800);
+    }
   }, []);
 
   const api = useMemo<ToastApi>(
-    () => ({ success: (m) => push(m, 'success'), error: (m) => push(m, 'error') }),
+    () => ({ success: (m) => push(m, 'success'), error: (m) => push(m, 'error'), celebrate: (m) => push(m, 'celebrate') }),
     [push],
   );
 
   return (
     <ToastContext.Provider value={api}>
       {children}
-      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex flex-col items-center gap-2 px-4 md:bottom-6">
+      {burst !== null && <ConfettiBurst key={burst} />}
+      <div
+        aria-live="polite"
+        className="pointer-events-none fixed inset-x-0 bottom-[calc(6rem+env(safe-area-inset-bottom))] z-50 flex flex-col items-center gap-2 px-4 md:bottom-6"
+      >
         {items.map((t) => (
           <div
             key={t.id}
-            className={`animate-pop-in pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-2xl px-5 py-4 text-lg font-semibold text-white shadow-lg ${
-              t.tone === 'success' ? 'bg-brand' : 'bg-berry-600'
-            }`}
+            role={t.tone === 'error' ? 'alert' : undefined}
+            className={`animate-pop-in pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-2xl px-5 py-4 text-lg font-bold shadow-lift ${toneStyles[t.tone]}`}
           >
-            {t.tone === 'success' ? <CheckCircle2 className="size-7 shrink-0" aria-hidden /> : <XCircle className="size-7 shrink-0" aria-hidden />}
+            {t.tone === 'success' && <CheckCircle2 className="size-7 shrink-0" aria-hidden />}
+            {t.tone === 'error' && <XCircle className="size-7 shrink-0" aria-hidden />}
+            {t.tone === 'celebrate' && <PartyPopper className="size-7 shrink-0 text-gold-400" aria-hidden />}
             {t.message}
           </div>
         ))}

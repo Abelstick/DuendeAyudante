@@ -22,7 +22,7 @@ export function FamiliesOverview() {
   const people = participants.data ?? [];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className="stagger grid gap-4 sm:grid-cols-2">
       {list.map((f) => {
         const color = FAMILY_COLORS[f.color];
         const members = people.filter((p) => p.familyId === f.id);
@@ -32,21 +32,21 @@ export function FamiliesOverview() {
         );
         const isMine = context.me?.familyId === f.id;
         return (
-          <article key={f.id} className="overflow-hidden rounded-3xl border border-cream-200 bg-white shadow-sm">
+          <article key={f.id} className={`overflow-hidden rounded-3xl border-2 bg-white shadow-card ${isMine ? 'border-gold-400' : 'border-mist-200'}`}>
             <header className="snow-bg px-4 py-3 text-white" style={{ backgroundColor: FAMILY_THEMES[f.color].strong }}>
-              <h3 className="text-xl font-bold">Familia {f.name}</h3>
-              <p className="text-sm">
+              <h3 className="text-xl font-black">Familia {f.name}</h3>
+              <p className="flex flex-wrap items-center gap-2 text-sm font-semibold">
                 Color: {color.label}
-                {isMine ? ' · ¡Tu familia!' : ''}
+                {isMine && <span className="rounded-full bg-gold-400 px-2.5 py-0.5 font-black text-night-900">⭐ Tu familia</span>}
               </p>
             </header>
             <div className="space-y-3 p-4">
               {f.dressCodeNote && <p className="text-base">👕 Vestimenta: <strong>{f.dressCodeNote}</strong></p>}
               <div>
-                <p className="text-sm font-semibold text-ink-700">Integrantes ({members.length})</p>
+                <p className="text-sm font-bold uppercase tracking-wide text-ink-500">Integrantes ({members.length})</p>
                 <ul className="mt-1 flex flex-wrap gap-1.5">
                   {members.map((m) => (
-                    <li key={m.id} className="rounded-full px-3 py-1 text-sm font-semibold" style={{ backgroundColor: color.soft, color: color.text }}>
+                    <li key={m.id} className="rounded-full px-3 py-1 text-sm font-bold" style={{ backgroundColor: color.soft, color: color.text }}>
                       {displayName(m)}
                     </li>
                   ))}
@@ -54,7 +54,7 @@ export function FamiliesOverview() {
               </div>
               {contributions.length > 0 && (
                 <div>
-                  <p className="text-sm font-semibold text-ink-700">Aportes y tareas</p>
+                  <p className="text-sm font-bold uppercase tracking-wide text-ink-500">Aportes y tareas</p>
                   <ul className="mt-1 space-y-1">
                     {contributions.map((r) => (
                       <li key={r.id} className="text-base">

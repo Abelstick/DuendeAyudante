@@ -21,7 +21,7 @@ export function AnnouncementsPage() {
       <ButtonLink to={`/e/${event.id}`} variant="ghost" icon={<ArrowLeft className="size-5" aria-hidden />}>
         Volver al inicio
       </ButtonLink>
-      <PageTitle icon={<Megaphone className="size-8 text-brand" aria-hidden />} title="Anuncios" />
+      <PageTitle icon={<Megaphone className="size-8" aria-hidden />} title="Anuncios" subtitle="Avisos y recordatorios para toda la familia" />
 
       {isEditor && (
         <Button size="lg" onClick={() => setEditing({ item: null })} icon={<Megaphone className="size-6" aria-hidden />}>
@@ -33,7 +33,7 @@ export function AnnouncementsPage() {
       {announcements.error && <Notice tone="error">{errorMessage(announcements.error)}</Notice>}
       {announcements.data?.length === 0 && <EmptyState emoji="📢" title="Todavía no hay anuncios." />}
 
-      <div className="space-y-3">
+      <div className="stagger space-y-3">
         {(announcements.data ?? []).map((a) => (
           <AnnouncementItem
             key={a.id}

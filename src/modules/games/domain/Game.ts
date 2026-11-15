@@ -152,3 +152,14 @@ export function pickRandomGame(games: Game[], random: () => number = Math.random
   if (games.length === 0) return null;
   return games[Math.floor(random() * games.length)] ?? null;
 }
+
+/** Elige `count` personas distintas al azar (para sortear quién participa en un juego o reto). */
+export function pickRandomPeople<T>(people: T[], count: number, random: () => number = Math.random): T[] {
+  const pool = [...people];
+  // Fisher–Yates: todas las combinaciones tienen la misma probabilidad
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j]!, pool[i]!];
+  }
+  return pool.slice(0, Math.max(0, Math.min(count, pool.length)));
+}

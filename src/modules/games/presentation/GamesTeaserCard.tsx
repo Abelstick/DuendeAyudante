@@ -1,38 +1,30 @@
-import { ChevronRight, Dices } from 'lucide-react';
+import { Vote } from 'lucide-react';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { ButtonLink } from '@/shared/ui/Button';
-import { Card } from '@/shared/ui/Card';
-import { useGamePoll, useGames } from './hooks';
+import { useGamePoll } from './hooks';
 
-/** En Inicio: cuántas ideas de juegos hay y si se puede votar. */
+/** En Inicio: aviso destacado mientras la votación de juegos está abierta (el resto lo muestra el acceso "Juegos"). */
 export function GamesTeaserCard() {
   const { event } = useEventScope();
-  const games = useGames(event.id);
   const poll = useGamePoll(event.id);
-  if (!games.data) return null;
-
-  const count = games.data.filter((g) => g.status === 'active').length;
-  const open = poll.data?.status === 'open';
+  if (poll.data?.status !== 'open') return null;
 
   return (
-    <Card className={`space-y-3 ${open ? 'border-2 border-brand' : ''}`}>
-      <h2 className="flex items-center gap-2 text-xl font-bold text-brand">
-        <Dices className="size-6" aria-hidden /> Juegos y actividades
-      </h2>
-      <p className="text-base">
-        {open ? (
-          <strong>🗳️ ¡La votación está abierta! Elige tus juegos favoritos.</strong>
-        ) : count === 0 ? (
-          '¿Se te ocurre un juego para la noche? ¡Propónlo!'
-        ) : (
-          <>
-            Hay <strong>{count}</strong> {count === 1 ? 'idea' : 'ideas'} de juegos. ¿Tienes otra?
-          </>
-        )}
-      </p>
-      <ButtonLink to={`/e/${event.id}/juegos`} variant={open ? 'primary' : 'secondary'} icon={<ChevronRight className="size-5" aria-hidden />}>
-        {open ? 'Ir a votar' : 'Ver juegos'}
+    <section className="sky-bg snow-bg animate-pop-in flex flex-col gap-3 rounded-3xl p-5 text-white shadow-card sm:flex-row sm:items-center" aria-labelledby="poll-open-title">
+      <div className="flex flex-1 items-center gap-3">
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 text-gold-300 motion-safe:animate-wiggle" aria-hidden>
+          <Vote className="size-7" />
+        </span>
+        <div>
+          <h2 id="poll-open-title" className="text-xl font-black leading-tight">
+            ¡La votación está abierta!
+          </h2>
+          <p className="text-base text-white/90">Elige tus juegos favoritos para la noche.</p>
+        </div>
+      </div>
+      <ButtonLink to={`/e/${event.id}/juegos`} variant="gold" icon={<Vote className="size-5" aria-hidden />}>
+        Ir a votar
       </ButtonLink>
-    </Card>
+    </section>
   );
 }

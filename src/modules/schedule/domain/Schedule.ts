@@ -55,6 +55,14 @@ export function currentScheduleItemId(items: ScheduleItem[], now: Date = new Dat
   return null;
 }
 
+/** La próxima actividad que todavía no empieza (para mostrar "Después sigue…"). */
+export function nextScheduleItem(items: ScheduleItem[], now: Date = new Date()): ScheduleItem | null {
+  const upcoming = items
+    .filter((i) => i.status === 'pending' && i.startsAt > now)
+    .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());
+  return upcoming[0] ?? null;
+}
+
 export function sortSchedule(items: ScheduleItem[]): ScheduleItem[] {
   return [...items].sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime() || a.title.localeCompare(b.title, 'es'));
 }

@@ -85,13 +85,19 @@ export function EventLayout() {
 
   return (
     <EventScopeContext.Provider value={{ event: event.data, context: context.data }}>
-      <div className={`min-h-dvh pb-28 transition-[padding] duration-200 md:pb-0 ${collapsed ? 'md:pl-24' : 'md:pl-60'}`}>
-        <header className="snow-bg flex items-center justify-between gap-2 bg-brand px-4 py-3 text-white md:hidden">
-          <p className="min-w-0 truncate text-lg font-bold">🎄 {event.data.name}</p>
+      <div className={`min-h-dvh pb-[calc(6.5rem+env(safe-area-inset-bottom))] transition-[padding] duration-200 md:pb-0 ${collapsed ? 'md:pl-24' : 'md:pl-64'}`}>
+        {/* Encabezado móvil: nombre de la Navidad + acceso a Organizar (solo quien administra) */}
+        <header className="sky-bg snow-bg snow-cap flex items-center justify-between gap-2 px-4 pb-5 pt-[calc(0.75rem+env(safe-area-inset-top))] text-white md:hidden">
+          <Link to={base} className="flex min-h-12 min-w-0 items-center gap-2.5 rounded-xl">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-xl" aria-hidden>
+              🎄
+            </span>
+            <span className="line-clamp-2 min-w-0 text-base font-extrabold leading-tight">{event.data.name}</span>
+          </Link>
           {isManager && (
             <Link
               to={`${base}/organizar`}
-              className="flex min-h-12 shrink-0 items-center gap-1.5 rounded-xl bg-white/15 px-3 text-base font-semibold hover:bg-white/25"
+              className="flex min-h-12 shrink-0 items-center gap-1.5 rounded-full bg-gold-400 px-3.5 text-base font-extrabold text-night-900 shadow-card hover:bg-gold-300"
             >
               <Settings className="size-5" aria-hidden />
               Organizar
@@ -102,16 +108,21 @@ export function EventLayout() {
         {/* Navegación lateral en escritorio: se puede plegar (sigue mostrando icono + texto) */}
         <nav
           aria-label="Menú principal"
-          className={`fixed inset-y-0 left-0 hidden flex-col gap-2 bg-brand text-white transition-[width] duration-200 md:flex ${
-            collapsed ? 'w-24 p-2' : 'w-60 p-4'
+          className={`sky-bg snow-bg fixed inset-y-0 left-0 z-30 hidden flex-col gap-1.5 text-white transition-[width] duration-200 md:flex ${
+            collapsed ? 'w-24 p-2' : 'w-64 p-4'
           }`}
         >
           {collapsed ? (
-            <p className="mb-4 text-center text-3xl" title={event.data.name} aria-hidden>
+            <p className="mb-4 mt-2 text-center text-3xl" title={event.data.name} aria-hidden>
               🎄
             </p>
           ) : (
-            <p className="mb-4 px-2 text-xl font-bold leading-tight">🎄 {event.data.name}</p>
+            <p className="mb-4 mt-2 flex items-center gap-2 px-2 text-xl font-black leading-tight">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-white/15 text-2xl" aria-hidden>
+                🎄
+              </span>
+              <span className="min-w-0">{event.data.name}</span>
+            </p>
           )}
           {items.map(({ to, label, icon: Icon, end }) => (
             <NavLink
@@ -119,9 +130,9 @@ export function EventLayout() {
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex rounded-xl font-semibold ${
-                  collapsed ? 'min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs' : 'min-h-12 items-center gap-3 px-3 text-lg'
-                } ${isActive ? 'bg-white text-brand' : 'hover:bg-brand-strong'}`
+                `flex rounded-2xl font-bold transition-colors ${
+                  collapsed ? 'min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs' : 'min-h-13 items-center gap-3 px-4 text-lg'
+                } ${isActive ? 'bg-white text-night-800 shadow-card' : 'text-white/90 hover:bg-white/12'}`
               }
             >
               <Icon className={collapsed ? 'size-7' : 'size-6'} aria-hidden />
@@ -132,8 +143,8 @@ export function EventLayout() {
             type="button"
             onClick={toggleSidebar}
             aria-expanded={!collapsed}
-            className={`mt-auto flex rounded-xl font-semibold text-white/90 hover:bg-brand-strong ${
-              collapsed ? 'min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs' : 'min-h-12 items-center gap-3 px-3 text-base'
+            className={`mt-auto flex rounded-2xl font-semibold text-white/80 transition-colors hover:bg-white/12 ${
+              collapsed ? 'min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs' : 'min-h-12 items-center gap-3 px-4 text-base'
             }`}
           >
             {collapsed ? <PanelLeftOpen className="size-6" aria-hidden /> : <PanelLeftClose className="size-6" aria-hidden />}
@@ -141,30 +152,36 @@ export function EventLayout() {
           </button>
         </nav>
 
-        <main className="mx-auto w-full max-w-2xl px-4 py-5">
+        <main className="mx-auto w-full max-w-2xl px-4 py-5 md:py-8">
           <Outlet />
         </main>
 
         {/* Barra inferior en móvil: icono + texto siempre visibles */}
         <nav
           aria-label="Menú principal"
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-cream-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 rounded-t-3xl border-t border-mist-200 bg-white/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-6px_20px_-8px_rgb(23_43_77/0.18)] backdrop-blur md:hidden"
         >
-          <ul className="mx-auto grid max-w-2xl" style={{ gridTemplateColumns: `repeat(${mobileItems.length}, minmax(0, 1fr))` }}>
+          <ul className="mx-auto grid max-w-2xl px-1" style={{ gridTemplateColumns: `repeat(${mobileItems.length}, minmax(0, 1fr))` }}>
             {mobileItems.map(({ to, label, icon: Icon, end }) => (
               <li key={to}>
                 <NavLink
                   to={to}
                   end={end}
                   className={({ isActive }) =>
-                    `flex min-h-16 flex-col items-center justify-center gap-0.5 px-0.5 text-center text-xs font-semibold leading-tight ${
-                      isActive ? 'text-brand' : 'text-ink-700'
+                    `group flex min-h-[4.25rem] flex-col items-center justify-center gap-0.5 px-0.5 text-center text-xs leading-tight ${
+                      isActive ? 'font-black text-brand' : 'font-bold text-ink-700'
                     }`
                   }
                 >
                   {({ isActive }) => (
                     <>
-                      <Icon className="size-7" strokeWidth={isActive ? 2.5 : 2} aria-hidden />
+                      <span
+                        className={`flex h-8 w-14 items-center justify-center rounded-full transition-all duration-200 group-active:scale-90 ${
+                          isActive ? 'bg-brand text-white shadow-card' : 'bg-transparent'
+                        }`}
+                      >
+                        <Icon className="size-6" strokeWidth={isActive ? 2.5 : 2} aria-hidden />
+                      </span>
                       <span>{label}</span>
                     </>
                   )}
