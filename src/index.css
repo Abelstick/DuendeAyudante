@@ -108,11 +108,18 @@ html[data-text-size='large'] {
 }
 
 body {
-  background-color: var(--brand-page);
-  /* Trama de puntitos, como el fondo de un menú de consola */
-  background-image: radial-gradient(rgb(15 30 56 / 0.07) 1.5px, transparent 1.6px);
-  background-size: 18px 18px;
-  transition: background-color 0.3s ease;
+  /* Fondo invernal: azul hielo con copitos quietos; encima cae la nieve (ver Ambience.tsx) */
+  --page: #d5eaf9;
+  background-color: var(--page);
+  background-image:
+    radial-gradient(rgb(255 255 255 / 0.95) 2px, transparent 2.2px), radial-gradient(rgb(255 255 255 / 0.7) 1.2px, transparent 1.4px);
+  background-size:
+    46px 46px,
+    46px 46px;
+  background-position:
+    0 0,
+    23px 23px;
+  background-attachment: fixed;
   color: var(--color-ink-900);
   font-family: var(--font-sans);
   line-height: 1.5;
@@ -187,7 +194,7 @@ summary,
   position: absolute;
   inset: auto 0 -1px 0;
   height: 12px;
-  background: var(--brand-page);
+  background: var(--page);
   -webkit-mask: radial-gradient(12px 12px at 12px 12px, #000 98%, transparent) -12px 0 / 24px 100% repeat-x;
   mask: radial-gradient(12px 12px at 12px 12px, #000 98%, transparent) -12px 0 / 24px 100% repeat-x;
   pointer-events: none;
@@ -199,6 +206,35 @@ summary,
   border-radius: 10px;
   background-color: var(--color-night-900);
   box-shadow: 0 4px 0 0 rgb(0 0 0 / 0.45);
+}
+
+/* Foquito de la guirnalda: cuelga del cable y se prende y apaga */
+.garland-bulb {
+  position: absolute;
+  top: 13px;
+  width: 10px;
+  height: 14px;
+  margin-left: -5px;
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  border: 1.5px solid var(--color-night-900);
+  box-shadow: 0 0 10px 2px currentColor;
+  animation: bulb 1.8s ease-in-out infinite;
+}
+
+/* Destello que cruza los botones dorados cada pocos segundos */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.65), transparent);
+  transform: skewX(-18deg);
+  animation: shine 4.5s ease-in-out infinite;
+  pointer-events: none;
 }
 
 /* Botón con relieve: se hunde al presionarlo (feedback táctil visible) */
@@ -393,6 +429,26 @@ dialog[open] > div {
     transform: none;
   }
 }
+@keyframes bulb {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1.15);
+  }
+  50% {
+    opacity: 0.45;
+    filter: brightness(0.8);
+  }
+}
+@keyframes shine {
+  0%,
+  70% {
+    left: -60%;
+  }
+  100% {
+    left: 130%;
+  }
+}
 @keyframes snowfall {
   from {
     transform: translate(0, 0);
@@ -434,7 +490,8 @@ dialog[open] > div {
     transition-duration: 0.01ms !important;
   }
   .confetti-piece,
-  .snowflake {
+  .snowflake,
+  .btn-shine::after {
     display: none;
   }
 }

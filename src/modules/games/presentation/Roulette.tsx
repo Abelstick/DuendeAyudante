@@ -1,6 +1,7 @@
 import { CheckCircle2, Dices, RefreshCw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import type { Participant } from '@/modules/members/domain/Participant';
+import { playSound } from '@/shared/lib/sound';
 import { Button } from '@/shared/ui/Button';
 import { CATEGORY_LABELS, type Game, pickRandomGame } from '../domain/Game';
 import { GameDetails } from './GameCard';
@@ -74,13 +75,19 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
     while (elapsed < SPIN_MS - 400) {
       elapsed += delay;
       delay *= 1.12;
-      timers.current.push(window.setTimeout(() => setDisplay(pickRandomGame(games, secureRandom)), elapsed));
+      timers.current.push(
+        window.setTimeout(() => {
+          setDisplay(pickRandomGame(games, secureRandom));
+          playSound('tick');
+        }, elapsed),
+      );
     }
     timers.current.push(
       window.setTimeout(() => {
         setDisplay(final);
         setResult(final);
         setSpinning(false);
+        playSound('reveal');
       }, SPIN_MS),
     );
   };
@@ -94,10 +101,10 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
         <div className="relative size-28 shrink-0" aria-hidden>
           <span className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1.5 border-x-[11px] border-t-[18px] border-x-transparent border-t-gold-400" />
           <div
-            className="size-full rounded-full border-4 border-white shadow-[0_5px_0_0_#000]"
+            className={`size-full rounded-full border-4 border-white shadow-[0_5px_0_0_#000] ${!spinning && !display ? 'motion-safe:animate-[spin_22s_linear_infinite]' : ''}`}
             style={{
               background: wheelBackground(slices),
-              transform: `rotate(${rotation}deg)`,
+              transform: spinning || display ? `rotate(${rotation}deg)` : undefined,
               transition: spinning ? `transform ${SPIN_MS}ms cubic-bezier(0.15, 0.8, 0.2, 1)` : 'none',
             }}
           />

@@ -1,4 +1,4 @@
-import { ChevronRight, KeyRound, LogOut, Type, UserRound } from 'lucide-react';
+import { Bell, ChevronRight, KeyRound, LogOut, Type, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/AuthContext';
@@ -14,6 +14,7 @@ import { Avatar } from '@/shared/ui/Avatar';
 import { Button } from '@/shared/ui/Button';
 import { Card, CardTitle, PageTitle, Pill } from '@/shared/ui/Card';
 import { Modal } from '@/shared/ui/Modal';
+import { useSoundEnabled } from '@/shared/ui/SoundToggle';
 import { applyTextSize, getTextSize, type TextSize } from '@/shared/ui/textSize';
 import { ChangePasswordForm } from './ChangePasswordForm';
 
@@ -26,6 +27,7 @@ export function ProfilePage() {
   const myEvents = useMyEvents();
   const [textSize, setTextSize] = useState<TextSize>(getTextSize);
   const [changing, setChanging] = useState(false);
+  const [soundOn, setSoundOn] = useSoundEnabled();
 
   const me = context.me;
   const family = families.data?.find((f) => f.id === me?.familyId);
@@ -96,6 +98,35 @@ export function ProfilePage() {
               } ${value === 'large' ? 'text-xl' : 'text-base'}`}
             >
               {textSize === value ? '✓ ' : ''}
+              {label}
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="space-y-3">
+        <CardTitle icon={<Bell className="size-6" />} tone="gold">
+          Sonidos
+        </CardTitle>
+        <p className="text-base text-ink-700">Campanitas al completar una tarea, guardar un regalo o girar la ruleta.</p>
+        <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Sonidos">
+          {(
+            [
+              [true, 'Con sonido'],
+              [false, 'Sin sonido'],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={label}
+              type="button"
+              role="radio"
+              aria-checked={soundOn === value}
+              onClick={() => setSoundOn(value)}
+              className={`btn-3d font-display min-h-14 rounded-xl border-2 border-night-900 text-base font-bold ${
+                soundOn === value ? 'bg-brand text-white' : 'bg-white text-night-900 hover:bg-brand-soft'
+              }`}
+            >
+              {soundOn === value ? '✓ ' : ''}
               {label}
             </button>
           ))}

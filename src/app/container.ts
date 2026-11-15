@@ -12,6 +12,8 @@ import { SupabaseChecklistRepository } from '@/modules/checklist/infrastructure/
 import { EventService } from '@/modules/events/application/EventService';
 import { SupabaseEventRepository } from '@/modules/events/infrastructure/SupabaseEventRepository';
 import { FamilyService } from '@/modules/families/application/FamilyService';
+import { FamilyAccessService } from '@/modules/family-access/application/FamilyAccessService';
+import { SupabaseFamilyAccessRepository } from '@/modules/family-access/infrastructure/SupabaseFamilyAccessRepository';
 import { SupabaseFamilyRepository } from '@/modules/families/infrastructure/SupabaseFamilyRepository';
 import { GameService } from '@/modules/games/application/GameService';
 import { SupabaseGameRepository } from '@/modules/games/infrastructure/SupabaseGameRepository';
@@ -33,6 +35,7 @@ export interface Container {
   auth: IAuthService;
   events: EventService;
   families: FamilyService;
+  familyAccess: FamilyAccessService;
   members: MemberService;
   wishlist: WishlistService;
   checklist: ChecklistService;
@@ -49,6 +52,7 @@ export function createContainer(): Container {
     auth: new SupabaseAuthService(supabase, env.memberEmailDomain),
     events: new EventService(new SupabaseEventRepository(supabase)),
     families: new FamilyService(new SupabaseFamilyRepository(supabase)),
+    familyAccess: new FamilyAccessService(new SupabaseFamilyAccessRepository(supabase)),
     members: new MemberService(new SupabaseParticipantRepository(supabase), new EdgeFunctionMemberAccountService(supabase)),
     wishlist: new WishlistService(new SupabaseWishlistRepository(supabase)),
     checklist: new ChecklistService(new SupabaseChecklistRepository(supabase)),

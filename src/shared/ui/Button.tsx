@@ -21,7 +21,7 @@ const variants: Record<Variant, string> = {
   danger: 'btn-3d border-2 border-night-900 bg-berry-600 text-white hover:bg-berry-700',
   ghost: 'bg-transparent text-brand underline decoration-2 underline-offset-4 hover:bg-brand-soft active:bg-brand-soft transition-colors',
   whatsapp: 'btn-3d border-2 border-night-900 bg-[#1f8f4e] text-white hover:bg-[#187540]',
-  gold: 'btn-3d border-2 border-night-900 bg-gold-400 text-night-900 hover:bg-gold-300',
+  gold: 'btn-3d btn-shine border-2 border-night-900 bg-gold-400 text-night-900 hover:bg-gold-300',
 };
 
 // Áreas táctiles de 48 px o más

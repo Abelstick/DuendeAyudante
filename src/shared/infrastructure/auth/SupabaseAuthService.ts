@@ -60,6 +60,15 @@ export class SupabaseAuthService implements IAuthService {
     return this.toAuthUser(data.user);
   }
 
+  async signInWithPass(pass: string): Promise<AuthUser> {
+    const { data, error } = await this.supabase.auth.verifyOtp({ token_hash: pass, type: 'magiclink' });
+    if (error || !data.user) {
+      if (error?.status === 429) throw new AppError('TOO_MANY_ATTEMPTS');
+      throw new AppError(error?.status && error.status < 500 ? 'FAMILY_PASS_EXPIRED' : 'NETWORK');
+    }
+    return this.toAuthUser(data.user);
+  }
+
   async signUpOrganizer(email: string, password: string): Promise<{ needsEmailConfirmation: boolean }> {
     if (email.trim().toLowerCase().endsWith(this.memberEmailDomain)) throw new AppError('EMAIL_INVALID');
     const { data, error } = await this.supabase.auth.signUp({

@@ -2,6 +2,7 @@ import { Minus, Plus, Shuffle, Users } from 'lucide-react';
 import { useState } from 'react';
 import { FAMILY_COLORS, type Family } from '@/modules/families/domain/Family';
 import { displayName, type Participant } from '@/modules/members/domain/Participant';
+import { playSound } from '@/shared/lib/sound';
 import { Avatar } from '@/shared/ui/Avatar';
 import { Button } from '@/shared/ui/Button';
 import { Card, CardTitle } from '@/shared/ui/Card';
@@ -31,6 +32,7 @@ export function ParticipantDraw({ participants, families }: Props) {
   const draw = () => {
     setChosen(pickRandomPeople(participants, amount, secureRandom));
     setRound((r) => r + 1);
+    playSound('reveal');
   };
 
   return (

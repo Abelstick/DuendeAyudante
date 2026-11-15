@@ -1,5 +1,6 @@
 import { CheckCircle2, PartyPopper, XCircle } from 'lucide-react';
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
+import { playSound } from '@/shared/lib/sound';
 import { ConfettiBurst } from './Confetti';
 
 interface ToastItem {
@@ -31,6 +32,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   const push = useCallback((message: string, tone: ToastItem['tone']) => {
     const id = nextId.current++;
+    playSound(tone);
     setItems((prev) => [...prev, { id, message, tone }]);
     setTimeout(() => setItems((prev) => prev.filter((t) => t.id !== id)), tone === 'error' ? 7000 : 4000);
     if (tone === 'celebrate') {

@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Pencil, Plus, Save, Trash2 } from 'lucide-react';
+import { Link2, Pencil, Plus, Save, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { FAMILY_COLOR_KEYS, FAMILY_COLORS, FAMILY_THEMES, type Family, type FamilyColor } from '@/modules/families/domain/Family';
 import { useFamilyMutations } from '@/modules/families/presentation/hooks';
-import type { Participant } from '@/modules/members/domain/Participant';
+import { useFamilyAccessList } from '@/modules/family-access/presentation/hooks';
+import type { Member } from '@/modules/members/domain/Participant';
 import { Button } from '@/shared/ui/Button';
 import { EmptyState, Notice } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
@@ -13,11 +14,17 @@ import { Modal } from '@/shared/ui/Modal';
 import { useToast } from '@/shared/ui/Toast';
 import { TextField } from '@/shared/ui/TextField';
 import { normalizeName } from '@/shared/validation/names';
+import { FamilyLinkModal } from './FamilyLinkModal';
 
 type Editing = { mode: 'create' } | { mode: 'edit'; family: Family } | null;
 
-export function FamiliesManager({ eventId, families, participants }: { eventId: string; families: Family[]; participants: Participant[] }) {
+export function FamiliesManager({ eventId, families, participants }: { eventId: string; families: Family[]; participants: Member[] }) {
   const [editing, setEditing] = useState<Editing>(null);
+  const [linkFamilyId, setLinkFamilyId] = useState<string | null>(null);
+  const accessList = useFamilyAccessList(eventId);
+  const linkFamily = families.find((f) => f.id === linkFamilyId);
+  /** Quiénes podrán entrar con el enlace: participantes activos con usuario propio. */
+  const eligible = (familyId: string) => participants.filter((p) => p.familyId === familyId && p.status === 'active' && p.hasAccount && p.role === 'participant').length;
 
   return (
     <div className="space-y-4">
@@ -31,7 +38,7 @@ export function FamiliesManager({ eventId, families, participants }: { eventId: 
             const count = participants.filter((p) => p.familyId === f.id).length;
             const color = FAMILY_COLORS[f.color];
             return (
-              <li key={f.id} className="overflow-hidden rounded-2xl border-2 border-mist-300 bg-white shadow-card">
+              <li key={f.id} className="overflow-hidden rounded-xl border-2 border-night-900 bg-white shadow-block">
                 <div className="h-3" style={{ backgroundColor: FAMILY_THEMES[f.color].strong }} aria-hidden />
                 <div className="space-y-2 p-4">
                   <p className="text-lg font-bold" style={{ color: color.text }}>
@@ -42,9 +49,14 @@ export function FamiliesManager({ eventId, families, participants }: { eventId: 
                     {color.label} · {count} {count === 1 ? 'integrante' : 'integrantes'}
                   </p>
                   {f.dressCodeNote && <p className="text-sm text-ink-700">👕 {f.dressCodeNote}</p>}
-                  <Button variant="secondary" onClick={() => setEditing({ mode: 'edit', family: f })} icon={<Pencil className="size-5" aria-hidden />}>
-                    Editar
-                  </Button>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <Button onClick={() => setLinkFamilyId(f.id)} icon={<Link2 className="size-5" aria-hidden />}>
+                      {accessList.data?.some((a) => a.familyId === f.id) ? 'Enlace de la familia' : 'Crear enlace'}
+                    </Button>
+                    <Button variant="ghost" onClick={() => setEditing({ mode: 'edit', family: f })} icon={<Pencil className="size-5" aria-hidden />}>
+                      Editar
+                    </Button>
+                  </div>
                 </div>
               </li>
             );
@@ -64,6 +76,16 @@ export function FamiliesManager({ eventId, families, participants }: { eventId: 
           families={families}
           memberCount={editing.mode === 'edit' ? participants.filter((p) => p.familyId === editing.family.id).length : 0}
           onClose={() => setEditing(null)}
+        />
+      )}
+
+      {linkFamily && !accessList.isLoading && (
+        <FamilyLinkModal
+          key={linkFamily.id}
+          family={linkFamily}
+          access={accessList.data?.find((a) => a.familyId === linkFamily.id) ?? null}
+          eligibleCount={eligible(linkFamily.id)}
+          onClose={() => setLinkFamilyId(null)}
         />
       )}
     </div>

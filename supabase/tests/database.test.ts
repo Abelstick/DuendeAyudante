@@ -745,6 +745,48 @@ describe('RLS: gestión del evento', () => {
     expect(p.rows[0]!).toEqual({ family_id: null, event_id: eventA });
   });
 
+  it('enlace de familia: solo quien administra lo crea y lo ve; el enlace no cambia al cambiar la palabra', async () => {
+    const fam = await db.query<{ id: string }>(
+      `insert into public.families (event_id, name) values ($1, 'enlace') returning id`,
+      [eventA],
+    );
+    const familyId = fam.rows[0]!.id;
+
+    // Un participante y un editor no pueden crearlo
+    await expectDenied(as(ids.rosa, (tx) => tx.query(`select * from public.set_family_access_word($1, 'paneton')`, [familyId])));
+    await expectDenied(as(ids.editor, (tx) => tx.query(`select * from public.set_family_access_word($1, 'paneton')`, [familyId])));
+    // Tampoco el organizador de otra Navidad
+    await expectDenied(as(ids.ownerB, (tx) => tx.query(`select * from public.set_family_access_word($1, 'paneton')`, [familyId])));
+
+    const first = await as(ids.ownerA, (tx) =>
+      tx.query<{ link_token: string; secret_word: string }>(`select * from public.set_family_access_word($1, '  Panetón 25 ')`, [familyId]),
+    );
+    expect(first.rows[0]!.secret_word).toBe('PANETON25');
+    expect(first.rows[0]!.link_token).toMatch(/^[a-f0-9]{32}$/);
+
+    const second = await as(ids.ownerA, (tx) =>
+      tx.query<{ link_token: string; secret_word: string }>(`select * from public.set_family_access_word($1, 'estrella')`, [familyId]),
+    );
+    expect(second.rows[0]!).toEqual({ link_token: first.rows[0]!.link_token, secret_word: 'ESTRELLA' });
+
+    // Palabras inválidas
+    await expect(as(ids.ownerA, (tx) => tx.query(`select * from public.set_family_access_word($1, 'ab')`, [familyId]))).rejects.toThrow(/SECRET_WORD_INVALID/);
+    await expect(as(ids.ownerA, (tx) => tx.query(`select * from public.set_family_access_word($1, 'hola-mundo')`, [familyId]))).rejects.toThrow(
+      /SECRET_WORD_INVALID/,
+    );
+
+    // Lectura: el organizador ve la palabra; participantes y editores no ven nada
+    const seen = await as(ids.ownerA, (tx) => tx.query<{ secret_word: string }>(`select secret_word from public.family_access where family_id = $1`, [familyId]));
+    expect(seen.rows.map((r) => r.secret_word)).toEqual(['ESTRELLA']);
+    for (const user of [ids.rosa, ids.editor, ids.ownerB]) {
+      const hidden = await as(user, (tx) => tx.query(`select secret_word from public.family_access where family_id = $1`, [familyId]));
+      expect(hidden.rows).toEqual([]);
+    }
+    // Nadie escribe la tabla directamente, ni lee los contadores de intentos
+    await expectDenied(as(ids.ownerA, (tx) => tx.query(`update public.family_access set secret_word = 'OTRA' where family_id = $1`, [familyId])));
+    await expectDenied(as(ids.ownerA, (tx) => tx.query(`select failed_attempts from public.family_access`)));
+  });
+
   it('anon no puede leer nada', async () => {
     await expect(
       db.transaction(async (tx) => {

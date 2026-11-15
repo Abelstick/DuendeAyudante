@@ -59,7 +59,7 @@ export function OrganizePage() {
       </Card>
 
       <ol className="grid gap-2 sm:grid-cols-3" aria-label="Pasos para empezar">
-        {['Crea las familias', 'Agrega a tus familiares', 'Envíales su acceso por WhatsApp'].map((label, i) => (
+        {['Crea las familias', 'Agrega a tus familiares', 'Comparte el enlace de cada familia'].map((label, i) => (
           <li
             key={label}
             aria-current={i + 1 === step ? 'step' : undefined}

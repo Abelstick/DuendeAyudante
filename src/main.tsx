@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MotionConfig } from 'motion/react';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
@@ -36,11 +37,13 @@ if (!env.isConfigured) {
     <StrictMode>
       <ContainerProvider container={createContainer()}>
         <QueryClientProvider client={queryClient}>
-          <ToastProvider>
-            <AuthProvider>
-              <RouterProvider router={router} />
-            </AuthProvider>
-          </ToastProvider>
+          <MotionConfig reducedMotion="user">
+            <ToastProvider>
+              <AuthProvider>
+                <RouterProvider router={router} />
+              </AuthProvider>
+            </ToastProvider>
+          </MotionConfig>
         </QueryClientProvider>
       </ContainerProvider>
     </StrictMode>,

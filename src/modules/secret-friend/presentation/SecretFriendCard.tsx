@@ -7,6 +7,7 @@ import { useFamilies } from '@/modules/families/presentation/hooks';
 import { displayName } from '@/modules/members/domain/Participant';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { formatMoney } from '@/shared/lib/money';
+import { playSound } from '@/shared/lib/sound';
 import { Button, ButtonLink } from '@/shared/ui/Button';
 import { Card, CardTitle, Pill } from '@/shared/ui/Card';
 import { GiftBox } from '@/shared/ui/illustrations';
@@ -112,7 +113,10 @@ export function SecretFriendCard() {
           </div>
           <Button
             variant={revealed ? 'ghost' : 'secondary'}
-            onClick={() => setRevealed((v) => !v)}
+            onClick={() => {
+              if (!revealed) playSound('reveal');
+              setRevealed((v) => !v);
+            }}
             aria-pressed={revealed}
             icon={revealed ? <EyeOff className="size-5" aria-hidden /> : <Eye className="size-5" aria-hidden />}
           >

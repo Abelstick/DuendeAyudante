@@ -6,6 +6,7 @@ import { RecoverPage } from '@/modules/accounts/presentation/RecoverPage';
 import { SignUpPage } from '@/modules/accounts/presentation/SignUpPage';
 import { WelcomePage } from '@/modules/accounts/presentation/WelcomePage';
 import { OrganizePage } from '@/modules/admin/presentation/OrganizePage';
+import { FamilyLinkPage } from '@/modules/family-access/presentation/FamilyLinkPage';
 import { CreateEventPage } from '@/modules/events/presentation/CreateEventPage';
 import { HomePage } from '@/modules/events/presentation/HomePage';
 import { GamesPage } from '@/modules/games/presentation/GamesPage';
@@ -22,6 +23,8 @@ export const router = createBrowserRouter([
   { path: '/entrar', element: <LoginPage /> },
   { path: '/registro', element: <SignUpPage /> },
   { path: '/recuperar', element: <RecoverPage /> },
+  // Enlace de la familia: palabra secreta + elegir el nombre (sin usuario ni contraseña)
+  { path: '/f/:token', element: <FamilyLinkPage /> },
   {
     path: '/nueva-contrasena',
     element: (

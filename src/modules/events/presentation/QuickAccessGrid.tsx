@@ -1,10 +1,12 @@
 import { CalendarClock, ChevronRight, Dices, Gift, HandPlatter, type LucideIcon } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { useGamePoll, useGames } from '@/modules/games/presentation/hooks';
 import { ResponsibilityService } from '@/modules/responsibilities/application/ResponsibilityService';
 import { useResponsibilities } from '@/modules/responsibilities/presentation/hooks';
 import { useSchedule } from '@/modules/schedule/presentation/hooks';
+import { playSound } from '@/shared/lib/sound';
 import { useEventWishlist } from '@/modules/wishlist/presentation/hooks';
 import { actingParticipants } from '../domain/Event';
 
@@ -75,18 +77,26 @@ export function QuickAccessGrid() {
 
   return (
     <nav aria-label="Accesos rápidos">
-      <ul className="stagger grid grid-cols-2 gap-3">
-        {tiles.map(({ to, title, detail, icon: Icon, style, badge }) => (
-          <li key={to}>
+      <ul className="grid grid-cols-2 gap-3">
+        {tiles.map(({ to, title, detail, icon: Icon, style, badge }, i) => (
+          <motion.li
+            key={to}
+            initial={{ opacity: 0, y: 24, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 20, delay: 0.06 * i }}
+            whileHover={{ y: -4, rotate: i % 2 === 0 ? -1.2 : 1.2 }}
+            whileTap={{ scale: 0.95, y: 3 }}
+          >
             <Link
               to={to}
-              className={`tap-card select-ring relative flex h-full min-h-32 flex-col justify-between gap-2 overflow-hidden rounded-2xl border-2 border-night-900 p-3.5 shadow-block active:shadow-none ${style}`}
+              onClick={() => playSound('tap')}
+              className={`select-ring relative flex h-full min-h-32 flex-col justify-between gap-2 overflow-hidden rounded-2xl border-2 border-night-900 p-3.5 shadow-block active:shadow-none ${style}`}
             >
               {/* franja de brillo, como la carátula de un juego */}
               <span className="pointer-events-none absolute inset-x-0 top-0 h-2 bg-white/25" aria-hidden />
               <span className="relative flex items-start justify-between gap-2">
                 <span className="flex size-12 items-center justify-center rounded-xl border-2 border-night-900 bg-white text-night-900 shadow-[0_3px_0_0_var(--color-night-900)]">
-                  <Icon className="size-7" aria-hidden />
+                  <Icon className="size-7 motion-safe:animate-float" style={{ animationDelay: `${i * 0.3}s` }} aria-hidden />
                 </span>
                 {badge && (
                   <span className="font-display whitespace-nowrap rounded-lg border-2 border-night-900 bg-white px-2 py-0.5 text-sm font-semibold text-berry-700 motion-safe:animate-float">
@@ -102,7 +112,7 @@ export function QuickAccessGrid() {
                 <span className="block text-sm font-bold leading-snug">{detail}</span>
               </span>
             </Link>
-          </li>
+          </motion.li>
         ))}
       </ul>
     </nav>

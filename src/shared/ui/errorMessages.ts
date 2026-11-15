@@ -71,6 +71,13 @@ const MESSAGES: Record<string, string> = {
   TOO_MANY_LINKS: 'Puedes poner hasta 5 enlaces por regalo.',
   LINK_INVALID: 'Uno de los enlaces no es válido. Cópialo de nuevo desde la tienda.',
 
+  SECRET_WORD_INVALID: 'La palabra secreta debe tener entre 4 y 20 letras o números, sin espacios (ej. PANETON).',
+  SECRET_WORD_WRONG: 'Esa no es la palabra secreta. Revisa el mensaje de WhatsApp que te enviaron e inténtalo de nuevo.',
+  FAMILY_LINK_NOT_FOUND: 'Este enlace no existe. Pide a quien organiza tu Navidad que te lo envíe otra vez.',
+  FAMILY_LINK_LOCKED: 'Hubo demasiados intentos con una palabra equivocada. Espera 15 minutos y vuelve a intentarlo.',
+  MEMBER_NOT_ELIGIBLE: 'Esta persona no puede entrar con el enlace. Debe entrar con su usuario y contraseña.',
+  FAMILY_PASS_EXPIRED: 'No pudimos terminar de entrar. Toca tu nombre otra vez.',
+
   FORBIDDEN: 'No tienes permiso para hacer esto.',
   NOT_FOUND_OR_FORBIDDEN: 'No puedes cambiar este regalo.',
   NOT_FOUND: 'No encontramos lo que buscas.',

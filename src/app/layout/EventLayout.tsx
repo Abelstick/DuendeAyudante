@@ -1,4 +1,5 @@
 import { Dices, Gift, House, PanelLeftClose, PanelLeftOpen, PartyPopper, Settings, UserRound } from 'lucide-react';
+import { motion } from 'motion/react';
 import { createContext, useContext, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useParams } from 'react-router-dom';
 import { canManageEvent, type ChristmasEvent, type EventContext } from '@/modules/events/domain/Event';
@@ -8,7 +9,10 @@ import { useFamilies } from '@/modules/families/presentation/hooks';
 import { ButtonLink } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
-import { Tree } from '@/shared/ui/illustrations';
+import { playSound } from '@/shared/lib/sound';
+import { Garland, SnowBackdrop } from '@/shared/ui/Ambience';
+import { Snowfall, Tree, WinterScene } from '@/shared/ui/illustrations';
+import { SoundToggle } from '@/shared/ui/SoundToggle';
 import { FullPageSpinner } from './FullPageSpinner';
 
 interface EventScope {
@@ -87,7 +91,10 @@ export function EventLayout() {
 
   return (
     <EventScopeContext.Provider value={{ event: event.data, context: context.data }}>
-      <div className={`min-h-dvh pb-[calc(6.5rem+env(safe-area-inset-bottom))] transition-[padding] duration-200 md:pb-0 ${collapsed ? 'md:pl-24' : 'md:pl-64'}`}>
+      <SnowBackdrop />
+      <div
+        className={`relative z-10 min-h-dvh pb-[calc(6.5rem+env(safe-area-inset-bottom))] transition-[padding] duration-200 md:pb-0 ${collapsed ? 'md:pl-24' : 'md:pl-64'}`}
+      >
         {/* Encabezado móvil: nombre de la Navidad + acceso a Organizar (solo quien administra) */}
         <header className="sky-bg snow-bg snow-cap flex items-center justify-between gap-2 px-4 pb-6 pt-[calc(0.75rem+env(safe-area-inset-top))] text-white md:hidden">
           <Link to={base} className="flex min-h-12 min-w-0 items-center gap-2.5 rounded-xl">
@@ -104,14 +111,20 @@ export function EventLayout() {
             </Link>
           )}
         </header>
+        {/* Luces de colores bajo el encabezado */}
+        <Garland count={8} className="-mt-1 md:hidden" />
+        <Garland count={16} className="hidden md:block" />
 
         {/* Navegación lateral en escritorio: se puede plegar (sigue mostrando icono + texto) */}
         <nav
           aria-label="Menú principal"
-          className={`sky-bg snow-bg fixed inset-y-0 left-0 z-30 hidden flex-col gap-2 border-r-2 border-night-900 text-white transition-[width] duration-200 md:flex ${
+          className={`sky-bg snow-bg fixed inset-y-0 left-0 z-30 hidden flex-col gap-2 overflow-hidden border-r-2 border-night-900 text-white transition-[width] duration-200 md:flex ${
             collapsed ? 'w-24 p-2' : 'w-64 p-4'
           }`}
         >
+          {/* Dentro del menú también nieva, sobre un paisaje al pie */}
+          <Snowfall fall={900} />
+          <WinterScene className="h-24" />
           {collapsed ? (
             <p className="mb-4 mt-2 flex justify-center" title={event.data.name} aria-hidden>
               <Tree className="h-12 w-auto" />
@@ -127,8 +140,9 @@ export function EventLayout() {
               key={to}
               to={to}
               end={end}
+              onClick={() => playSound('tap')}
               className={({ isActive }) =>
-                `font-display flex rounded-[10px] border-2 font-bold transition-colors ${
+                `font-display relative flex rounded-[10px] border-2 font-bold transition-colors ${
                   collapsed ? 'min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs' : 'min-h-13 items-center gap-3 px-4 text-lg'
                 } ${isActive ? 'border-night-900 bg-gold-400 text-night-900 shadow-[0_4px_0_0_#000]' : 'border-transparent text-white hover:bg-white/15'}`
               }
@@ -137,11 +151,17 @@ export function EventLayout() {
               {label}
             </NavLink>
           ))}
+          <SoundToggle
+            compact={collapsed}
+            className={`relative mt-auto flex rounded-[10px] font-semibold text-white/90 transition-colors hover:bg-white/15 ${
+              collapsed ? 'min-h-16 flex-col items-center justify-center gap-1 px-1 text-center text-xs' : 'min-h-12 items-center gap-3 px-4 text-base'
+            }`}
+          />
           <button
             type="button"
             onClick={toggleSidebar}
             aria-expanded={!collapsed}
-            className={`mt-auto flex rounded-2xl font-semibold text-white/80 transition-colors hover:bg-white/12 ${
+            className={`relative mb-20 flex rounded-[10px] font-semibold text-white/90 transition-colors hover:bg-white/15 ${
               collapsed ? 'min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs' : 'min-h-12 items-center gap-3 px-4 text-base'
             }`}
           >
@@ -150,10 +170,16 @@ export function EventLayout() {
           </button>
         </nav>
 
-        {/* `key`: cada sección entra con una pequeña transición */}
-        <main key={pathname} className="animate-rise mx-auto w-full max-w-2xl px-4 py-5 md:py-8">
+        {/* `key`: cada sección entra deslizándose con un pequeño rebote */}
+        <motion.main
+          key={pathname}
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+          className="mx-auto w-full max-w-2xl px-4 py-4 md:py-6"
+        >
           <Outlet />
-        </main>
+        </motion.main>
 
         {/* Barra inferior en móvil: icono + texto siempre visibles */}
         <nav
@@ -166,6 +192,7 @@ export function EventLayout() {
                 <NavLink
                   to={to}
                   end={end}
+                  onClick={() => playSound('tap')}
                   className={({ isActive }) =>
                     `group font-display flex min-h-[4.5rem] flex-col items-center justify-center gap-1 px-0.5 text-center text-xs leading-tight ${
                       isActive ? 'font-extrabold text-night-900' : 'font-semibold text-ink-700'

@@ -9,3 +9,7 @@ verify_jwt = true
 
 [functions.change-join-code]
 verify_jwt = true
+
+# Pública: la usan los familiares antes de tener sesión (valida enlace + palabra secreta).
+[functions.family-access]
+verify_jwt = false

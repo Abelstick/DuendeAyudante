@@ -44,7 +44,8 @@ npx supabase db push                              # aplica supabase/migrations/*
 
 **Alternativa sin CLI:** en Supabase → **SQL Editor**, pega y ejecuta, **en este orden**, el contenido de:
 `20261114000001_core_schema.sql`, `20261114000002_security.sql`, `20261114000003_wishlist_rpc.sql`,
-`20261114000004_event_join_code.sql`, `20261114000005_code_history_white_color.sql`, `20261114000006_checklist.sql`, `20261114000007_responsibilities.sql`, `20261114000008_games.sql`, `20261114000009_secret_friend.sql`, `20261114000010_schedule_announcements.sql`.
+`20261114000004_event_join_code.sql`, `20261114000005_code_history_white_color.sql`, `20261114000006_checklist.sql`, `20261114000007_responsibilities.sql`, `20261114000008_games.sql`, `20261114000009_secret_friend.sql`, `20261114000010_schedule_announcements.sql`,
+`20261115000011_family_access.sql`.
 
 > Si ya habías aplicado las primeras migraciones, `npx supabase db push` aplica solo las nuevas.
 
@@ -60,8 +61,13 @@ select app.normalize_name('  josé   pérez ');   -- debe devolver: JOSÉ PÉREZ
 npx supabase functions deploy create-member --use-api
 npx supabase functions deploy reset-member-password --use-api
 npx supabase functions deploy change-join-code --use-api
+npx supabase functions deploy family-access --use-api --no-verify-jwt   # pública: enlace de la familia
 npx supabase secrets set MEMBER_EMAIL_DOMAIN=usuarios.navidad.invalid
 ```
+
+> **Enlace de la familia.** `family-access` es la única función pública (`--no-verify-jwt`): la usan los familiares antes de
+> tener sesión. Valida el enlace y la palabra secreta, y solo deja entrar a cuentas con rol *participante*. No requiere
+> cambiar nada en Authentication: usa el proveedor **Email**, que ya está activado, y no envía ningún correo.
 
 `--use-api` empaqueta las funciones en los servidores de Supabase, así que **no necesita Docker**.
 
