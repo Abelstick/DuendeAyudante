@@ -20,5 +20,7 @@ export interface IAuthService {
   signUpOrganizer(email: string, password: string): Promise<{ needsEmailConfirmation: boolean }>;
   requestPasswordReset(email: string): Promise<void>;
   changePassword(newPassword: string): Promise<void>;
+  /** Comprueba la contraseña de quien tiene la sesión abierta (para ver datos privados). Falla con WRONG_PASSWORD. */
+  verifyPassword(password: string): Promise<void>;
   signOut(): Promise<void>;
 }

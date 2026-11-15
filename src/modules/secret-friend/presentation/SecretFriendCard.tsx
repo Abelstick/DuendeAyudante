@@ -1,6 +1,7 @@
 import { Eye, EyeOff, Gift, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useEventScope } from '@/app/layout/EventLayout';
+import { PasswordGateModal } from '@/modules/accounts/presentation/PasswordGateModal';
 import { actingParticipants } from '@/modules/events/domain/Event';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { useFamilies } from '@/modules/families/presentation/hooks';
@@ -20,7 +21,10 @@ import { SecretFriendPickerModal } from './SecretFriendPickerModal';
 
 /**
  * Amigo secreto OPCIONAL: cada persona puede anotar a quién le regala para
- * tener su lista a mano. El nombre queda oculto hasta tocar «Mostrar».
+ * tener su lista a mano. El nombre queda oculto y, para verlo, se pide la
+ * contraseña de la cuenta CADA VEZ (no se recuerda): así nadie lo ve por
+ * tener el celular a la mano. Mientras está oculto tampoco se ofrecen las
+ * acciones que lo delatarían (ver su lista, cambiarlo).
  */
 export function SecretFriendCard() {
   const { event, context } = useEventScope();
@@ -32,6 +36,7 @@ export function SecretFriendCard() {
   const people = actingParticipants(context);
   const [giverId, setGiverId] = useState<string | null>(people[0]?.id ?? null);
   const [revealed, setRevealed] = useState(false);
+  const [askingPassword, setAskingPassword] = useState(false);
   const [picking, setPicking] = useState(false);
   const [confirmingClear, setConfirmingClear] = useState(false);
 
@@ -114,14 +119,17 @@ export function SecretFriendCard() {
           <Button
             variant={revealed ? 'ghost' : 'secondary'}
             onClick={() => {
-              if (!revealed) playSound('reveal');
-              setRevealed((v) => !v);
+              if (revealed) {
+                setRevealed(false);
+                setConfirmingClear(false);
+              } else setAskingPassword(true);
             }}
             aria-pressed={revealed}
             icon={revealed ? <EyeOff className="size-5" aria-hidden /> : <Eye className="size-5" aria-hidden />}
           >
             {revealed ? 'Ocultar el nombre' : 'Mostrar el nombre'}
           </Button>
+          {!revealed && <p className="text-sm text-ink-700">🔒 Para verlo te pediremos tu contraseña, cada vez.</p>}
 
           {budget != null && (
             <p className="text-base text-ink-700">
@@ -129,11 +137,13 @@ export function SecretFriendCard() {
             </p>
           )}
 
-          <ButtonLink to={`/e/${event.id}/regalos/persona/${receiver.id}`} icon={<Gift className="size-5" aria-hidden />}>
-            Ver qué le gustaría recibir
-          </ButtonLink>
+          {revealed && (
+            <ButtonLink to={`/e/${event.id}/regalos/persona/${receiver.id}`} state={{ secretFriendUnlocked: true }} icon={<Gift className="size-5" aria-hidden />}>
+              Ver qué le gustaría recibir
+            </ButtonLink>
+          )}
 
-          {confirmingClear ? (
+          {!revealed ? null : confirmingClear ? (
             <div className="space-y-2 rounded-xl bg-berry-50 p-3" role="alert">
               <p className="font-semibold text-berry-700">¿Quitar lo que anotaste?</p>
               <div className="flex flex-col gap-2 sm:flex-row">
@@ -156,6 +166,22 @@ export function SecretFriendCard() {
             </div>
           )}
         </>
+      )}
+
+      {askingPassword && (
+        <PasswordGateModal
+          title="Ver el amigo secreto"
+          confirmLabel="Mostrar el nombre"
+          onClose={() => setAskingPassword(false)}
+          onVerified={() => {
+            setAskingPassword(false);
+            setRevealed(true);
+            playSound('reveal');
+          }}
+        >
+          {forName ? `Para ver a quién le regala ${forName}, escribe tu contraseña.` : 'Para ver a quién le regalas, escribe tu contraseña.'} Es la misma con la
+          que entras a la aplicación.
+        </PasswordGateModal>
       )}
 
       {picking && (

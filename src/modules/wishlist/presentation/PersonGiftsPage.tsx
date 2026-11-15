@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { actingParticipants, canManageEvent } from '@/modules/events/domain/Event';
 import { FAMILY_COLORS } from '@/modules/families/domain/Family';
@@ -20,6 +20,8 @@ import { WishlistItemCard } from './WishlistItemCard';
 /** Lista de deseos de una persona (todos los del evento pueden verla). */
 export function PersonGiftsPage() {
   const { participantId = '' } = useParams();
+  // El aviso de amigo secreto solo aparece si se llega desde la tarjeta ya desbloqueada con contraseña
+  const unlocked = (useLocation().state as { secretFriendUnlocked?: boolean } | null)?.secretFriendUnlocked === true;
   const { event, context } = useEventScope();
   const participants = useParticipants(event.id);
   const secretNotes = useMySecretFriends(event.id);
@@ -51,7 +53,7 @@ export function PersonGiftsPage() {
         </div>
       </header>
 
-      {secretNotes.data?.some((n) => n.receiverId === person.id) && (
+      {unlocked && secretNotes.data?.some((n) => n.receiverId === person.id) && (
         <Notice tone="success">🎁 Anotaste que es tu amigo secreto. Solo tú ves este aviso. 🤫</Notice>
       )}
 

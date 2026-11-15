@@ -7,6 +7,7 @@ import { isAppError } from '@/shared/domain/errors';
 const MESSAGES: Record<string, string> = {
   INVALID_CREDENTIALS: 'El código, el usuario o la contraseña no coinciden. Revisa el mensaje de WhatsApp que te enviaron e inténtalo de nuevo.',
   EMAIL_NOT_CONFIRMED: 'Todavía no confirmaste tu correo. Abre el correo que te enviamos y toca el enlace de confirmación.',
+  WRONG_PASSWORD: 'Esa no es tu contraseña. Revísala e inténtalo de nuevo.',
   TOO_MANY_ATTEMPTS: 'Hubo demasiados intentos seguidos. Espera unos minutos y vuelve a intentarlo.',
   NETWORK: 'No pudimos conectarnos. Revisa tu internet y vuelve a intentarlo.',
   NOT_AUTHENTICATED: 'Tu sesión terminó. Vuelve a entrar con tu usuario y contraseña.',

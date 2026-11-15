@@ -97,6 +97,19 @@ export class SupabaseAuthService implements IAuthService {
     if (error) throw new AppError(error.code === 'same_password' ? 'SAME_PASSWORD' : 'PASSWORD_INVALID');
   }
 
+  /** Vuelve a identificar a la misma cuenta: si la contraseña es correcta, la sesión simplemente se renueva. */
+  async verifyPassword(password: string): Promise<void> {
+    const { data } = await this.supabase.auth.getSession();
+    const email = data.session?.user.email;
+    if (!email) throw new AppError('NOT_AUTHENTICATED');
+    const { error } = await this.supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      if (error.status === 429) throw new AppError('TOO_MANY_ATTEMPTS');
+      if (error.status === 400 || error.code === 'invalid_credentials') throw new AppError('WRONG_PASSWORD');
+      throw new AppError('NETWORK');
+    }
+  }
+
   async signOut(): Promise<void> {
     await this.supabase.auth.signOut();
   }
