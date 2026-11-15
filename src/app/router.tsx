@@ -10,7 +10,8 @@ import { CreateEventPage } from '@/modules/events/presentation/CreateEventPage';
 import { HomePage } from '@/modules/events/presentation/HomePage';
 import { GamesPage } from '@/modules/games/presentation/GamesPage';
 import { MyEventsPage } from '@/modules/events/presentation/MyEventsPage';
-import { CelebrationPage } from '@/modules/responsibilities/presentation/CelebrationPage';
+import { AnnouncementsPage } from '@/modules/announcements/presentation/AnnouncementsPage';
+import { CelebrationPage } from '@/modules/events/presentation/CelebrationPage';
 import { GiftsPage } from '@/modules/wishlist/presentation/GiftsPage';
 import { PersonGiftsPage } from '@/modules/wishlist/presentation/PersonGiftsPage';
 import { RequireAuth } from './AuthContext';
@@ -58,6 +59,7 @@ export const router = createBrowserRouter([
       { path: 'regalos/persona/:participantId', element: <PersonGiftsPage /> },
       { path: 'juegos', element: <GamesPage /> },
       { path: 'celebracion', element: <CelebrationPage /> },
+      { path: 'anuncios', element: <AnnouncementsPage /> },
       { path: 'organizar', element: <OrganizePage /> },
       { path: 'perfil', element: <ProfilePage /> },
     ],

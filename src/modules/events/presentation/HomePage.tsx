@@ -10,6 +10,7 @@ import { ButtonLink } from '@/shared/ui/Button';
 import { Card, SectionTitle } from '@/shared/ui/Card';
 import { toTitleCase } from '@/shared/validation/names';
 import { canManageEvent } from '../domain/Event';
+import { AnnouncementsHomeCard } from '@/modules/announcements/presentation/AnnouncementsHomeCard';
 import { ChecklistCard } from '@/modules/checklist/presentation/ChecklistCard';
 import { MyResponsibilitiesCard } from '@/modules/responsibilities/presentation/MyResponsibilitiesCard';
 import { GamesTeaserCard } from '@/modules/games/presentation/GamesTeaserCard';
@@ -34,6 +35,8 @@ export function HomePage() {
       <h1 className="text-2xl font-bold text-brand">¡Hola{me ? `, ${toTitleCase(me.firstName)}` : ''}! 👋</h1>
 
       <Countdown target={event.celebrationAt} timezone={event.timezone} />
+
+      <AnnouncementsHomeCard />
 
       <ChecklistCard />
 

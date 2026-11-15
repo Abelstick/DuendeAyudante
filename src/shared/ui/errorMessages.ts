@@ -58,6 +58,10 @@ const MESSAGES: Record<string, string> = {
   MERGE_TARGET_INVALID: 'Elige con cuál de los juegos te quedas.',
   MAX_VOTES_INVALID: 'Elige entre 1 y 10 votos por persona.',
   SECRET_FRIEND_SELF: 'No puedes ser tu propio amigo secreto 🙂. Elige a otra persona.',
+  SCHEDULE_TITLE_INVALID: 'Escribe el nombre de la actividad (ej. Cena navideña).',
+  SCHEDULE_END_BEFORE_START: 'La hora de fin debe ser después de la hora de inicio.',
+  ANNOUNCEMENT_TITLE_INVALID: 'Escribe un título corto para el anuncio.',
+  ANNOUNCEMENT_BODY_INVALID: 'Escribe el mensaje del anuncio.',
   FAMILY_NAME_INVALID: 'Escribe el nombre de la familia (ej. GARCÍA).',
   DUPLICATE_FAMILY: 'Ya existe una familia con ese nombre.',
 

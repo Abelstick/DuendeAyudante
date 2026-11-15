@@ -669,6 +669,40 @@ describe('amigo secreto (opcional y privado)', () => {
   });
 });
 
+describe('cronograma y anuncios', () => {
+  it('editores y organizador gestionan el cronograma; los participantes solo lo ven', async () => {
+    await as(ids.editor, (tx) =>
+      tx.query(`insert into public.schedule_items (event_id, title, starts_at, ends_at) values ($1, 'Cena navideña', '2026-12-24 20:00-05', '2026-12-24 21:00-05')`, [eventA]),
+    );
+    await expectDenied(
+      as(ids.rosa, (tx) => tx.query(`insert into public.schedule_items (event_id, title, starts_at) values ($1, 'X', now())`, [eventA])),
+    );
+    await expect(
+      as(ids.editor, (tx) =>
+        tx.query(`insert into public.schedule_items (event_id, title, starts_at, ends_at) values ($1, 'Al revés', '2026-12-24 21:00-05', '2026-12-24 20:00-05')`, [eventA]),
+      ),
+    ).rejects.toThrow(/check constraint/);
+    const seen = await as(ids.rosa, (tx) => tx.query(`select title from public.schedule_items`));
+    expect(seen.rows).toHaveLength(1);
+    const other = await as(ids.ownerB, (tx) => tx.query(`select 1 from public.schedule_items`));
+    expect(other.rows).toHaveLength(0);
+  });
+
+  it('los anuncios se firman solos con el nombre del autor (no se puede falsificar)', async () => {
+    await as(ids.editor, (tx) =>
+      tx.query(`insert into public.announcements (event_id, title, body, priority) values ($1, 'Cambio de hora', 'Empezamos a las 6', 'important')`, [eventA]),
+    );
+    const r = await db.query<{ author_name: string; author_user_id: string }>(`select author_name, author_user_id from public.announcements where event_id = $1`, [eventA]);
+    expect(r.rows[0]).toEqual({ author_name: 'LUCÍA DÍAZ', author_user_id: ids.editor });
+    await expectDenied(
+      as(ids.rosa, (tx) => tx.query(`insert into public.announcements (event_id, title, body) values ($1, 'X', 'Y')`, [eventA])),
+    );
+    await expectDenied(
+      as(ids.editor, (tx) => tx.query(`update public.announcements set author_name = 'OTRO' where event_id = $1`, [eventA])),
+    );
+  });
+});
+
 describe('RLS: gestión del evento', () => {
   it('solo organizador/administradores gestionan familias (no editores ni participantes)', async () => {
     await as(ids.ownerA, (tx) => tx.query(`insert into public.families (event_id, name, color_key) values ($1, ' garcía ', 'red')`, [eventA]));

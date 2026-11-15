@@ -79,3 +79,13 @@ export function formatDateOnly(date: string): string {
     new Date(Date.UTC(y ?? 0, (m ?? 1) - 1, d ?? 1, 12)),
   );
 }
+
+/** "7:00 p. m." en la zona horaria del evento. */
+export function formatTime(instant: Date, timeZone: string): string {
+  return new Intl.DateTimeFormat('es-PE', { timeZone, hour: 'numeric', minute: '2-digit' }).format(instant);
+}
+
+/** "24 dic., 7:00 p. m." para fechas cortas de publicación. */
+export function formatShortDateTime(instant: Date, timeZone: string): string {
+  return new Intl.DateTimeFormat('es-PE', { timeZone, day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }).format(instant);
+}

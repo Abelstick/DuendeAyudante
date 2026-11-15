@@ -1,4 +1,4 @@
-import { PartyPopper, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { actingParticipants, canEditContent } from '@/modules/events/domain/Event';
@@ -6,7 +6,7 @@ import { useFamilies } from '@/modules/families/presentation/hooks';
 import { displayName } from '@/modules/members/domain/Participant';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { Button, Spinner } from '@/shared/ui/Button';
-import { EmptyState, Notice, PageTitle } from '@/shared/ui/Card';
+import { EmptyState, Notice } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { DEFAULT_FILTERS, ResponsibilityService, type ResponsibilityFilters } from '../application/ResponsibilityService';
 import { isAssignedTo, STATUS_LABELS, type Responsibility, type ResponsibilityKind, type ResponsibilityStatus } from '../domain/Responsibility';
@@ -17,7 +17,7 @@ import { ResponsibilityFormModal } from './ResponsibilityFormModal';
 type Editing = { item: Responsibility | null; kind: ResponsibilityKind } | null;
 
 /** Aportes y tareas de la celebración: todos ven todo; cada quien marca lo suyo. */
-export function CelebrationPage() {
+export function ResponsibilitiesSection() {
   const { event, context } = useEventScope();
   const responsibilities = useResponsibilities(event.id);
   const participants = useParticipants(event.id);
@@ -45,8 +45,6 @@ export function CelebrationPage() {
 
   return (
     <div className="space-y-5">
-      <PageTitle icon={<PartyPopper className="size-8 text-brand" aria-hidden />} title="Celebración" subtitle="Quién lleva qué y quién hace qué." />
-
       {all.length > 0 && (
         <p className="flex flex-wrap gap-x-4 gap-y-1 text-base text-ink-700">
           {counts.map(({ s, n }) => (

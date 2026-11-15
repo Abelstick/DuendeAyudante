@@ -16,7 +16,8 @@ participa sin aprender a usar una aplicación complicada.
 | Juegos, votación, unir juegos parecidos y ruleta | ✅ |
 | Amigo secreto (opcional: cada persona anota el suyo, en privado) | ✅ |
 | Checklist de preparación (automático + tareas del organizador) | ✅ |
-| Cronograma y anuncios | ⏳ |
+| Cronograma (con «AHORA») y anuncios (compartibles por WhatsApp) | ✅ |
+| Publicar en Render | ⏳ |
 | Mascotas e ilustraciones por familia | ⏳ (la identidad de color por familia ya está) |
 
 ## Tecnología

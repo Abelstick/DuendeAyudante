@@ -3,6 +3,10 @@
  * Para migrar a una API propia basta con cambiar las clases de aquí
  * (p. ej. SupabaseWishlistRepository → HttpWishlistRepository).
  */
+import { AnnouncementService } from '@/modules/announcements/application/AnnouncementService';
+import { SupabaseAnnouncementRepository } from '@/modules/announcements/infrastructure/SupabaseAnnouncementRepository';
+import { ScheduleService } from '@/modules/schedule/application/ScheduleService';
+import { SupabaseScheduleRepository } from '@/modules/schedule/infrastructure/SupabaseScheduleRepository';
 import { ChecklistService } from '@/modules/checklist/application/ChecklistService';
 import { SupabaseChecklistRepository } from '@/modules/checklist/infrastructure/SupabaseChecklistRepository';
 import { EventService } from '@/modules/events/application/EventService';
@@ -35,6 +39,8 @@ export interface Container {
   responsibilities: ResponsibilityService;
   games: GameService;
   secretFriend: SecretFriendService;
+  schedule: ScheduleService;
+  announcements: AnnouncementService;
 }
 
 export function createContainer(): Container {
@@ -49,5 +55,7 @@ export function createContainer(): Container {
     responsibilities: new ResponsibilityService(new SupabaseResponsibilityRepository(supabase)),
     games: new GameService(new SupabaseGameRepository(supabase)),
     secretFriend: new SecretFriendService(new SupabaseSecretFriendRepository(supabase)),
+    schedule: new ScheduleService(new SupabaseScheduleRepository(supabase)),
+    announcements: new AnnouncementService(new SupabaseAnnouncementRepository(supabase)),
   };
 }
