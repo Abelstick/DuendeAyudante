@@ -121,7 +121,7 @@ export function LoginPage() {
           {mode === 'family' ? (
             <>
               <TextField
-                label="Código de tu Navidad"
+                label="Código de tu Navidad" enterKeyHint="next"
                 placeholder="ej. GARCIA25"
                 autoCapitalize="characters"
                 autoCorrect="off"
@@ -131,7 +131,7 @@ export function LoginPage() {
                 {...register('code')}
               />
               <TextField
-                label="Usuario"
+                label="Usuario" enterKeyHint="next"
                 placeholder="ej. rosa"
                 autoComplete="username"
                 autoCapitalize="none"
@@ -142,11 +142,11 @@ export function LoginPage() {
               />
             </>
           ) : (
-            <TextField label="Correo" type="email" autoComplete="email" error={errors.user?.message} {...register('user')} />
+            <TextField label="Correo" enterKeyHint="next" type="email" autoComplete="email" error={errors.user?.message} {...register('user')} />
           )}
 
           <TextField
-            label="Contraseña"
+            label="Contraseña" enterKeyHint="go"
             type={showPassword ? 'text' : 'password'}
             autoComplete="current-password"
             autoCapitalize="none"

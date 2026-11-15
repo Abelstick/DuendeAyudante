@@ -2,6 +2,7 @@ import { ArrowDown, ArrowUp, ChevronDown, LayoutGrid, Search, SlidersHorizontal,
 import { useId, useState, type ReactNode } from 'react';
 import type { ListPrefs, ListView } from '@/shared/lib/listing';
 import { selectClasses } from './Tabs';
+import { closeKeyboardOnEnter } from '@/shared/lib/virtualKeyboard';
 
 export interface SortOption {
   value: string;
@@ -42,6 +43,8 @@ export function ListToolbar({ prefs, onChange, searchLabel, sortOptions, showVie
             <Search className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-ink-500" aria-hidden />
             <input
               type="search"
+              enterKeyHint="search"
+              onKeyDown={closeKeyboardOnEnter}
               aria-label={searchLabel}
               placeholder={searchLabel}
               value={prefs.q}

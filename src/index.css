@@ -519,3 +519,18 @@ dialog[open] > div {
     animation: photo-shimmer 1.3s ease-in-out infinite;
   }
 }
+
+/* ---------------------------------------------------------------- Teclado del celular
+   (ver shared/lib/virtualKeyboard.ts): mientras se escribe, la barra de menú de abajo se
+   oculta para dejar más espacio, y los avisos y las ventanas suben por encima del teclado. */
+:root {
+  --kb-inset: 0px;
+}
+
+[data-keyboard='open'] .hide-with-keyboard {
+  display: none;
+}
+
+[data-keyboard='open'] .toast-stack {
+  bottom: calc(var(--kb-inset) + 0.75rem);
+}

@@ -11,12 +11,14 @@ import { env } from '@/shared/config/env';
 import { PhotoQueueRunner } from '@/modules/wishlist/presentation/photoQueue';
 import { InstallPrompt } from '@/shared/pwa/InstallPrompt';
 import { setupPwa } from '@/shared/pwa/install';
+import { installKeyboardTracking } from '@/shared/lib/virtualKeyboard';
 import { ToastProvider } from '@/shared/ui/Toast';
 import { applyTextSize, getTextSize } from '@/shared/ui/textSize';
 import './index.css';
 
 applyTextSize(getTextSize());
 setupPwa();
+installKeyboardTracking();
 
 const root = createRoot(document.getElementById('root')!);
 

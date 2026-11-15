@@ -146,9 +146,9 @@ export function AddMemberForm({ families, members, myRole }: Props) {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
 
-        <TextField label="Nombre" autoComplete="off" error={errors.firstName?.message} {...register('firstName')} />
-        <TextField label="Apellido paterno" autoComplete="off" error={errors.paternalSurname?.message} {...register('paternalSurname')} />
-        <TextField label="Apellido materno" optional autoComplete="off" error={errors.maternalSurname?.message} {...register('maternalSurname')} />
+        <TextField label="Nombre" enterKeyHint="next" autoCapitalize="words" autoComplete="off" error={errors.firstName?.message} {...register('firstName')} />
+        <TextField label="Apellido paterno" enterKeyHint="next" autoCapitalize="words" autoComplete="off" error={errors.paternalSurname?.message} {...register('paternalSurname')} />
+        <TextField label="Apellido materno" enterKeyHint="next" autoCapitalize="words" optional autoComplete="off" error={errors.maternalSurname?.message} {...register('maternalSurname')} />
         {preview && (
           <p className="text-base text-ink-700">
             Se guardará como: <strong>{preview}</strong>

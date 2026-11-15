@@ -68,7 +68,7 @@ export function GameFieldInputs({ register, errors, participants, afterName, aut
   return (
     <>
       <div className="space-y-2">
-        <TextField label="Nombre del juego o actividad" placeholder="ej. Charadas navideñas" autoFocus={autoFocus} error={errors.name?.message} {...register('name')} />
+        <TextField label="Nombre del juego o actividad" enterKeyHint="next" placeholder="ej. Charadas navideñas" autoFocus={autoFocus} error={errors.name?.message} {...register('name')} />
         {afterName}
       </div>
 

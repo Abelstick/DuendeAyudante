@@ -1,4 +1,5 @@
-import { forwardRef, useId, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react';
+import { forwardRef, useId, type InputHTMLAttributes, type KeyboardEvent, type ReactNode, type TextareaHTMLAttributes } from 'react';
+import { nextTextField } from '@/shared/lib/virtualKeyboard';
 
 interface FieldShellProps {
   label: string;
@@ -43,12 +44,37 @@ interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function TextField(
-  { label, hint, error, optional, trailing, id, className = '', ...rest },
+  { label, hint, error, optional, trailing, id, className = '', onKeyDown, ...rest },
   ref,
 ) {
   const autoId = useId();
   const fieldId = id ?? autoId;
   const describedBy = [hint && `${fieldId}-hint`, error && `${fieldId}-error`].filter(Boolean).join(' ') || undefined;
+  const isSearch = rest.type === 'search';
+
+  /**
+   * Tecla Enter del teclado del celular:
+   *  · «Siguiente» (enterKeyHint=next): pasa al siguiente campo en vez de enviar el formulario a medias;
+   *  · en una búsqueda: los resultados ya se filtran al escribir, así que solo cierra el teclado
+   *    (y nunca envía el formulario donde está el buscador).
+   */
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    onKeyDown?.(e);
+    if (e.defaultPrevented || e.key !== 'Enter' || e.nativeEvent.isComposing) return;
+    if (isSearch) {
+      e.preventDefault();
+      e.currentTarget.blur();
+      return;
+    }
+    if (rest.enterKeyHint === 'next') {
+      const next = nextTextField(e.currentTarget);
+      if (next) {
+        e.preventDefault();
+        next.focus();
+      }
+    }
+  };
+
   return (
     <FieldShell label={label} hint={hint} error={error} optional={optional} id={fieldId}>
       <div className="flex items-stretch gap-2">
@@ -58,7 +84,9 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
           className={`${inputClass} ${error ? 'border-berry-600' : 'border-night-900'} ${className}`}
+          enterKeyHint={isSearch ? 'search' : undefined}
           {...rest}
+          onKeyDown={handleKeyDown}
         />
         {trailing}
       </div>

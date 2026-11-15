@@ -52,7 +52,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {burst !== null && <ConfettiBurst key={burst} />}
       <div
         aria-live="polite"
-        className="pointer-events-none fixed inset-x-0 bottom-[calc(6rem+env(safe-area-inset-bottom))] z-50 flex flex-col items-center gap-2 px-4 md:bottom-6"
+        className="toast-stack pointer-events-none fixed inset-x-0 bottom-[calc(6rem+env(safe-area-inset-bottom))] z-50 flex flex-col items-center gap-2 px-4 md:bottom-6"
       >
         {items.map((t) => (
           <div

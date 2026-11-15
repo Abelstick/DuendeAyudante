@@ -194,7 +194,7 @@ export function EventLayout() {
         {/* Barra inferior en móvil: icono + texto siempre visibles */}
         <nav
           aria-label="Menú principal"
-          className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-night-900 bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
+          className="hide-with-keyboard fixed inset-x-0 bottom-0 z-40 border-t-2 border-night-900 bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
         >
           <ul className="mx-auto grid max-w-2xl px-1" style={{ gridTemplateColumns: `repeat(${mobileItems.length}, minmax(0, 1fr))` }}>
             {mobileItems.map(({ to, label, icon: Icon, end }) => (

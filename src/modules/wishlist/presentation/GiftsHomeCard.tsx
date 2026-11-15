@@ -16,6 +16,7 @@ import { toTitleCase } from '@/shared/validation/names';
 import { WishlistService } from '../application/WishlistService';
 import { DrivePhoto } from './DrivePhoto';
 import { useEventWishlist } from './hooks';
+import { closeKeyboardOnEnter } from '@/shared/lib/virtualKeyboard';
 
 /**
  * En Inicio: acceso rápido a las listas de deseos. Muestra cómo va la propia
@@ -88,6 +89,8 @@ export function GiftsHomeCard() {
           <Search className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-ink-500" aria-hidden />
           <input
             type="search"
+            enterKeyHint="search"
+            onKeyDown={closeKeyboardOnEnter}
             aria-label="Buscar la lista de una persona"
             placeholder="¿Qué le gustaría a…?"
             value={q}

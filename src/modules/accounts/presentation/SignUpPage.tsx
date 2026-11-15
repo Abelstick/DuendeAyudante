@@ -69,7 +69,7 @@ export function SignUpPage() {
           Primero crea tu cuenta de organizador. Después podrás agregar a tu familia; ellos no necesitan correo.
         </p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-          <TextField label="Tu correo" type="email" autoComplete="email" error={errors.email?.message} {...register('email')} />
+          <TextField label="Tu correo" enterKeyHint="next" type="email" autoComplete="email" error={errors.email?.message} {...register('email')} />
           <TextField
             label="Crea una contraseña"
             hint="Al menos 8 caracteres."

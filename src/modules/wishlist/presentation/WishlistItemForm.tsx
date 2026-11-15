@@ -257,7 +257,7 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
         <div className="flex items-end gap-2">
           <div className="min-w-0 flex-1">
             <TextField
-              label="¿Lo viste en una tienda? Pega el enlace"
+              label="¿Lo viste en una tienda? Pega el enlace" enterKeyHint="go" autoCorrect="off" spellCheck={false}
               optional
               type="url"
               inputMode="url"
@@ -286,6 +286,7 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
       <TextField
         label={easy ? '1. ¿Qué regalo te gustaría?' : '¿Qué regalo te gustaría?'}
         placeholder="ej. Polo, Colonia, Billetera, Juguete"
+        enterKeyHint="next"
         autoFocus
         error={errors.title?.message}
         {...register('title')}
@@ -356,7 +357,7 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
           <div className="flex items-end gap-2">
             <div className="flex-1">
               <TextField
-                label="Marca"
+                label="Marca" enterKeyHint="enter" autoCapitalize="words"
                 placeholder="ej. Nike, Adidas, Samsung"
                 maxLength={MAX_BRAND_LENGTH * 3}
                 value={brandDraft}
@@ -385,7 +386,7 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
           <div key={field.id} className="flex items-start gap-2">
             <div className="flex-1">
               <TextField
-                label={`Enlace ${index + 1}`}
+                label={`Enlace ${index + 1}`} autoCorrect="off" spellCheck={false}
                 type="url"
                 inputMode="url"
                 autoCapitalize="none"

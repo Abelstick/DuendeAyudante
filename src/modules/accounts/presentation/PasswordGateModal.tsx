@@ -62,6 +62,7 @@ export function PasswordGateModal({ title, children, confirmLabel, onVerified, o
         <div className="text-base text-ink-700">{children}</div>
         <TextField
           label="Tu contraseña"
+          enterKeyHint="go"
           type={show ? 'text' : 'password'}
           autoComplete="current-password"
           autoCapitalize="none"

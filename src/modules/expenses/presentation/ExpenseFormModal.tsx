@@ -117,7 +117,7 @@ export function ExpenseFormModal({ eventId, currency, initial, kind: initialKind
     >
       <div className="space-y-5">
         {!isPayment && (
-          <TextField label="¿En qué se gastó?" placeholder="ej. Pavo, Bebidas, Decoración" value={description} onChange={(e) => setDescription(e.target.value)} maxLength={120} autoFocus />
+          <TextField label="¿En qué se gastó?" enterKeyHint="next" placeholder="ej. Pavo, Bebidas, Decoración" value={description} onChange={(e) => setDescription(e.target.value)} maxLength={120} autoFocus />
         )}
         <TextField
           label={`Monto (${currency === 'PEN' ? 'S/' : currency})`}

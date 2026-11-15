@@ -116,11 +116,11 @@ export function CreateEventPage() {
         <h1 className="mb-1 text-2xl font-extrabold text-ink-900">Crea tu Navidad 🎄</h1>
         <p className="mb-5 text-lg text-ink-700">Solo necesitamos unos datos. Podrás cambiarlos después.</p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
-          <TextField label="Nombre de la celebración" error={errors.name?.message} {...register('name')} />
+          <TextField label="Nombre de la celebración" enterKeyHint="next" error={errors.name?.message} {...register('name')} />
 
           <div className="space-y-2 rounded-2xl border-2 border-gold-400 bg-gold-50 p-4">
             <TextField
-              label="Código de tu Navidad"
+              label="Código de tu Navidad" enterKeyHint="next"
               hint="Tus familiares lo usarán para entrar (va incluido en el mensaje de WhatsApp). Elige una palabra sencilla, sin espacios. No se podrá cambiar después."
               autoCapitalize="characters"
               autoCorrect="off"
@@ -138,9 +138,9 @@ export function CreateEventPage() {
 
           <fieldset className="space-y-4 rounded-2xl bg-mist-100 p-4">
             <legend className="px-1 text-lg font-extrabold text-ink-900">¿Quién organiza?</legend>
-            <TextField label="Tu nombre" autoComplete="given-name" error={errors.firstName?.message} {...register('firstName')} />
-            <TextField label="Tu apellido paterno" autoComplete="family-name" error={errors.paternalSurname?.message} {...register('paternalSurname')} />
-            <TextField label="Tu apellido materno" optional error={errors.maternalSurname?.message} {...register('maternalSurname')} />
+            <TextField label="Tu nombre" enterKeyHint="next" autoComplete="given-name" error={errors.firstName?.message} {...register('firstName')} />
+            <TextField label="Tu apellido paterno" enterKeyHint="next" autoComplete="family-name" error={errors.paternalSurname?.message} {...register('paternalSurname')} />
+            <TextField label="Tu apellido materno" enterKeyHint="next" optional error={errors.maternalSurname?.message} {...register('maternalSurname')} />
           </fieldset>
 
           <div className="grid grid-cols-2 gap-3">

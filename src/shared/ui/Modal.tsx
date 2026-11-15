@@ -15,7 +15,8 @@ interface ModalProps {
 /**
  * Ventana accesible basada en <dialog>: el foco queda dentro, se cierra con
  * Esc o con el botón "Cerrar" (con texto visible). En el celular se abre
- * desde abajo ocupando todo el ancho.
+ * desde abajo ocupando todo el ancho; si aparece el teclado, sube por encima de él
+ * (--kb-inset, ver shared/lib/virtualKeyboard.ts) para que los botones sigan a la vista.
  */
 export function Modal({ open, title, onClose, children, footer, size = 'md' }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
@@ -40,12 +41,12 @@ export function Modal({ open, title, onClose, children, footer, size = 'md' }: M
         // Tocar fuera de la ventana (el fondo) la cierra
         if (e.target === ref.current) onClose();
       }}
-      className={`m-0 mt-auto max-h-[92dvh] w-full max-w-none overflow-hidden rounded-t-2xl border-2 border-b-0 border-night-900 bg-white p-0 text-ink-900 sm:m-auto sm:rounded-2xl sm:border-b-2 ${
+      className={`m-0 mt-auto mb-(--kb-inset) max-h-[calc(92dvh-var(--kb-inset))] w-full max-w-none overflow-hidden rounded-t-2xl border-2 border-b-0 border-night-900 bg-white p-0 text-ink-900 sm:m-auto sm:rounded-2xl sm:border-b-2 ${
         size === 'wide' ? 'sm:max-w-[min(72rem,calc(100vw-2rem))]' : 'sm:max-w-lg'
       }`}
     >
       {open && (
-        <div className="flex max-h-[92dvh] flex-col">
+        <div className="flex max-h-[calc(92dvh-var(--kb-inset))] flex-col">
           <header className="flex items-center justify-between gap-3 border-b-2 border-night-900 bg-gold-400 py-3 pl-5 pr-3">
             <h2 id={titleId} className="text-xl font-bold text-night-900">
               {title}
