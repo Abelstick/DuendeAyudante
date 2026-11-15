@@ -103,6 +103,10 @@ const MESSAGES: Record<string, string> = {
 };
 
 export function errorMessage(error: unknown): string {
+  // Para quien organiza: dice qué secreto falta en Supabase (solo el nombre, nunca el valor)
+  if (isAppError(error) && error.code === 'GOOGLE_NOT_CONFIGURED' && Array.isArray(error.details.missing) && error.details.missing.length > 0) {
+    return `Falta configurar en Supabase (Edge Functions → Secrets): ${error.details.missing.join(', ')}. Después vuelve a intentarlo.`;
+  }
   if (isAppError(error)) return MESSAGES[error.code] ?? 'Algo salió mal. Vuelve a intentarlo en un momento.';
   return 'Algo salió mal. Vuelve a intentarlo en un momento.';
 }

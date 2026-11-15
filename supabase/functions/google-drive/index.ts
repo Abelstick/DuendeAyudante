@@ -247,8 +247,13 @@ async function deletePhoto(req: Request, photoId: string) {
 
 async function oauthCallback(req: Request): Promise<Response> {
   const url = new URL(req.url);
-  const state = await verifyState(url.searchParams.get('state') ?? '');
-  if (!state) return new Response('El enlace venció. Vuelve a la aplicación e inténtalo otra vez.', { status: 400 });
+  const text = (body: string, status: number) => new Response(body, { status, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+  const rawState = url.searchParams.get('state');
+  if (!rawState) return text('Esta dirección la usa Google para volver a la aplicación. Conecta el Drive desde Organizar → Fotos de los regalos.', 400);
+  const missing = google.missingSecrets();
+  if (missing.length > 0) return text(`Falta configurar en Supabase (Edge Functions → Secrets): ${missing.join(', ')}.`, 503);
+  const state = await verifyState(rawState);
+  if (!state) return text('El enlace venció. Vuelve a la aplicación e inténtalo otra vez.', 400);
 
   const back = (result: string) =>
     Response.redirect(`${state.origin}/e/${state.eventId}/organizar?drive=${encodeURIComponent(result)}#fotos`, 302);

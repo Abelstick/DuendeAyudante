@@ -1,8 +1,8 @@
 // Llamadas a Google (OAuth y Drive) usadas por la Edge Function google-drive.
 import { HttpError } from '../_shared/http.ts';
 
-const CLIENT_ID = Deno.env.get('GOOGLE_CLIENT_ID') ?? '';
-const CLIENT_SECRET = Deno.env.get('GOOGLE_CLIENT_SECRET') ?? '';
+// Se leen en cada uso (no al cargar): si se cambian los secretos, la función los toma sin quedarse con los viejos.
+const env = (name: string) => (Deno.env.get(name) ?? '').trim();
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 
 /** Google vuelve aquí después de que la persona acepta (la misma función, por GET). */
@@ -11,13 +11,25 @@ export const REDIRECT_URI = `${SUPABASE_URL}/functions/v1/google-drive`;
 // drive.file: solo los archivos que crea la app. openid + email: saber qué cuenta se conectó.
 const SCOPES = ['openid', 'email', 'https://www.googleapis.com/auth/drive.file'];
 
+/** Nombres de los secretos que faltan (sin mostrar sus valores). */
+export function missingSecrets(): string[] {
+  const missing: string[] = [];
+  if (!env('GOOGLE_CLIENT_ID')) missing.push('GOOGLE_CLIENT_ID');
+  if (!env('GOOGLE_CLIENT_SECRET')) missing.push('GOOGLE_CLIENT_SECRET');
+  const state = env('GOOGLE_OAUTH_STATE_SECRET');
+  if (!state) missing.push('GOOGLE_OAUTH_STATE_SECRET');
+  else if (state.length < 32) missing.push('GOOGLE_OAUTH_STATE_SECRET (mínimo 32 caracteres)');
+  return missing;
+}
+
 export function assertConfigured() {
-  if (!CLIENT_ID || !CLIENT_SECRET) throw new HttpError(503, 'GOOGLE_NOT_CONFIGURED');
+  const missing = missingSecrets();
+  if (missing.length > 0) throw new HttpError(503, 'GOOGLE_NOT_CONFIGURED', { missing });
 }
 
 export function authUrl(state: string): string {
   const params = new URLSearchParams({
-    client_id: CLIENT_ID,
+    client_id: env('GOOGLE_CLIENT_ID'),
     redirect_uri: REDIRECT_URI,
     response_type: 'code',
     scope: SCOPES.join(' '),
@@ -39,7 +51,7 @@ async function tokenRequest(body: Record<string, string>): Promise<TokenResponse
   const res = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({ client_id: CLIENT_ID, client_secret: CLIENT_SECRET, ...body }),
+    body: new URLSearchParams({ client_id: env('GOOGLE_CLIENT_ID'), client_secret: env('GOOGLE_CLIENT_SECRET'), ...body }),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {

@@ -25,8 +25,12 @@ function fromB64url(text: string): Uint8Array {
 }
 
 async function key(): Promise<CryptoKey> {
-  const secret = Deno.env.get('GOOGLE_OAUTH_STATE_SECRET') ?? '';
-  if (secret.length < 32) throw new HttpError(503, 'GOOGLE_NOT_CONFIGURED');
+  const secret = (Deno.env.get('GOOGLE_OAUTH_STATE_SECRET') ?? '').trim();
+  if (secret.length < 32) {
+    throw new HttpError(503, 'GOOGLE_NOT_CONFIGURED', {
+      missing: [secret ? 'GOOGLE_OAUTH_STATE_SECRET (mínimo 32 caracteres)' : 'GOOGLE_OAUTH_STATE_SECRET'],
+    });
+  }
   return crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']);
 }
 
