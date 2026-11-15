@@ -171,6 +171,54 @@ export function parseLinkMetadata(html: string, pageUrl: string): LinkMetadata {
 }
 
 // ---------------------------------------------------------------------
+// Respaldo: el nombre del producto que casi todas las tiendas ponen en el enlace
+// ---------------------------------------------------------------------
+
+/** Partes del enlace que no son nombre: rutas típicas de tiendas. */
+const PATH_WORDS = new Set(['p', 'dp', 'gp', 'product', 'products', 'producto', 'productos', 'prod', 'item', 'items', 'sku', 'catalog', 'es', 'pe', 'www']);
+
+/**
+ * ¿Parece un código interno (EFEGC03132, B08XYZ1234, 17069001) y no parte del nombre?
+ * Los modelos cortos (V2, CH520, 4K) sí son parte del nombre.
+ */
+function looksLikeCode(token: string): boolean {
+  if (/^\d+$/.test(token)) return token.length >= 4;
+  return token.length >= 7 && /\d/.test(token) && /[a-z]/i.test(token);
+}
+
+/**
+ * "…/pad-mouse-razer-gigantus-v2-softm-black-efegc03132.html" → "Pad mouse razer gigantus v2 softm black".
+ * Elige el tramo del enlace con más palabras (el nombre del producto). null si no encuentra uno razonable.
+ */
+export function titleFromUrl(raw: string): string | null {
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return null;
+  }
+  let best: string[] = [];
+  for (const segment of url.pathname.split('/')) {
+    let text = segment;
+    try {
+      text = decodeURIComponent(segment);
+    } catch {
+      // se queda como viene
+    }
+    const words = text
+      .replace(/\.(html?|php|aspx?)$/i, '')
+      .split(/[-_+\s.]+/)
+      .filter((t) => t && !looksLikeCode(t) && !PATH_WORDS.has(t.toLowerCase()));
+    const letters = words.filter((w) => /\p{L}{2,}/u.test(w)).length;
+    // A igual cantidad, gana el tramo de más adelante (el nombre suele ir al final)
+    if (letters >= 2 && letters >= best.filter((w) => /\p{L}{2,}/u.test(w)).length) best = words;
+  }
+  if (best.length === 0) return null;
+  const title = best.join(' ').toLowerCase().slice(0, 120).trim();
+  return title.charAt(0).toUpperCase() + title.slice(1);
+}
+
+// ---------------------------------------------------------------------
 // Protección: no dejar que la función lea direcciones internas
 // ---------------------------------------------------------------------
 

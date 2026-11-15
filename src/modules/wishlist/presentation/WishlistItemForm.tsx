@@ -123,6 +123,8 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
   const [linkDraft, setLinkDraft] = useState('');
   const [linkNote, setLinkNote] = useState<{ tone: 'success' | 'warning' | 'error'; text: string } | null>(null);
   const [ideasOpen, setIdeasOpen] = useState(false);
+  // Pegar el enlace queda escondido hasta que se pida (no siempre funciona y ocupa espacio)
+  const [linkOpen, setLinkOpen] = useState(false);
   const [ideaTip, setIdeaTip] = useState<string | null>(null);
 
   /** Agrega el enlace a la lista (en el primer espacio vacío), sin repetirlo. */
@@ -155,6 +157,17 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
       if (data.price !== null && sameCurrency && !getValues('priceMin').trim() && !getValues('priceMax').trim()) {
         setValue('priceMin', String(data.price), { shouldDirty: true, shouldValidate: true });
         filled.push(`el precio (${formatMoney(data.price, currency)})`);
+      }
+      if (data.source === 'url') {
+        // La tienda no dejó leer su página: el nombre viene del enlace y suele necesitar un retoque
+        setLinkNote({
+          tone: 'warning',
+          text:
+            filled.length > 0
+              ? 'La tienda no dejó leer su página, así que tomamos el nombre del enlace. Revísalo y agrega el precio si lo sabes. El enlace sí se guardó.'
+              : 'La tienda no dejó leer su página. Guardamos el enlace; llena el nombre y el precio a mano.',
+        });
+        return;
       }
       setLinkNote({
         tone: 'success',
@@ -218,6 +231,7 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
       setBrandDraft('');
       setLinkDraft('');
       setLinkNote(null);
+      setLinkOpen(false);
       setIdeaTip(null);
       setSavedCount((c) => c + 1);
       setTimeout(() => setFocus('title'), 0);
@@ -252,8 +266,25 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
 
       {savedCount > 0 && !initial && <Notice tone="success">✅ ¡Regalo guardado! Ya aparece en tu lista. Si quieres, agrega otro aquí.</Notice>}
 
-      {/* Atajos: pegar el enlace de la tienda o elegir una idea */}
-      <div className="space-y-3 rounded-2xl border-2 border-dashed border-mist-300 bg-mist-100/60 p-3">
+      {/* Atajos: elegir una idea (a la vista) o pegar el enlace de una tienda (escondido hasta que se pida) */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <Button variant="secondary" onClick={() => setIdeasOpen(true)} icon={<Lightbulb className="size-5" aria-hidden />}>
+          ¿No sabes qué pedir? Ver ideas
+        </Button>
+        {!linkOpen && (
+          <button
+            type="button"
+            onClick={() => setLinkOpen(true)}
+            className="flex min-h-12 items-center gap-1.5 rounded-xl px-2 text-sm font-semibold text-ink-700 underline underline-offset-4 hover:bg-mist-100"
+          >
+            <Link2 className="size-4" aria-hidden />
+            Pegar enlace de una tienda
+          </button>
+        )}
+      </div>
+
+      {linkOpen && (
+      <div className="animate-pop-in space-y-2 rounded-2xl border-2 border-dashed border-mist-300 bg-mist-100/60 p-3">
         <div className="flex items-end gap-2">
           <div className="min-w-0 flex-1">
             <TextField
@@ -278,10 +309,9 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
           </Button>
         </div>
         {linkNote && <Notice tone={linkNote.tone}>{linkNote.text}</Notice>}
-        <Button variant="ghost" onClick={() => setIdeasOpen(true)} icon={<Lightbulb className="size-5" aria-hidden />}>
-          ¿No sabes qué pedir? Ver ideas
-        </Button>
+        <p className="text-sm text-ink-700">Intentamos llenar el nombre y el precio. Algunas tiendas no lo permiten; el enlace se guarda igual.</p>
       </div>
+      )}
 
       <TextField
         label={easy ? '1. ¿Qué regalo te gustaría?' : '¿Qué regalo te gustaría?'}

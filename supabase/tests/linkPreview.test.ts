@@ -1,5 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { decodeEntities, isSafePublicUrl, parseLinkMetadata, parsePrice } from '../functions/link-preview/parse';
+import { decodeEntities, isSafePublicUrl, parseLinkMetadata, parsePrice, titleFromUrl } from '../functions/link-preview/parse';
+
+describe('vista previa de enlaces: nombre desde el enlace (respaldo)', () => {
+  it.each([
+    [
+      'https://www.lacuracao.pe/pad-mouse-razer-gigantus-v2-softm-black-efegc03132.html?utm_term=&hsa_grp=',
+      'Pad mouse razer gigantus v2 softm black',
+    ],
+    ['https://www.amazon.com/Razer-Gigantus-V2-Medium-Mouse/dp/B08BZQ1GHG/ref=sr_1_1', 'Razer gigantus v2 medium mouse'],
+    ['https://www.falabella.com.pe/falabella-pe/product/17069001/Audifonos-Inalambricos-Sony-WH-CH520/17069002', 'Audifonos inalambricos sony wh ch520'],
+    ['https://tienda.pe/p/123456', null],
+    ['https://tienda.pe/', null],
+  ])('%s → %s', (url, expected) => {
+    expect(titleFromUrl(url)).toBe(expected);
+  });
+});
 
 describe('vista previa de enlaces: precio', () => {
   it.each([
