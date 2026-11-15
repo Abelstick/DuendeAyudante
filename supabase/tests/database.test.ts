@@ -395,6 +395,27 @@ describe('RPC save_wishlist_item', () => {
     const r = await db.query(`select 1 from public.wishlist_items where title = 'Cartera'`);
     expect(r.rows).toHaveLength(0);
   });
+
+  it('guarda marcas (limpias, sin repetir) y un rango de precios válido', async () => {
+    const saveFull = (args: unknown[]) =>
+      as(ids.rosa, (tx) =>
+        tx.query<{ id: string }>(
+          `select public.save_wishlist_item($1, $2, $3, $4, $5, $6, $7::jsonb, $8, $9, $10::text[]) as id`,
+          args,
+        ),
+      );
+    const created = await saveFull([eventA, participant.rosa, 'Zapatillas', null, 150, 1, '[]', null, 250, [' Nike ', 'NIKE', '', 'Adidas']]);
+    const id = created.rows[0]!.id;
+    const item = await db.query<{ price_estimate: string; price_max: string; brands: string[] }>(
+      `select price_estimate, price_max, brands from public.wishlist_items where id = $1`,
+      [id],
+    );
+    expect(item.rows[0]!).toEqual({ price_estimate: '150.00', price_max: '250.00', brands: ['Nike', 'Adidas'] });
+
+    await expect(saveFull([eventA, participant.rosa, 'Zapatillas', null, 300, 1, '[]', id, 100, []])).rejects.toThrow(/PRICE_RANGE_INVALID/);
+    const nine = Array.from({ length: 9 }, (_, i) => `Marca ${i}`);
+    await expect(saveFull([eventA, participant.rosa, 'Zapatillas', null, null, 1, '[]', id, null, nine])).rejects.toThrow(/TOO_MANY_BRANDS/);
+  });
 });
 
 describe('checklist', () => {

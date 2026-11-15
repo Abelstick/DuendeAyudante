@@ -1,6 +1,17 @@
 import { AppError } from '@/shared/domain/errors';
 import type { IWishlistRepository } from '../domain/IWishlistRepository';
-import { isValidHttpUrl, MAX_LINKS_PER_ITEM, normalizeUrl, type SaveWishlistItemData, type WishlistItem } from '../domain/WishlistItem';
+import {
+  isValidHttpUrl,
+  MAX_BRAND_LENGTH,
+  MAX_BRANDS_PER_ITEM,
+  MAX_LINKS_PER_ITEM,
+  normalizeBrands,
+  normalizeUrl,
+  type SaveWishlistItemData,
+  type WishlistItem,
+} from '../domain/WishlistItem';
+
+const isBadPrice = (p: number | null) => p !== null && (Number.isNaN(p) || p < 0);
 
 export class WishlistService {
   constructor(private readonly wishes: IWishlistRepository) {}
@@ -24,9 +35,14 @@ export class WishlistService {
     const title = data.title.trim();
     if (!title || title.length > 120) throw new AppError('WISH_TITLE_INVALID');
     if (data.description && data.description.length > 1000) throw new AppError('WISH_DESCRIPTION_TOO_LONG');
-    if (data.priceEstimate !== null && (Number.isNaN(data.priceEstimate) || data.priceEstimate < 0)) {
-      throw new AppError('PRICE_INVALID');
+    if (isBadPrice(data.priceMin) || isBadPrice(data.priceMax)) throw new AppError('PRICE_INVALID');
+    if (data.priceMin !== null && data.priceMax !== null && data.priceMax < data.priceMin) {
+      throw new AppError('PRICE_RANGE_INVALID');
     }
+
+    const brands = normalizeBrands(data.brands);
+    if (brands.length > MAX_BRANDS_PER_ITEM) throw new AppError('TOO_MANY_BRANDS');
+    if (brands.some((b) => b.length > MAX_BRAND_LENGTH)) throw new AppError('BRAND_TOO_LONG');
 
     const links = data.links
       .map((l) => ({ url: normalizeUrl(l.url), label: l.label?.trim() || null }))
@@ -34,7 +50,7 @@ export class WishlistService {
     if (links.length > MAX_LINKS_PER_ITEM) throw new AppError('TOO_MANY_LINKS');
     if (links.some((l) => !isValidHttpUrl(l.url))) throw new AppError('LINK_INVALID');
 
-    return this.wishes.save({ ...data, title, description: data.description?.trim() || null, links });
+    return this.wishes.save({ ...data, title, description: data.description?.trim() || null, links, brands });
   }
 
   remove(id: string) {

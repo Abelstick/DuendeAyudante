@@ -1,10 +1,10 @@
-import { ExternalLink, Pencil, Trash2 } from 'lucide-react';
+import { ExternalLink, Pencil, Tag, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { formatMoney } from '@/shared/lib/money';
 import { hostnameOf } from '@/shared/lib/whatsapp';
 import { Button } from '@/shared/ui/Button';
 import { GiftBox, type GiftTone } from '@/shared/ui/illustrations';
-import { isOverBudget, PRIORITY_LABELS, type WishlistItem } from '../domain/WishlistItem';
+import { describePrice, isOverBudget, PRIORITY_LABELS, type WishlistItem } from '../domain/WishlistItem';
 
 interface Props {
   item: WishlistItem;
@@ -27,6 +27,8 @@ const priorityGift: Record<1 | 2 | 3, GiftTone> = { 1: 'berry', 2: 'pine', 3: 'n
 
 export function WishlistItemCard({ item, budget, currency, canEdit, deleting, onEdit, onDelete }: Props) {
   const [confirming, setConfirming] = useState(false);
+  const price = describePrice(item, (n) => formatMoney(n, currency));
+  const isRange = item.priceMin !== null && item.priceMax !== null && item.priceMin !== item.priceMax;
 
   return (
     <article className="group animate-pop-in space-y-3 rounded-2xl border-2 border-night-900 bg-white p-5 shadow-block">
@@ -42,9 +44,23 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
 
       {item.description && <p className="whitespace-pre-line text-base text-ink-700">{item.description}</p>}
 
-      {item.priceEstimate !== null && (
+      {item.brands.length > 0 && (
+        <div className="space-y-1">
+          <p className="text-sm font-bold uppercase tracking-wide text-ink-500">{item.brands.length === 1 ? 'Marca' : 'Marcas'}</p>
+          <ul className="flex flex-wrap gap-2">
+            {item.brands.map((brand) => (
+              <li key={brand} className="inline-flex items-center gap-1 rounded-full border-2 border-night-900 bg-gold-50 px-3 py-0.5 text-base font-bold text-night-900">
+                <Tag className="size-4 shrink-0" aria-hidden />
+                {brand}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {price !== null && (
         <p className="text-base">
-          Precio aproximado: <strong className="text-lg">{formatMoney(item.priceEstimate, currency)}</strong>
+          {isRange ? 'Rango de precio' : 'Precio aproximado'}: <strong className="text-lg">{price}</strong>
           {isOverBudget(item, budget) && <span className="mt-1 block w-fit rounded-full bg-gold-100 px-3 py-0.5 text-sm font-bold text-gold-700">Más que el presupuesto</span>}
         </p>
       )}

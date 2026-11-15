@@ -10,6 +10,8 @@ interface WishlistRow {
   title: string;
   description: string | null;
   price_estimate: number | string | null;
+  price_max: number | string | null;
+  brands: string[] | null;
   priority: WishPriority;
   created_at: string;
   wishlist_item_links: { url: string; label: string | null; sort_order: number }[] | null;
@@ -22,7 +24,7 @@ export class SupabaseWishlistRepository implements IWishlistRepository {
     const { data, error } = await this.supabase
       .from('wishlist_items')
       .select(
-        'id, event_id, participant_id, title, description, price_estimate, priority, created_at, wishlist_item_links(url, label, sort_order)',
+        'id, event_id, participant_id, title, description, price_estimate, price_max, brands, priority, created_at, wishlist_item_links(url, label, sort_order)',
       )
       .eq('event_id', eventId)
       .order('priority')
@@ -35,7 +37,9 @@ export class SupabaseWishlistRepository implements IWishlistRepository {
       participantId: r.participant_id,
       title: r.title,
       description: r.description,
-      priceEstimate: r.price_estimate === null ? null : Number(r.price_estimate),
+      priceMin: r.price_estimate === null ? null : Number(r.price_estimate),
+      priceMax: r.price_max === null ? null : Number(r.price_max),
+      brands: r.brands ?? [],
       priority: r.priority,
       createdAt: new Date(r.created_at),
       links: [...(r.wishlist_item_links ?? [])]
@@ -50,7 +54,9 @@ export class SupabaseWishlistRepository implements IWishlistRepository {
       p_participant_id: data.participantId,
       p_title: data.title,
       p_description: data.description,
-      p_price_estimate: data.priceEstimate,
+      p_price_estimate: data.priceMin,
+      p_price_max: data.priceMax,
+      p_brands: data.brands,
       p_priority: data.priority,
       p_links: data.links,
       p_item_id: data.id,

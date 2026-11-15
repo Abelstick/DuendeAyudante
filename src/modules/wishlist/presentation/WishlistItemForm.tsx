@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link2, Plus, Save, X } from 'lucide-react';
+import { Link2, Plus, Save, Tag, X } from 'lucide-react';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -7,9 +7,22 @@ import { formatMoney, parseMoney } from '@/shared/lib/money';
 import { Button } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Card';
 import { TextArea, TextField } from '@/shared/ui/TextField';
-import { isValidHttpUrl, MAX_LINKS_PER_ITEM, normalizeUrl, PRIORITY_LABELS, type WishlistItem, type WishPriority } from '../domain/WishlistItem';
+import {
+  isValidHttpUrl,
+  MAX_BRAND_LENGTH,
+  MAX_BRANDS_PER_ITEM,
+  MAX_LINKS_PER_ITEM,
+  normalizeBrands,
+  normalizeUrl,
+  PRIORITY_LABELS,
+  type WishlistItem,
+  type WishPriority,
+} from '../domain/WishlistItem';
 
-const schema = z.object({
+const priceText = z.string().refine((v) => !Number.isNaN(parseMoney(v)), 'Escribe el precio solo con números (ej. 45 o 45.50).');
+
+const schema = z
+  .object({
   title: z.string().trim().min(1, 'Escribe qué regalo te gustaría (ej. Polo, Colonia, Billetera).').max(120, 'Usa un nombre más corto.'),
   description: z.string().max(1000, 'Los detalles son muy largos. Resúmelos un poco.'),
   links: z.array(
@@ -17,16 +30,28 @@ const schema = z.object({
       url: z.string().refine((v) => !v.trim() || isValidHttpUrl(normalizeUrl(v)), 'Este enlace no es válido. Cópialo de nuevo desde la tienda.'),
     }),
   ),
-  price: z.string().refine((v) => !Number.isNaN(parseMoney(v)), 'Escribe el precio solo con números (ej. 45 o 45.50).'),
+  brands: z.array(z.string()).max(MAX_BRANDS_PER_ITEM),
+  priceMin: priceText,
+  priceMax: priceText,
   priority: z.enum(['1', '2', '3']),
-});
+})
+  .refine(
+    (v) => {
+      const min = parseMoney(v.priceMin);
+      const max = parseMoney(v.priceMax);
+      return min === null || max === null || Number.isNaN(min) || Number.isNaN(max) || max >= min;
+    },
+    { path: ['priceMax'], message: 'Debe ser igual o mayor que el precio «desde».' },
+  );
 export type WishFormValues = z.infer<typeof schema>;
 
 export interface WishFormResult {
   title: string;
   description: string | null;
   links: { url: string; label: null }[];
-  priceEstimate: number | null;
+  brands: string[];
+  priceMin: number | null;
+  priceMax: number | null;
   priority: WishPriority;
 }
 
@@ -46,38 +71,62 @@ function toDefaults(item?: WishlistItem): WishFormValues {
     title: item?.title ?? '',
     description: item?.description ?? '',
     links: item && item.links.length > 0 ? item.links.map((l) => ({ url: l.url })) : [{ url: '' }],
-    price: item?.priceEstimate != null ? String(item.priceEstimate) : '',
+    brands: item?.brands ?? [],
+    priceMin: item?.priceMin != null ? String(item.priceMin) : '',
+    priceMax: item?.priceMax != null ? String(item.priceMax) : '',
     priority: String(item?.priority ?? 2) as WishFormValues['priority'],
   };
 }
 
 export function WishlistItemForm({ initial, budget, currency, forName, submitting, error, onSubmit, onCancel }: Props) {
   const [savedCount, setSavedCount] = useState(0);
+  const [brandDraft, setBrandDraft] = useState('');
   const {
     register,
     control,
     handleSubmit,
     reset,
     watch,
+    setValue,
     setFocus,
     formState: { errors },
   } = useForm<WishFormValues>({ resolver: zodResolver(schema), defaultValues: toDefaults(initial) });
   const { fields, append, remove } = useFieldArray({ control, name: 'links' });
 
-  const price = parseMoney(watch('price'));
-  const overBudget = budget != null && price != null && !Number.isNaN(price) && price > budget;
+  // Está sobre el presupuesto si hasta el precio más bajo lo supera
+  const lowest = parseMoney(watch('priceMin'));
+  const overBudget = budget != null && lowest != null && !Number.isNaN(lowest) && lowest > budget;
+
+  const brands = watch('brands');
+  const brandsFull = brands.length >= MAX_BRANDS_PER_ITEM;
+  // Acepta varias separadas por coma: "Nike, Adidas"
+  const addBrands = () => {
+    const next = normalizeBrands([...brands, ...brandDraft.split(',')]).slice(0, MAX_BRANDS_PER_ITEM);
+    setValue('brands', next, { shouldDirty: true });
+    setBrandDraft('');
+  };
+  const removeBrand = (brand: string) =>
+    setValue(
+      'brands',
+      brands.filter((b) => b !== brand),
+      { shouldDirty: true },
+    );
 
   const submit = async (v: WishFormValues) => {
     const ok = await onSubmit({
       title: v.title,
       description: v.description.trim() || null,
       links: v.links.map((l) => ({ url: normalizeUrl(l.url), label: null })).filter((l) => l.url),
-      priceEstimate: parseMoney(v.price),
+      // Si quedó una marca escrita sin tocar «Agregar», también se guarda
+      brands: normalizeBrands([...v.brands, ...brandDraft.split(',')]).slice(0, MAX_BRANDS_PER_ITEM),
+      priceMin: parseMoney(v.priceMin),
+      priceMax: parseMoney(v.priceMax),
       priority: Number(v.priority) as WishPriority,
     });
     // Al crear, el formulario queda listo para el siguiente regalo
     if (ok && !initial) {
       reset(toDefaults());
+      setBrandDraft('');
       setSavedCount((c) => c + 1);
       setTimeout(() => setFocus('title'), 0);
     }
@@ -104,11 +153,62 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
       <TextArea
         label="Detalles"
         optional
-        hint="Talla, color, marca, modelo… lo que nos ayude a acertar."
+        hint="Talla, color, modelo… lo que nos ayude a acertar."
         placeholder="ej. Talla M, color azul"
         error={errors.description?.message}
         {...register('description')}
       />
+
+      <fieldset className="space-y-3">
+        <legend className="text-base font-bold text-ink-900">
+          Marcas que te gustan <span className="font-normal text-ink-500">(opcional)</span>
+        </legend>
+        <p className="text-sm text-ink-700">Escribe una marca y toca «Agregar». Puedes poner varias. Si no pones ninguna, cualquier marca está bien.</p>
+        {brands.length > 0 && (
+          <ul className="flex flex-wrap gap-2" aria-label="Marcas elegidas">
+            {brands.map((brand) => (
+              <li key={brand}>
+                <span className="inline-flex min-h-11 items-center gap-1 rounded-full border-2 border-night-900 bg-gold-50 py-1 pl-3 pr-1 text-base font-bold text-night-900">
+                  <Tag className="size-4 shrink-0" aria-hidden />
+                  {brand}
+                  <button
+                    type="button"
+                    onClick={() => removeBrand(brand)}
+                    className="flex size-9 items-center justify-center rounded-full text-berry-700 hover:bg-berry-50"
+                    aria-label={`Quitar la marca ${brand}`}
+                  >
+                    <X className="size-5" aria-hidden />
+                  </button>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {brandsFull ? (
+          <p className="text-sm text-ink-700">Llegaste al máximo de {MAX_BRANDS_PER_ITEM} marcas.</p>
+        ) : (
+          <div className="flex items-end gap-2">
+            <div className="flex-1">
+              <TextField
+                label="Marca"
+                placeholder="ej. Nike, Adidas, Samsung"
+                maxLength={MAX_BRAND_LENGTH * 3}
+                value={brandDraft}
+                onChange={(e) => setBrandDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault(); // no enviar el formulario
+                    addBrands();
+                  }
+                }}
+              />
+            </div>
+            <Button variant="secondary" onClick={addBrands} disabled={!brandDraft.trim()} icon={<Plus className="size-5" aria-hidden />}>
+              Agregar
+            </Button>
+          </div>
+        )}
+      </fieldset>
 
       <fieldset className="space-y-3">
         <legend className="text-base font-semibold text-ink-900">
@@ -147,14 +247,16 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
         )}
       </fieldset>
 
-      <TextField
-        label={`Precio aproximado (${currency === 'PEN' ? 'S/' : currency})`}
-        optional
-        inputMode="decimal"
-        placeholder="ej. 45"
-        error={errors.price?.message}
-        {...register('price')}
-      />
+      <fieldset className="space-y-2">
+        <legend className="text-base font-bold text-ink-900">
+          Rango de precio ({currency === 'PEN' ? 'S/' : currency}) <span className="font-normal text-ink-500">(opcional)</span>
+        </legend>
+        <p className="text-sm text-ink-700">Si sabes el precio exacto, llena solo «Desde».</p>
+        <div className="grid grid-cols-2 gap-3">
+          <TextField label="Desde" inputMode="decimal" placeholder="ej. 50" error={errors.priceMin?.message} {...register('priceMin')} />
+          <TextField label="Hasta" inputMode="decimal" placeholder="ej. 80" error={errors.priceMax?.message} {...register('priceMax')} />
+        </div>
+      </fieldset>
       {overBudget && budget != null && (
         <Notice tone="warning">Este regalo cuesta más que {formatMoney(budget, currency)}, el presupuesto del intercambio. Puedes guardarlo igual.</Notice>
       )}

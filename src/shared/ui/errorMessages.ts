@@ -69,6 +69,9 @@ const MESSAGES: Record<string, string> = {
   WISH_TITLE_INVALID: 'Escribe qué regalo te gustaría (ej. Polo, Colonia, Billetera).',
   WISH_DESCRIPTION_TOO_LONG: 'Los detalles son muy largos. Resúmelos un poco.',
   PRICE_INVALID: 'Escribe el precio solo con números (ej. 45 o 45.50), o déjalo vacío.',
+  PRICE_RANGE_INVALID: 'El precio «hasta» debe ser igual o mayor que el precio «desde».',
+  TOO_MANY_BRANDS: 'Puedes poner hasta 8 marcas por regalo.',
+  BRAND_TOO_LONG: 'El nombre de una marca es muy largo. Usa un nombre más corto.',
   TOO_MANY_LINKS: 'Puedes poner hasta 5 enlaces por regalo.',
   LINK_INVALID: 'Uno de los enlaces no es válido. Cópialo de nuevo desde la tienda.',
 
