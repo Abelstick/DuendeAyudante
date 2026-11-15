@@ -3,6 +3,8 @@ import { createContext, useContext } from 'react';
 import { NavLink, Outlet, useParams } from 'react-router-dom';
 import { canManageEvent, type ChristmasEvent, type EventContext } from '@/modules/events/domain/Event';
 import { useEvent, useEventContext } from '@/modules/events/presentation/hooks';
+import { useFamilyTheme } from '@/modules/families/presentation/familyTheme';
+import { useFamilies } from '@/modules/families/presentation/hooks';
 import { ButtonLink } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
@@ -25,6 +27,9 @@ export function EventLayout() {
   const { eventId = '' } = useParams();
   const event = useEvent(eventId);
   const context = useEventContext(eventId);
+  const families = useFamilies(eventId);
+  const myFamily = families.data?.find((f) => f.id === context.data?.me?.familyId);
+  useFamilyTheme(myFamily?.color);
 
   if (event.isLoading || context.isLoading) return <FullPageSpinner />;
   if (event.error || context.error || !event.data || !context.data) {
@@ -50,12 +55,12 @@ export function EventLayout() {
   return (
     <EventScopeContext.Provider value={{ event: event.data, context: context.data }}>
       <div className="min-h-dvh pb-28 md:pb-0 md:pl-60">
-        <header className="snow-bg bg-pine-800 px-4 py-4 text-white md:hidden">
+        <header className="snow-bg bg-brand px-4 py-4 text-white md:hidden">
           <p className="truncate text-lg font-bold">🎄 {event.data.name}</p>
         </header>
 
         {/* Navegación lateral en escritorio */}
-        <nav aria-label="Menú principal" className="fixed inset-y-0 left-0 hidden w-60 flex-col gap-2 bg-pine-800 p-4 text-white md:flex">
+        <nav aria-label="Menú principal" className="fixed inset-y-0 left-0 hidden w-60 flex-col gap-2 bg-brand p-4 text-white md:flex">
           <p className="mb-4 px-2 text-xl font-bold leading-tight">🎄 {event.data.name}</p>
           {items.map(({ to, label, icon: Icon, end }) => (
             <NavLink
@@ -63,7 +68,7 @@ export function EventLayout() {
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex min-h-12 items-center gap-3 rounded-xl px-3 text-lg font-semibold ${isActive ? 'bg-white text-pine-900' : 'hover:bg-pine-700'}`
+                `flex min-h-12 items-center gap-3 rounded-xl px-3 text-lg font-semibold ${isActive ? 'bg-white text-brand' : 'hover:bg-brand-strong'}`
               }
             >
               <Icon className="size-6" aria-hidden />
@@ -89,7 +94,7 @@ export function EventLayout() {
                   end={end}
                   className={({ isActive }) =>
                     `flex min-h-16 flex-col items-center justify-center gap-0.5 text-sm font-semibold ${
-                      isActive ? 'text-berry-600' : 'text-ink-700'
+                      isActive ? 'text-brand' : 'text-ink-700'
                     }`
                   }
                 >

@@ -23,6 +23,24 @@
   --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
+/* Identidad de color de la familia: EventLayout cambia estas variables
+   según la familia de la persona (rojo, verde, blanco…). */
+:root {
+  --brand: #1f5236;
+  --brand-strong: #183f2a;
+  --brand-soft: #eef6f1;
+  --brand-page: #fbf6ec;
+  --brand-accent: #e0bb3e;
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-page: var(--brand-page);
+  --color-brand-accent: var(--brand-accent);
+}
+
 /* Tamaño de letra base cómodo (18 px) y opción "Letra grande" (21 px). */
 html {
   font-size: 112.5%;
@@ -33,7 +51,8 @@ html[data-text-size='large'] {
 }
 
 body {
-  background: var(--color-cream-100);
+  background: var(--brand-page);
+  transition: background-color 0.3s ease;
   color: var(--color-ink-900);
   font-family: var(--font-sans);
   line-height: 1.5;

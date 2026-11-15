@@ -10,6 +10,7 @@ import { Spinner } from '@/shared/ui/Button';
 import { Card, Notice, PageTitle, SectionTitle } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { AddMemberForm } from './AddMemberForm';
+import { JoinCodeEditor } from './JoinCodeEditor';
 import { FamiliesManager } from './FamiliesManager';
 import { MembersList } from './MembersList';
 
@@ -29,13 +30,10 @@ export function OrganizePage() {
 
   return (
     <div className="space-y-6">
-      <PageTitle icon={<Settings className="size-8 text-pine-700" aria-hidden />} title="Organizar" subtitle={event.name} />
+      <PageTitle icon={<Settings className="size-8 text-brand" aria-hidden />} title="Organizar" subtitle={event.name} />
 
       <Card className="space-y-1">
-        <p className="text-lg">
-          🏠 Código de tu Navidad: <strong className="select-all tracking-wider text-pine-900">{event.joinCode}</strong>
-        </p>
-        <p className="text-sm text-ink-700">Tus familiares lo usan para entrar. Ya va incluido en cada mensaje de WhatsApp.</p>
+        <JoinCodeEditor />
         <p className="text-base capitalize text-ink-700">📅 {formatEventDate(event.celebrationAt, event.timezone)}</p>
         {event.giftExchange && <p className="text-base text-ink-700">💰 Presupuesto: {formatMoney(event.giftExchange.budgetMax, event.currency)}</p>}
       </Card>
@@ -45,7 +43,7 @@ export function OrganizePage() {
           <li
             key={label}
             className={`rounded-2xl border-2 px-4 py-3 text-base font-semibold ${
-              i + 1 < step ? 'border-pine-600 bg-pine-50 text-pine-900' : i + 1 === step ? 'border-gold-400 bg-gold-100' : 'border-cream-200 bg-white text-ink-700'
+              i + 1 < step ? 'border-brand bg-brand-soft text-brand' : i + 1 === step ? 'border-gold-400 bg-gold-100' : 'border-cream-200 bg-white text-ink-700'
             }`}
           >
             {i + 1 < step ? '✓' : `${i + 1}.`} {label}

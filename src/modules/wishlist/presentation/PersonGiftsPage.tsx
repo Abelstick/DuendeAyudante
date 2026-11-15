@@ -38,7 +38,7 @@ export function PersonGiftsPage() {
         Volver a Regalos de todos
       </ButtonLink>
       <header className="space-y-2">
-        <h1 className="text-2xl font-bold text-pine-900">{displayName(person)}</h1>
+        <h1 className="text-2xl font-bold text-brand">{displayName(person)}</h1>
         <FamilyBadge family={families.data?.find((f) => f.id === person.familyId)} showColorName />
       </header>
 

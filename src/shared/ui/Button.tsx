@@ -8,10 +8,10 @@ const base =
   'inline-flex items-center justify-center gap-2 rounded-2xl font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed select-none text-center';
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-pine-700 text-white hover:bg-pine-800 active:bg-pine-900 shadow-sm',
-  secondary: 'bg-white text-pine-800 border-2 border-pine-700 hover:bg-pine-50',
+  primary: 'bg-brand text-white hover:bg-brand-strong active:bg-brand-strong shadow-sm',
+  secondary: 'bg-white text-brand border-2 border-brand hover:bg-brand-soft',
   danger: 'bg-berry-600 text-white hover:bg-berry-700',
-  ghost: 'bg-transparent text-pine-800 hover:bg-pine-50 underline-offset-4',
+  ghost: 'bg-transparent text-brand hover:bg-brand-soft underline-offset-4',
   whatsapp: 'bg-[#1f8f4e] text-white hover:bg-[#187540] shadow-sm',
 };
 

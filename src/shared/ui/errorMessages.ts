@@ -30,6 +30,8 @@ const MESSAGES: Record<string, string> = {
   GUARDIAN_NOT_FOUND: 'No encontramos al familiar responsable elegido. Vuelve a elegirlo.',
   FAMILY_NOT_FOUND: 'Esa familia ya no existe. Elige otra.',
 
+  EVENT_CODE_NOT_FOUND: 'No encontramos una Navidad con ese código. Revisa el código en el mensaje de WhatsApp que te enviaron.',
+  JOIN_CODE_NOT_CHANGED: 'No pudimos cambiar el código. No se cambió nada; inténtalo de nuevo en un momento.',
   JOIN_CODE_INVALID: 'El código debe tener entre 4 y 20 letras o números, sin espacios (ej. GARCIA25).',
   JOIN_CODE_TAKEN: 'Ese código ya lo usa otra Navidad. Prueba agregando un número o una palabra (ej. GARCIA25LIMA).',
   EVENT_NAME_INVALID: 'Escribe un nombre para tu Navidad.',

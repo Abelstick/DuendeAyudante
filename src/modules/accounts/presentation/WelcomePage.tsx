@@ -32,7 +32,7 @@ export function WelcomePage() {
   return (
     <PublicLayout>
       <Card className="space-y-4 text-center">
-        <h1 className="text-2xl font-bold text-pine-900">¡Bienvenido! 🎁</h1>
+        <h1 className="text-2xl font-bold text-brand">¡Bienvenido! 🎁</h1>
         <p className="text-lg text-ink-700">
           Aquí tu familia registra los regalos que le gustaría recibir y se organiza para celebrar la Navidad juntos.
         </p>

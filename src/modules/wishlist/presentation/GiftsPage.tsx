@@ -44,7 +44,7 @@ export function GiftsPage() {
             role="tab"
             aria-selected={view === value}
             onClick={() => setView(value)}
-            className={`min-h-13 rounded-xl text-base font-bold ${view === value ? 'bg-white text-pine-900 shadow' : 'text-ink-700'}`}
+            className={`min-h-13 rounded-xl text-base font-bold ${view === value ? 'bg-white text-brand shadow' : 'text-ink-700'}`}
           >
             {label}
           </button>
@@ -95,7 +95,7 @@ function MyGifts({ items, startAdding }: { items: WishlistItem[]; startAdding: b
                 aria-pressed={p.id === selected.id}
                 onClick={() => setSelectedId(p.id)}
                 className={`min-h-12 rounded-full border-2 px-5 text-base font-semibold ${
-                  p.id === selected.id ? 'border-pine-700 bg-pine-700 text-white' : 'border-cream-200 bg-white'
+                  p.id === selected.id ? 'border-brand bg-brand text-white' : 'border-cream-200 bg-white'
                 }`}
               >
                 {p.id === context.me?.id ? 'Yo' : toTitleCase(p.firstName)}
@@ -149,7 +149,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
                 <li key={p.id}>
                   <Link
                     to={`/e/${event.id}/regalos/persona/${p.id}`}
-                    className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-cream-200 bg-white px-4 py-3 hover:border-pine-600"
+                    className="flex min-h-16 items-center justify-between gap-3 rounded-2xl border border-cream-200 bg-white px-4 py-3 hover:border-brand"
                   >
                     <span>
                       <span className="block text-lg font-semibold">{displayName(p)}</span>
@@ -157,7 +157,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
                         {count === 0 ? 'Todavía no agregó regalos' : `${count} ${count === 1 ? 'regalo' : 'regalos'}`}
                       </span>
                     </span>
-                    <ChevronRight className="size-6 shrink-0 text-pine-700" aria-hidden />
+                    <ChevronRight className="size-6 shrink-0 text-brand" aria-hidden />
                   </Link>
                 </li>
               );

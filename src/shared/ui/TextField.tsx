@@ -32,7 +32,7 @@ function FieldShell({ label, hint, error, optional, id, children }: FieldShellPr
 }
 
 const inputClass =
-  'w-full min-h-13 rounded-xl border-2 bg-white px-4 py-3 text-lg text-ink-900 placeholder:text-ink-500 focus:border-pine-700 focus:outline-none';
+  'w-full min-h-13 rounded-xl border-2 bg-white px-4 py-3 text-lg text-ink-900 placeholder:text-ink-500 focus:border-brand focus:outline-none';
 
 interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;

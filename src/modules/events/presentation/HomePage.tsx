@@ -27,7 +27,7 @@ export function HomePage() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-bold text-pine-900">¡Hola{me ? `, ${toTitleCase(me.firstName)}` : ''}! 👋</h1>
+      <h1 className="text-2xl font-bold text-brand">¡Hola{me ? `, ${toTitleCase(me.firstName)}` : ''}! 👋</h1>
 
       <Countdown target={event.celebrationAt} timezone={event.timezone} />
 
@@ -68,7 +68,7 @@ export function HomePage() {
       )}
 
       <Card className="flex items-center gap-4">
-        <Users className="size-10 shrink-0 text-pine-700" aria-hidden />
+        <Users className="size-10 shrink-0 text-brand" aria-hidden />
         <p className="text-lg">
           <strong>{participants.data?.length ?? '…'}</strong> integrantes en <strong>{families.data?.length ?? '…'}</strong>{' '}
           {families.data?.length === 1 ? 'familia' : 'familias'}

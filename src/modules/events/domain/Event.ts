@@ -5,7 +5,7 @@ export type EventRole = 'owner' | 'admin' | 'editor' | 'participant';
 export interface ChristmasEvent {
   id: string;
   name: string;
-  /** Código que los familiares usan para entrar (ej. GARCIA25). No cambia. */
+  /** Código que los familiares usan para entrar (ej. GARCIA25). Los códigos anteriores siguen funcionando. */
   joinCode: string;
   organizerName: string;
   description: string | null;

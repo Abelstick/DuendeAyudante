@@ -224,6 +224,59 @@ describe('código de la Navidad y usuarios por Navidad', () => {
   });
 });
 
+describe('cambio de código de la Navidad', () => {
+  const asRole = <T,>(role: 'anon' | 'service_role', fn: (tx: Transaction) => Promise<T>) =>
+    db.transaction(async (tx) => {
+      await tx.exec(`set local role ${role}`);
+      return fn(tx);
+    });
+
+  it('resolve_join_code funciona sin sesión y normaliza lo que se escribe', async () => {
+    const r = await asRole('anon', (tx) => tx.query<{ c: string | null }>(`select public.resolve_join_code(' garcía-25 ') as c`));
+    expect(r.rows[0]!.c).toBe('GARCIA25');
+    const none = await asRole('anon', (tx) => tx.query<{ c: string | null }>(`select public.resolve_join_code('NOEXISTE') as c`));
+    expect(none.rows[0]!.c).toBeNull();
+  });
+
+  it('solo el servidor puede aplicar el cambio', async () => {
+    await expectDenied(as(ids.ownerA, (tx) => tx.query(`select public.apply_join_code_change($1, 'FAMILIA', $2)`, [eventA, ids.ownerA])));
+  });
+
+  it('el código anterior sigue llevando a la Navidad y nadie más puede usarlo', async () => {
+    await asRole('service_role', (tx) => tx.query(`select public.apply_join_code_change($1, 'FAMILIA', $2)`, [eventA, ids.ownerA]));
+    const current = await db.query<{ join_code: string }>(`select join_code from public.events where id = $1`, [eventA]);
+    expect(current.rows[0]!.join_code).toBe('FAMILIA');
+
+    const viaOld = await asRole('anon', (tx) => tx.query<{ c: string }>(`select public.resolve_join_code('GARCIA25') as c`));
+    expect(viaOld.rows[0]!.c).toBe('FAMILIA');
+
+    const free = await as(ids.ownerB, (tx) => tx.query<{ ok: boolean }>(`select public.is_join_code_available('GARCIA25') as ok`));
+    expect(free.rows[0]!.ok).toBe(false);
+    await expect(
+      as(ids.ownerB, (tx) => tx.query(`select public.create_event('Otra', 'GARCIA25', '2026-12-24 19:00-05', 'Ana', 'López')`)),
+    ).rejects.toThrow(/JOIN_CODE_TAKEN/);
+  });
+
+  it('no permite tomar el código de otra Navidad, pero sí volver al propio código anterior', async () => {
+    await expect(
+      asRole('service_role', (tx) => tx.query(`select public.apply_join_code_change($1, 'LOPEZ', $2)`, [eventA, ids.ownerA])),
+    ).rejects.toThrow(/JOIN_CODE_TAKEN/);
+    await asRole('service_role', (tx) => tx.query(`select public.apply_join_code_change($1, 'GARCIA25', $2)`, [eventA, ids.ownerA]));
+    const back = await db.query<{ join_code: string }>(`select join_code from public.events where id = $1`, [eventA]);
+    expect(back.rows[0]!.join_code).toBe('GARCIA25');
+    const viaFamilia = await asRole('anon', (tx) => tx.query<{ c: string }>(`select public.resolve_join_code('FAMILIA') as c`));
+    expect(viaFamilia.rows[0]!.c).toBe('GARCIA25');
+  });
+
+  it('acepta el color blanco para las familias', async () => {
+    await as(ids.ownerA, (tx) => tx.query(`insert into public.families (event_id, name, color_key) values ($1, 'NIEVE', 'white')`, [eventA]));
+    await expect(
+      as(ids.ownerA, (tx) => tx.query(`insert into public.families (event_id, name, color_key) values ($1, 'X', 'black')`, [eventA])),
+    ).rejects.toThrow(/families_color_key_check/);
+    await db.query(`delete from public.families where name = 'NIEVE'`);
+  });
+});
+
 describe('RLS: aislamiento entre eventos', () => {
   it('un participante solo ve su evento', async () => {
     const r = await as(ids.rosa, (tx) => tx.query<{ id: string }>(`select id from public.events`));

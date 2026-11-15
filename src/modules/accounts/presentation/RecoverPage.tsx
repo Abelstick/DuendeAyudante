@@ -37,7 +37,7 @@ export function RecoverPage() {
   return (
     <PublicLayout>
       <Card className="space-y-4">
-        <h1 className="text-2xl font-bold text-pine-900">Recuperar contraseña</h1>
+        <h1 className="text-2xl font-bold text-brand">Recuperar contraseña</h1>
         {done ? (
           <Notice tone="success">Si el correo está registrado, te llegará un enlace para crear una nueva contraseña.</Notice>
         ) : (
@@ -49,7 +49,7 @@ export function RecoverPage() {
             </Button>
           </form>
         )}
-        <Link to="/entrar" className="inline-block min-h-12 text-base font-semibold text-pine-800 underline">
+        <Link to="/entrar" className="inline-block min-h-12 text-base font-semibold text-brand underline">
           Volver a Entrar
         </Link>
       </Card>

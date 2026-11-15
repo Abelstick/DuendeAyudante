@@ -11,7 +11,7 @@ export function Card({ className = '', children, ...rest }: HTMLAttributes<HTMLD
 export function PageTitle({ icon, title, subtitle }: { icon?: ReactNode; title: string; subtitle?: string }) {
   return (
     <header className="mb-5">
-      <h1 className="flex items-center gap-3 text-2xl font-bold text-pine-900 sm:text-3xl">
+      <h1 className="flex items-center gap-3 text-2xl font-bold text-brand sm:text-3xl">
         {icon}
         {title}
       </h1>
@@ -21,7 +21,7 @@ export function PageTitle({ icon, title, subtitle }: { icon?: ReactNode; title: 
 }
 
 export function SectionTitle({ children }: { children: ReactNode }) {
-  return <h2 className="mb-3 text-xl font-bold text-pine-900">{children}</h2>;
+  return <h2 className="mb-3 text-xl font-bold text-brand">{children}</h2>;
 }
 
 export function EmptyState({ emoji, title, children }: { emoji: string; title: string; children?: ReactNode }) {
@@ -38,9 +38,9 @@ export function EmptyState({ emoji, title, children }: { emoji: string; title: s
 
 export function Notice({ tone = 'info', children }: { tone?: 'info' | 'warning' | 'success' | 'error'; children: ReactNode }) {
   const tones = {
-    info: 'bg-pine-50 text-pine-900 border-pine-100',
+    info: 'bg-brand-soft text-brand border-brand-soft',
     warning: 'bg-gold-100 text-ink-900 border-gold-400',
-    success: 'bg-pine-50 text-pine-900 border-pine-600',
+    success: 'bg-brand-soft text-brand border-brand',
     error: 'bg-berry-50 text-berry-700 border-berry-600',
   } as const;
   return (

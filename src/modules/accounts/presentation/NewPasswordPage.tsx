@@ -9,7 +9,7 @@ export function NewPasswordPage() {
   return (
     <PublicLayout>
       <Card className="space-y-4">
-        <h1 className="text-2xl font-bold text-pine-900">Crea tu nueva contraseña</h1>
+        <h1 className="text-2xl font-bold text-brand">Crea tu nueva contraseña</h1>
         <ChangePasswordForm onDone={() => navigate('/', { replace: true })} />
       </Card>
     </PublicLayout>

@@ -42,7 +42,7 @@ export function ProfilePage() {
       <PageTitle title="Mi perfil" />
 
       <Card className="space-y-2">
-        <p className="text-xl font-bold text-pine-900">{me ? displayName(me) : 'Organizador'}</p>
+        <p className="text-xl font-bold text-brand">{me ? displayName(me) : 'Organizador'}</p>
         {me && <FamilyBadge family={family} showColorName />}
         <p className="text-base text-ink-700">
           Código de tu Navidad: <strong className="tracking-wider">{event.joinCode}</strong>
@@ -75,7 +75,7 @@ export function ProfilePage() {
               aria-checked={textSize === value}
               onClick={() => chooseSize(value)}
               className={`min-h-14 rounded-2xl border-2 font-semibold ${
-                textSize === value ? 'border-pine-700 bg-pine-700 text-white' : 'border-cream-200 bg-white text-ink-900'
+                textSize === value ? 'border-brand bg-brand text-white' : 'border-cream-200 bg-white text-ink-900'
               } ${value === 'large' ? 'text-xl' : 'text-base'}`}
             >
               {textSize === value ? '✓ ' : ''}
@@ -100,7 +100,7 @@ export function ProfilePage() {
       </Card>
 
       {(myEvents.data?.length ?? 0) > 1 && (
-        <Link to="/mis-navidades" className="block min-h-12 text-lg font-semibold text-pine-800 underline">
+        <Link to="/mis-navidades" className="block min-h-12 text-lg font-semibold text-brand underline">
           Ver mis otras Navidades
         </Link>
       )}

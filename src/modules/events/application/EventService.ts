@@ -27,6 +27,12 @@ export class EventService {
     return this.events.isJoinCodeAvailable(normalized);
   }
 
+  async changeJoinCode(eventId: string, newCode: string): Promise<string> {
+    const code = normalizeJoinCode(newCode);
+    if (!JOIN_CODE_PATTERN.test(code)) throw new AppError('JOIN_CODE_INVALID');
+    return this.events.changeJoinCode(eventId, code);
+  }
+
   async create(input: CreateEventInput): Promise<string> {
     if (!input.name.trim()) throw new AppError('EVENT_NAME_INVALID');
     const joinCode = normalizeJoinCode(input.joinCode);

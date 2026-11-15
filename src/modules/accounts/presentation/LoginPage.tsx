@@ -108,7 +108,7 @@ export function LoginPage() {
   return (
     <PublicLayout>
       <Card>
-        <h1 className="mb-1 text-2xl font-bold text-pine-900">Entrar</h1>
+        <h1 className="mb-1 text-2xl font-bold text-brand">Entrar</h1>
         <p className="mb-5 text-lg text-ink-700">
           {mode === 'organizer'
             ? 'Escribe el correo y la contraseña con los que creaste tu Navidad.'
@@ -158,7 +158,7 @@ export function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="flex min-h-13 min-w-24 items-center justify-center gap-1 rounded-xl border-2 border-cream-200 bg-white px-3 text-base font-semibold text-pine-800"
+                className="flex min-h-13 min-w-24 items-center justify-center gap-1 rounded-xl border-2 border-cream-200 bg-white px-3 text-base font-semibold text-brand"
                 aria-pressed={showPassword}
               >
                 {showPassword ? <EyeOff className="size-5" aria-hidden /> : <Eye className="size-5" aria-hidden />}
@@ -176,7 +176,7 @@ export function LoginPage() {
         </form>
 
         <div className="mt-6 space-y-2 border-t border-cream-200 pt-4">
-          <button type="button" className="block min-h-12 text-base font-semibold text-pine-800 underline" onClick={() => setShowHelp((v) => !v)}>
+          <button type="button" className="block min-h-12 text-base font-semibold text-brand underline" onClick={() => setShowHelp((v) => !v)}>
             ¿Olvidaste tu contraseña?
           </button>
           {showHelp && (
@@ -184,7 +184,7 @@ export function LoginPage() {
               <p>Pídele una nueva a la persona que organiza tu Navidad. Te la enviará por WhatsApp.</p>
               <p>
                 Si eres organizador y entras con tu correo,{' '}
-                <Link to="/recuperar" className="font-semibold text-pine-800 underline">
+                <Link to="/recuperar" className="font-semibold text-brand underline">
                   recupera tu contraseña aquí
                 </Link>
                 .
@@ -193,7 +193,7 @@ export function LoginPage() {
           )}
           <button
             type="button"
-            className="block min-h-12 text-base font-semibold text-pine-800 underline"
+            className="block min-h-12 text-base font-semibold text-brand underline"
             onClick={() => switchMode(mode === 'family' ? 'organizer' : 'family')}
           >
             {mode === 'family' ? 'Soy organizador: entrar con mi correo' : 'Soy familiar: entrar con código y usuario'}

@@ -84,8 +84,8 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
   };
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="animate-pop-in space-y-5 rounded-3xl border-2 border-pine-600 bg-white p-5 shadow-md" noValidate>
-      <h2 className="text-xl font-bold text-pine-900">
+    <form onSubmit={handleSubmit(submit)} className="animate-pop-in space-y-5 rounded-3xl border-2 border-brand bg-white p-5 shadow-md" noValidate>
+      <h2 className="text-xl font-bold text-brand">
         {initial ? 'Cambiar regalo' : savedCount > 0 ? '¿Otro regalo? 🎁' : 'Nuevo regalo 🎁'}
         {forName && <span className="block text-base font-normal text-ink-700">Para {forName}</span>}
       </h2>
@@ -164,7 +164,7 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
           {(['1', '2', '3'] as const).map((p) => (
             <label key={p} className="cursor-pointer">
               <input type="radio" value={p} className="peer sr-only" {...register('priority')} />
-              <span className="flex min-h-14 items-center justify-center rounded-2xl border-2 border-cream-200 px-2 text-center text-base font-semibold peer-checked:border-pine-700 peer-checked:bg-pine-700 peer-checked:text-white peer-focus-visible:outline-3 peer-focus-visible:outline-gold-400">
+              <span className="flex min-h-14 items-center justify-center rounded-2xl border-2 border-cream-200 px-2 text-center text-base font-semibold peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white peer-focus-visible:outline-3 peer-focus-visible:outline-gold-400">
                 {PRIORITY_LABELS[Number(p) as WishPriority]}
               </span>
             </label>

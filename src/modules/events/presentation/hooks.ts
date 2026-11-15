@@ -28,6 +28,18 @@ export function useJoinCodeChecker() {
   return (code: string) => events.isJoinCodeAvailable(code);
 }
 
+export function useChangeJoinCode(eventId: string) {
+  const { events } = useServices();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (newCode: string) => events.changeJoinCode(eventId, newCode),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
+      void qc.invalidateQueries({ queryKey: eventKeys.mine });
+    },
+  });
+}
+
 export function useCreateEvent() {
   const { events } = useServices();
   const qc = useQueryClient();

@@ -144,7 +144,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 rounded-3xl bg-cream-50 p-4" noValidate>
-        <h3 className="text-lg font-bold text-pine-900">Agregar a un familiar</h3>
+        <h3 className="text-lg font-bold text-brand">Agregar a un familiar</h3>
 
         <TextField label="Nombre" autoComplete="off" error={errors.firstName?.message} {...register('firstName')} />
         <TextField label="Apellido paterno" autoComplete="off" error={errors.paternalSurname?.message} {...register('paternalSurname')} />
@@ -163,7 +163,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
             {...register('distinguishingNote')}
           />
         ) : (
-          <button type="button" className="min-h-12 text-base font-semibold text-pine-800 underline" onClick={() => setShowNote(true)}>
+          <button type="button" className="min-h-12 text-base font-semibold text-brand underline" onClick={() => setShowNote(true)}>
             ¿Hay otra persona con el mismo nombre?
           </button>
         )}
@@ -183,7 +183,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
                   }`}
                   style={{ backgroundColor: FAMILY_COLORS[f.color].soft, color: FAMILY_COLORS[f.color].text }}
                 >
-                  <span className="size-3 rounded-full" style={{ backgroundColor: FAMILY_COLORS[f.color].swatch }} aria-hidden />
+                  <span className="size-3 rounded-full border border-black/25" style={{ backgroundColor: FAMILY_COLORS[f.color].swatch }} aria-hidden />
                   {familyId === f.id ? '✓ ' : ''}
                   {f.name}
                 </button>
@@ -203,7 +203,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
             ).map(([value, label]) => (
               <label key={value} className="cursor-pointer">
                 <input type="radio" value={value} className="peer sr-only" {...register('hasAccount')} />
-                <span className="flex min-h-14 items-center rounded-2xl border-2 border-cream-200 bg-white px-4 text-base font-semibold peer-checked:border-pine-700 peer-checked:bg-pine-700 peer-checked:text-white">
+                <span className="flex min-h-14 items-center rounded-2xl border-2 border-cream-200 bg-white px-4 text-base font-semibold peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white">
                   {label}
                 </span>
               </label>
@@ -233,7 +233,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
                 <button
                   type="button"
                   onClick={() => setValue('password', generateFriendlyPassword(), { shouldValidate: true })}
-                  className="flex min-h-13 min-w-13 items-center justify-center rounded-xl border-2 border-cream-200 bg-white text-pine-800"
+                  className="flex min-h-13 min-w-13 items-center justify-center rounded-xl border-2 border-cream-200 bg-white text-brand"
                   aria-label="Generar otra contraseña"
                   title="Generar otra contraseña"
                 >
@@ -249,10 +249,10 @@ export function AddMemberForm({ families, members, myRole }: Props) {
                   <label
                     key={o.value}
                     className={`flex min-h-14 cursor-pointer items-start gap-3 rounded-2xl border-2 p-3 ${
-                      role === o.value ? 'border-pine-700 bg-pine-50' : 'border-cream-200'
+                      role === o.value ? 'border-brand bg-brand-soft' : 'border-cream-200'
                     }`}
                   >
-                    <input type="radio" name="role" className="mt-1 size-5 accent-pine-700" checked={role === o.value} onChange={() => setRole(o.value)} />
+                    <input type="radio" name="role" className="mt-1 size-5 accent-brand" checked={role === o.value} onChange={() => setRole(o.value)} />
                     <span>
                       <span className="block font-semibold">{o.label}</span>
                       <span className="block text-sm text-ink-700">{o.help}</span>
@@ -276,7 +276,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
                 <label key={m.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-cream-200 bg-white px-3">
                   <input
                     type="checkbox"
-                    className="size-5 accent-pine-700"
+                    className="size-5 accent-brand"
                     checked={guardianIds.includes(m.id)}
                     onChange={(e) => setGuardianIds((ids) => (e.target.checked ? [...ids, m.id] : ids.filter((id) => id !== m.id)))}
                   />

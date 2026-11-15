@@ -14,10 +14,18 @@ export class SupabaseAuthService implements IAuthService {
     private readonly memberEmailDomain: string,
   ) {}
 
-  private toEmail({ eventCode, user }: SignInCredentials): string {
+  /**
+   * El código puede ser el actual o uno anterior (si el organizador lo cambió):
+   * se traduce al código vigente, que es el que va en el correo interno.
+   */
+  private async toEmail({ eventCode, user }: SignInCredentials): Promise<string> {
     const value = user.trim();
     if (!eventCode || value.includes('@')) return value.toLowerCase();
-    return `${normalizeUsername(value)}@${normalizeJoinCode(eventCode).toLowerCase()}.${this.memberEmailDomain}`;
+
+    const { data, error } = await this.supabase.rpc('resolve_join_code', { p_code: normalizeJoinCode(eventCode) });
+    if (error) throw new AppError('NETWORK');
+    if (typeof data !== 'string' || !data) throw new AppError('EVENT_CODE_NOT_FOUND');
+    return `${normalizeUsername(value)}@${data.toLowerCase()}.${this.memberEmailDomain}`;
   }
 
   private toAuthUser(user: User): AuthUser {
@@ -40,7 +48,7 @@ export class SupabaseAuthService implements IAuthService {
 
   async signIn(credentials: SignInCredentials): Promise<AuthUser> {
     const { data, error } = await this.supabase.auth.signInWithPassword({
-      email: this.toEmail(credentials),
+      email: await this.toEmail(credentials),
       password: credentials.password,
     });
     if (error) {

@@ -104,11 +104,11 @@ export function FamiliesManager({ eventId, families, participants }: { eventId: 
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-3xl bg-cream-50 p-4" noValidate>
-        <h3 className="text-lg font-bold text-pine-900">Nueva familia</h3>
+        <h3 className="text-lg font-bold text-brand">Nueva familia</h3>
         <TextField label="Nombre de la familia" placeholder="ej. García" error={errors.name?.message} {...register('name')} />
         <fieldset>
           <legend className="mb-2 text-base font-semibold">Color</legend>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
             {FAMILY_COLOR_KEYS.map((c) => (
               <button
                 key={c}
@@ -120,7 +120,7 @@ export function FamiliesManager({ eventId, families, participants }: { eventId: 
                 }`}
                 style={{ backgroundColor: FAMILY_COLORS[c].soft, color: FAMILY_COLORS[c].text }}
               >
-                <span className="size-4 rounded-full" style={{ backgroundColor: FAMILY_COLORS[c].swatch }} aria-hidden />
+                <span className="size-4 rounded-full border border-black/25" style={{ backgroundColor: FAMILY_COLORS[c].swatch }} aria-hidden />
                 {color === c ? '✓ ' : ''}
                 {FAMILY_COLORS[c].label}
               </button>

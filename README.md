@@ -16,6 +16,7 @@ participa sin aprender a usar una aplicación complicada.
 | Juegos, votación y ruleta | ⏳ |
 | Amigo secreto | ⏳ |
 | Cronograma, anuncios y checklist | ⏳ |
+| Mascotas e ilustraciones por familia | ⏳ (la identidad de color por familia ya está) |
 
 ## Tecnología
 

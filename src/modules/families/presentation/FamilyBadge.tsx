@@ -9,7 +9,7 @@ export function FamilyBadge({ family, showColorName = false }: { family: Family 
       className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold"
       style={{ backgroundColor: c.soft, color: c.text }}
     >
-      <span className="size-3 rounded-full" style={{ backgroundColor: c.swatch }} aria-hidden />
+      <span className="size-3 rounded-full border border-black/25" style={{ backgroundColor: c.swatch }} aria-hidden />
       Familia {family.name}
       {showColorName && <span className="font-normal">· {c.label}</span>}
     </span>

@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { mapParticipantRow, type ParticipantRow } from '@/modules/members/infrastructure/mappers';
 import { AppError } from '@/shared/domain/errors';
-import { fromPostgrestError } from '@/shared/infrastructure/supabase/errors';
+import { fromFunctionError, fromPostgrestError } from '@/shared/infrastructure/supabase/errors';
 import type { ChristmasEvent, EventContext, EventRole, MyEventSummary } from '../domain/Event';
 import type { CreateEventData, IEventRepository } from '../domain/IEventRepository';
 
@@ -79,6 +79,14 @@ export class SupabaseEventRepository implements IEventRepository {
     const { data, error } = await this.supabase.rpc('is_join_code_available', { p_code: code });
     if (error) throw fromPostgrestError(error);
     return data === true;
+  }
+
+  async changeJoinCode(eventId: string, newCode: string): Promise<string> {
+    const { data, error } = await this.supabase.functions.invoke<{ joinCode: string }>('change-join-code', {
+      body: { eventId, newCode },
+    });
+    if (error || !data) throw await fromFunctionError(error);
+    return data.joinCode;
   }
 
   async getMyContext(eventId: string): Promise<EventContext> {

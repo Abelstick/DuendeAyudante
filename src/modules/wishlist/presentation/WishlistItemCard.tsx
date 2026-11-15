@@ -17,7 +17,7 @@ interface Props {
 
 const priorityStyles = {
   1: 'bg-berry-50 text-berry-700',
-  2: 'bg-pine-50 text-pine-800',
+  2: 'bg-brand-soft text-brand',
   3: 'bg-cream-200 text-ink-700',
 } as const;
 
@@ -48,7 +48,7 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
-                className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-cream-50 px-3 text-base font-semibold text-pine-800 underline underline-offset-2"
+                className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-cream-50 px-3 text-base font-semibold text-brand underline underline-offset-2"
               >
                 <ExternalLink className="size-5 shrink-0" aria-hidden />
                 Ver en {link.label ?? hostnameOf(link.url)}
