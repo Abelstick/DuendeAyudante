@@ -1,6 +1,6 @@
 import { Dices, Gift, House, PanelLeftClose, PanelLeftOpen, PartyPopper, Settings, UserRound } from 'lucide-react';
 import { motion } from 'motion/react';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, type CSSProperties } from 'react';
 import { Link, NavLink, Outlet, useLocation, useParams } from 'react-router-dom';
 import { canManageEvent, type ChristmasEvent, type EventContext } from '@/modules/events/domain/Event';
 import { useEvent, useEventContext } from '@/modules/events/presentation/hooks';
@@ -94,6 +94,8 @@ export function EventLayout() {
       <SnowBackdrop />
       <div
         className={`relative z-10 min-h-dvh pb-[calc(6.5rem+env(safe-area-inset-bottom))] transition-[padding] duration-200 md:pb-0 ${collapsed ? 'md:pl-24' : 'md:pl-64'}`}
+        // Ancho del menú lateral: las tablas lo usan para saber cuánto pueden ensancharse en escritorio
+        style={{ '--nf-side': collapsed ? '6rem' : '16rem' } as CSSProperties}
       >
         {/* Encabezado móvil: nombre de la Navidad + acceso a Organizar (solo quien administra) */}
         <header className="sky-bg snow-bg snow-cap flex items-center justify-between gap-2 px-4 pb-6 pt-[calc(0.75rem+env(safe-area-inset-top))] text-white md:hidden">
