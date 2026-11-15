@@ -31,7 +31,7 @@ export function CelebrationPage() {
         label="Secciones de la celebración"
         value={tab}
         options={TABS}
-        onChange={(value) => setParams(value === 'aportes' ? {} : { vista: value }, { replace: true })}
+        onChange={(value) => setParams(value === 'aportes' ? {} : { vista: value }, { replace: true, preventScrollReset: true })}
       />
 
       <div role="tabpanel" key={tab} className="animate-rise space-y-5">

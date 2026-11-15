@@ -47,7 +47,7 @@ export function FamilyDrivesManager({ eventId, families }: Props) {
     else toast.error(msg.text);
     const next = new URLSearchParams(params);
     next.delete('drive');
-    setParams(next, { replace: true });
+    setParams(next, { replace: true, preventScrollReset: true });
     void familyDrives.refetch();
     void eventDrive.refetch();
   }, [result]); // solo cuando llega un resultado nuevo

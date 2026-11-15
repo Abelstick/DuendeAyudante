@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet, ScrollRestoration } from 'react-router-dom';
 import { LoginPage } from '@/modules/accounts/presentation/LoginPage';
 import { NewPasswordPage } from '@/modules/accounts/presentation/NewPasswordPage';
 import { ProfilePage } from '@/modules/accounts/presentation/ProfilePage';
@@ -21,65 +21,83 @@ import { TvPage } from '@/modules/events/presentation/TvPage';
 import { RequireAuth } from './AuthContext';
 import { EventLayout } from './layout/EventLayout';
 
+/**
+ * Raíz: al entrar a otra sección se empieza desde arriba; con «Atrás» se vuelve a
+ * donde estaba. Los cambios de pestaña dentro de una página (?vista=) no mueven el scroll.
+ */
+function RootLayout() {
+  return (
+    <>
+      <ScrollRestoration />
+      <Outlet />
+    </>
+  );
+}
+
 export const router = createBrowserRouter([
-  { path: '/', element: <WelcomePage /> },
-  { path: '/entrar', element: <LoginPage /> },
-  { path: '/registro', element: <SignUpPage /> },
-  { path: '/recuperar', element: <RecoverPage /> },
-  // Enlace de la familia: palabra secreta + elegir el nombre (sin usuario ni contraseña)
-  { path: '/f/:token', element: <FamilyLinkPage /> },
   {
-    path: '/nueva-contrasena',
-    element: (
-      <RequireAuth>
-        <NewPasswordPage />
-      </RequireAuth>
-    ),
-  },
-  {
-    path: '/crear',
-    element: (
-      <RequireAuth>
-        <CreateEventPage />
-      </RequireAuth>
-    ),
-  },
-  {
-    path: '/mis-navidades',
-    element: (
-      <RequireAuth>
-        <MyEventsPage />
-      </RequireAuth>
-    ),
-  },
-  // Pantalla para la tele: a pantalla completa, sin menús
-  {
-    path: '/e/:eventId/tv',
-    element: (
-      <RequireAuth>
-        <TvPage />
-      </RequireAuth>
-    ),
-  },
-  {
-    path: '/e/:eventId',
-    element: (
-      <RequireAuth>
-        <EventLayout />
-      </RequireAuth>
-    ),
+    element: <RootLayout />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: 'regalos', element: <GiftsPage /> },
-      { path: 'regalos/persona/:participantId', element: <PersonGiftsPage /> },
-      { path: 'juegos', element: <GamesPage /> },
-      { path: 'celebracion', element: <CelebrationPage /> },
-      { path: 'anuncios', element: <AnnouncementsPage /> },
-      { path: 'mensajes', element: <MessagesPage /> },
-      { path: 'recuerdos', element: <RecapPage /> },
-      { path: 'organizar', element: <OrganizePage /> },
-      { path: 'perfil', element: <ProfilePage /> },
+      { path: '/', element: <WelcomePage /> },
+      { path: '/entrar', element: <LoginPage /> },
+      { path: '/registro', element: <SignUpPage /> },
+      { path: '/recuperar', element: <RecoverPage /> },
+      // Enlace de la familia: palabra secreta + elegir el nombre (sin usuario ni contraseña)
+      { path: '/f/:token', element: <FamilyLinkPage /> },
+      {
+        path: '/nueva-contrasena',
+        element: (
+          <RequireAuth>
+            <NewPasswordPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: '/crear',
+        element: (
+          <RequireAuth>
+            <CreateEventPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: '/mis-navidades',
+        element: (
+          <RequireAuth>
+            <MyEventsPage />
+          </RequireAuth>
+        ),
+      },
+      // Pantalla para la tele: a pantalla completa, sin menús
+      {
+        path: '/e/:eventId/tv',
+        element: (
+          <RequireAuth>
+            <TvPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: '/e/:eventId',
+        element: (
+          <RequireAuth>
+            <EventLayout />
+          </RequireAuth>
+        ),
+        children: [
+          { index: true, element: <HomePage /> },
+          { path: 'regalos', element: <GiftsPage /> },
+          { path: 'regalos/persona/:participantId', element: <PersonGiftsPage /> },
+          { path: 'juegos', element: <GamesPage /> },
+          { path: 'celebracion', element: <CelebrationPage /> },
+          { path: 'anuncios', element: <AnnouncementsPage /> },
+          { path: 'mensajes', element: <MessagesPage /> },
+          { path: 'recuerdos', element: <RecapPage /> },
+          { path: 'organizar', element: <OrganizePage /> },
+          { path: 'perfil', element: <ProfilePage /> },
+        ],
+      },
+      { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
-  { path: '*', element: <Navigate to="/" replace /> },
 ]);

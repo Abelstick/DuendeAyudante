@@ -146,7 +146,7 @@ export function MessagesPage() {
           unlockText={unlockText}
           onClose={() => {
             setEditing(null);
-            if (params.has('escribir')) setParams({}, { replace: true });
+            if (params.has('escribir')) setParams({}, { replace: true, preventScrollReset: true });
           }}
         />
       )}

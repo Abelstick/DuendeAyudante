@@ -32,7 +32,7 @@ export function GiftsPage() {
   const wishlist = useEventWishlist(event.id);
   const budget = event.giftExchange?.budgetMax ?? null;
 
-  const setView = (v: 'mine' | 'all') => setParams(v === 'all' ? { vista: 'todos' } : {}, { replace: true });
+  const setView = (v: 'mine' | 'all') => setParams(v === 'all' ? { vista: 'todos' } : {}, { replace: true, preventScrollReset: true });
 
   return (
     <div className="space-y-5">
