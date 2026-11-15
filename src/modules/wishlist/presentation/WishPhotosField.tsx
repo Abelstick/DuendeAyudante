@@ -6,6 +6,8 @@ import { MAX_PHOTOS_PER_ITEM, type WishlistPhoto } from '../domain/WishlistPhoto
 import { DrivePhoto } from './DrivePhoto';
 
 interface Props {
+  /** Número de paso en el modo fácil ("3. Fotos"). */
+  step?: number;
   status: PhotoUploadStatus;
   /** Fotos ya guardadas del regalo (al cambiarlo). */
   existing: WishlistPhoto[];
@@ -28,7 +30,7 @@ function hasTouchCamera(): boolean {
   return typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches === true;
 }
 
-export function WishPhotosField({ status, existing, removingId, onRemoveExisting, pending, onPendingChange, upload }: Props) {
+export function WishPhotosField({ step, status, existing, removingId, onRemoveExisting, pending, onPendingChange, upload }: Props) {
   const uploading = upload !== null;
   const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
@@ -55,7 +57,7 @@ export function WishPhotosField({ status, existing, removingId, onRemoveExisting
   return (
     <fieldset className="space-y-3">
       <legend className="text-base font-bold text-ink-900">
-        Fotos <span className="font-normal text-ink-500">(opcional)</span>
+        {step ? `${step}. ` : ''}Fotos <span className="font-normal text-ink-500">(opcional)</span>
       </legend>
       <p className="text-sm text-ink-700">Una foto ayuda a acertar: del producto, de la etiqueta o de algo parecido. La primera será la portada.</p>
 
@@ -95,11 +97,11 @@ export function WishPhotosField({ status, existing, removingId, onRemoveExisting
       ) : (
         <div className="flex flex-wrap gap-2">
           {showCamera && (
-            <Button variant="secondary" onClick={() => cameraRef.current?.click()} disabled={!canAdd} icon={<Camera className="size-5" aria-hidden />}>
+            <Button variant="secondary" size={step ? 'lg' : 'md'} onClick={() => cameraRef.current?.click()} disabled={!canAdd} icon={<Camera className="size-5" aria-hidden />}>
               Tomar foto
             </Button>
           )}
-          <Button variant="secondary" onClick={() => galleryRef.current?.click()} disabled={!canAdd} icon={<ImagePlus className="size-5" aria-hidden />}>
+          <Button variant="secondary" size={step ? 'lg' : 'md'} onClick={() => galleryRef.current?.click()} disabled={!canAdd} icon={<ImagePlus className="size-5" aria-hidden />}>
             {showCamera ? 'Elegir de la galería' : 'Elegir fotos'}
           </Button>
           <span className="self-center text-sm text-ink-700">

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link2, Plus, Save, Tag, UploadCloud, X } from 'lucide-react';
+import { Link2, ListPlus, Plus, Save, Sparkles, Tag, UploadCloud, X } from 'lucide-react';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -8,6 +8,7 @@ import { formatMoney, parseMoney } from '@/shared/lib/money';
 import { Button } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Card';
 import { ProgressBar } from '@/shared/ui/Progress';
+import { SegmentedTabs } from '@/shared/ui/Tabs';
 import { TextArea, TextField } from '@/shared/ui/TextField';
 import {
   isValidHttpUrl,
@@ -22,6 +23,7 @@ import {
 } from '../domain/WishlistItem';
 import type { WishlistPhoto } from '../domain/WishlistPhoto';
 import { WishPhotosField } from './WishPhotosField';
+import { useWishFormMode } from './wishFormMode';
 
 const priceText = z.string().refine((v) => !Number.isNaN(parseMoney(v)), 'Escribe el precio solo con números (ej. 45 o 45.50).');
 
@@ -103,6 +105,10 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
   const [savedCount, setSavedCount] = useState(0);
   const [brandDraft, setBrandDraft] = useState('');
   const [newPhotos, setNewPhotos] = useState<File[]>([]);
+  const [mode, setMode] = useWishFormMode();
+  const easy = mode === 'easy';
+  // Al cambiar un regalo en modo fácil: avisar si tiene datos que ese modo no muestra (se conservan)
+  const hasExtras = Boolean(initial && (initial.brands.length > 0 || initial.links.length > 0 || initial.priceMin !== null || initial.priceMax !== null || initial.priority !== 2));
   const {
     register,
     control,
@@ -157,17 +163,35 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
   };
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="space-y-5" noValidate>
+    <form
+      onSubmit={handleSubmit(submit, (errs) => {
+        // Si el error está en un campo que el modo fácil no muestra, se pasa a Completo para verlo
+        if (easy && (errs.links || errs.brands || errs.priceMin || errs.priceMax || errs.priority)) setMode('full');
+      })}
+      className="space-y-5"
+      noValidate
+    >
       {forName && (
         <p className="text-base text-ink-700">
           Para <strong className="text-ink-900">{forName}</strong>
         </p>
       )}
 
+      {/* Modo fácil: solo qué regalo, detalles y fotos. Completo: también marcas, enlaces, precio y prioridad. */}
+      <SegmentedTabs
+        label="Cómo quieres llenar el regalo"
+        value={mode}
+        onChange={setMode}
+        options={[
+          { value: 'easy', label: 'Modo fácil', icon: <Sparkles className="size-5" aria-hidden /> },
+          { value: 'full', label: 'Completo', icon: <ListPlus className="size-5" aria-hidden /> },
+        ]}
+      />
+
       {savedCount > 0 && !initial && <Notice tone="success">✅ ¡Regalo guardado! Ya aparece en tu lista. Si quieres, agrega otro aquí.</Notice>}
 
       <TextField
-        label="¿Qué regalo te gustaría?"
+        label={easy ? '1. ¿Qué regalo te gustaría?' : '¿Qué regalo te gustaría?'}
         placeholder="ej. Polo, Colonia, Billetera, Juguete"
         autoFocus
         error={errors.title?.message}
@@ -175,14 +199,38 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
       />
 
       <TextArea
-        label="Detalles"
+        label={easy ? '2. Detalles' : 'Detalles'}
         optional
-        hint="Talla, color, modelo… lo que nos ayude a acertar."
+        hint={easy ? 'Talla, color, modelo o dónde lo viste.' : 'Talla, color, modelo… lo que nos ayude a acertar.'}
         placeholder="ej. Talla M, color azul"
         error={errors.description?.message}
         {...register('description')}
       />
 
+      <WishPhotosField
+        step={easy ? 3 : undefined}
+        status={photos.status}
+        existing={initial?.photos ?? []}
+        removingId={photos.removingId}
+        onRemoveExisting={photos.onRemoveExisting}
+        pending={newPhotos}
+        onPendingChange={setNewPhotos}
+        upload={upload ?? null}
+      />
+
+      {easy && (
+        <div className="space-y-2">
+          {hasExtras && (
+            <p className="text-sm text-ink-700">Este regalo también tiene marcas, enlaces, precio o prioridad. Se guardan igual; para verlos, toca «Completo».</p>
+          )}
+          <Button variant="ghost" onClick={() => setMode('full')} icon={<ListPlus className="size-5" aria-hidden />}>
+            Agregar marca, enlace o precio
+          </Button>
+        </div>
+      )}
+
+      {!easy && (
+        <>
       <fieldset className="space-y-3">
         <legend className="text-base font-bold text-ink-900">
           Marcas que te gustan <span className="font-normal text-ink-500">(opcional)</span>
@@ -271,16 +319,6 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
         )}
       </fieldset>
 
-      <WishPhotosField
-        status={photos.status}
-        existing={initial?.photos ?? []}
-        removingId={photos.removingId}
-        onRemoveExisting={photos.onRemoveExisting}
-        pending={newPhotos}
-        onPendingChange={setNewPhotos}
-        upload={upload ?? null}
-      />
-
       <fieldset className="space-y-2">
         <legend className="text-base font-bold text-ink-900">
           Rango de precio ({currency === 'PEN' ? 'S/' : currency}) <span className="font-normal text-ink-500">(opcional)</span>
@@ -308,6 +346,9 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
           ))}
         </div>
       </fieldset>
+
+        </>
+      )}
 
       {upload && <UploadPanel upload={upload} />}
       {error && <Notice tone="error">{error}</Notice>}
