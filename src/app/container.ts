@@ -3,6 +3,8 @@
  * Para migrar a una API propia basta con cambiar las clases de aquí
  * (p. ej. SupabaseWishlistRepository → HttpWishlistRepository).
  */
+import { ChecklistService } from '@/modules/checklist/application/ChecklistService';
+import { SupabaseChecklistRepository } from '@/modules/checklist/infrastructure/SupabaseChecklistRepository';
 import { EventService } from '@/modules/events/application/EventService';
 import { SupabaseEventRepository } from '@/modules/events/infrastructure/SupabaseEventRepository';
 import { FamilyService } from '@/modules/families/application/FamilyService';
@@ -23,6 +25,7 @@ export interface Container {
   families: FamilyService;
   members: MemberService;
   wishlist: WishlistService;
+  checklist: ChecklistService;
 }
 
 export function createContainer(): Container {
@@ -33,5 +36,6 @@ export function createContainer(): Container {
     families: new FamilyService(new SupabaseFamilyRepository(supabase)),
     members: new MemberService(new SupabaseParticipantRepository(supabase), new EdgeFunctionMemberAccountService(supabase)),
     wishlist: new WishlistService(new SupabaseWishlistRepository(supabase)),
+    checklist: new ChecklistService(new SupabaseChecklistRepository(supabase)),
   };
 }

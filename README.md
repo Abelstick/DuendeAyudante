@@ -15,7 +15,8 @@ participa sin aprender a usar una aplicación complicada.
 | Responsabilidades (ver y marcar) | ⏳ |
 | Juegos, votación y ruleta | ⏳ |
 | Amigo secreto | ⏳ |
-| Cronograma, anuncios y checklist | ⏳ |
+| Checklist de preparación (automático + tareas del organizador) | ✅ |
+| Cronograma y anuncios | ⏳ |
 | Mascotas e ilustraciones por familia | ⏳ (la identidad de color por familia ya está) |
 
 ## Tecnología

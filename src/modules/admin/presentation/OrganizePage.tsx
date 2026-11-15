@@ -10,6 +10,7 @@ import { Spinner } from '@/shared/ui/Button';
 import { Card, Notice, PageTitle, SectionTitle } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { AddMemberForm } from './AddMemberForm';
+import { ChecklistManager } from './ChecklistManager';
 import { JoinCodeEditor } from './JoinCodeEditor';
 import { FamiliesManager } from './FamiliesManager';
 import { MembersList } from './MembersList';
@@ -60,6 +61,11 @@ export function OrganizePage() {
         <SectionTitle>🧑‍🤝‍🧑 Familiares ({memberList.length})</SectionTitle>
         <AddMemberForm families={familyList} members={memberList} myRole={context.role} />
         <MembersList members={memberList} families={familyList} myRole={context.role} />
+      </section>
+
+      <section>
+        <SectionTitle>✅ Checklist de preparación</SectionTitle>
+        <ChecklistManager eventId={event.id} families={familyList} members={memberList} />
       </section>
     </div>
   );

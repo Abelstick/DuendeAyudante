@@ -397,6 +397,54 @@ describe('RPC save_wishlist_item', () => {
   });
 });
 
+describe('checklist', () => {
+  let general = '';
+  let onlyLopez = '';
+
+  it('organizador y editores crean tareas; los participantes no', async () => {
+    const r = await as(ids.ownerA, (tx) =>
+      tx.query<{ id: string }>(`insert into public.checklist_items (event_id, title) values ($1, 'Confirma tu asistencia') returning id`, [eventA]),
+    );
+    general = r.rows[0]!.id;
+    await as(ids.editor, (tx) => tx.query(`insert into public.checklist_items (event_id, title) values ($1, 'Lleva un postre')`, [eventA]));
+    await expectDenied(as(ids.rosa, (tx) => tx.query(`insert into public.checklist_items (event_id, title) values ($1, 'X')`, [eventA])));
+
+    const fam = await as(ids.ownerA, (tx) =>
+      tx.query<{ id: string }>(`insert into public.families (event_id, name, color_key) values ($1, 'LÓPEZ', 'blue') returning id`, [eventA]),
+    );
+    const item = await as(ids.ownerA, (tx) =>
+      tx.query<{ id: string }>(
+        `insert into public.checklist_items (event_id, title, scope, family_id) values ($1, 'Trae las luces', 'family', $2) returning id`,
+        [eventA, fam.rows[0]!.id],
+      ),
+    );
+    onlyLopez = item.rows[0]!.id;
+  });
+
+  it('cada quien marca sus tareas, las de sus hijos, y puede desmarcarlas', async () => {
+    await as(ids.rosa, (tx) => tx.query(`insert into public.checklist_progress (item_id, participant_id) values ($1, $2)`, [general, participant.rosa]));
+    await as(ids.papa, (tx) => tx.query(`insert into public.checklist_progress (item_id, participant_id) values ($1, $2)`, [general, participant.nino]));
+    const del = await as(ids.rosa, (tx) => tx.query(`delete from public.checklist_progress where item_id = $1 and participant_id = $2`, [general, participant.rosa]));
+    expect(del.affectedRows).toBe(1);
+  });
+
+  it('no puede marcar tareas de otras personas ni tareas que no le corresponden', async () => {
+    await expectDenied(
+      as(ids.rosa, (tx) => tx.query(`insert into public.checklist_progress (item_id, participant_id) values ($1, $2)`, [general, participant.papa])),
+    );
+    // Rosa no es de la familia LÓPEZ
+    await expectDenied(
+      as(ids.rosa, (tx) => tx.query(`insert into public.checklist_progress (item_id, participant_id) values ($1, $2)`, [onlyLopez, participant.rosa])),
+    );
+  });
+
+  it('el organizador de otra Navidad no ve las tareas', async () => {
+    const r = await as(ids.ownerB, (tx) => tx.query(`select 1 from public.checklist_items`));
+    expect(r.rows).toHaveLength(0);
+    await db.query(`delete from public.families where name = 'LÓPEZ' and event_id = $1`, [eventA]);
+  });
+});
+
 describe('RLS: gestión del evento', () => {
   it('solo organizador/administradores gestionan familias (no editores ni participantes)', async () => {
     await as(ids.ownerA, (tx) => tx.query(`insert into public.families (event_id, name, color_key) values ($1, ' garcía ', 'red')`, [eventA]));

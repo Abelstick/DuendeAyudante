@@ -1,5 +1,5 @@
-import { Gift, House, Settings, UserRound } from 'lucide-react';
-import { createContext, useContext } from 'react';
+import { Gift, House, PanelLeftClose, PanelLeftOpen, Settings, UserRound } from 'lucide-react';
+import { createContext, useContext, useState } from 'react';
 import { NavLink, Outlet, useParams } from 'react-router-dom';
 import { canManageEvent, type ChristmasEvent, type EventContext } from '@/modules/events/domain/Event';
 import { useEvent, useEventContext } from '@/modules/events/presentation/hooks';
@@ -23,6 +23,24 @@ export function useEventScope(): EventScope {
   return scope;
 }
 
+const SIDEBAR_KEY = 'nf-sidebar-collapsed';
+
+function readSidebarCollapsed(): boolean {
+  try {
+    return localStorage.getItem(SIDEBAR_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function saveSidebarCollapsed(value: boolean) {
+  try {
+    localStorage.setItem(SIDEBAR_KEY, value ? '1' : '0');
+  } catch {
+    // modo privado: se recuerda solo en esta visita
+  }
+}
+
 export function EventLayout() {
   const { eventId = '' } = useParams();
   const event = useEvent(eventId);
@@ -30,6 +48,14 @@ export function EventLayout() {
   const families = useFamilies(eventId);
   const myFamily = families.data?.find((f) => f.id === context.data?.me?.familyId);
   useFamilyTheme(myFamily?.color);
+  const [collapsed, setCollapsed] = useState(readSidebarCollapsed);
+
+  const toggleSidebar = () => {
+    setCollapsed((prev) => {
+      saveSidebarCollapsed(!prev);
+      return !prev;
+    });
+  };
 
   if (event.isLoading || context.isLoading) return <FullPageSpinner />;
   if (event.error || context.error || !event.data || !context.data) {
@@ -54,27 +80,51 @@ export function EventLayout() {
 
   return (
     <EventScopeContext.Provider value={{ event: event.data, context: context.data }}>
-      <div className="min-h-dvh pb-28 md:pb-0 md:pl-60">
+      <div className={`min-h-dvh pb-28 transition-[padding] duration-200 md:pb-0 ${collapsed ? 'md:pl-24' : 'md:pl-60'}`}>
         <header className="snow-bg bg-brand px-4 py-4 text-white md:hidden">
           <p className="truncate text-lg font-bold">🎄 {event.data.name}</p>
         </header>
 
-        {/* Navegación lateral en escritorio */}
-        <nav aria-label="Menú principal" className="fixed inset-y-0 left-0 hidden w-60 flex-col gap-2 bg-brand p-4 text-white md:flex">
-          <p className="mb-4 px-2 text-xl font-bold leading-tight">🎄 {event.data.name}</p>
+        {/* Navegación lateral en escritorio: se puede plegar (sigue mostrando icono + texto) */}
+        <nav
+          aria-label="Menú principal"
+          className={`fixed inset-y-0 left-0 hidden flex-col gap-2 bg-brand text-white transition-[width] duration-200 md:flex ${
+            collapsed ? 'w-24 p-2' : 'w-60 p-4'
+          }`}
+        >
+          {collapsed ? (
+            <p className="mb-4 text-center text-3xl" title={event.data.name} aria-hidden>
+              🎄
+            </p>
+          ) : (
+            <p className="mb-4 px-2 text-xl font-bold leading-tight">🎄 {event.data.name}</p>
+          )}
           {items.map(({ to, label, icon: Icon, end }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex min-h-12 items-center gap-3 rounded-xl px-3 text-lg font-semibold ${isActive ? 'bg-white text-brand' : 'hover:bg-brand-strong'}`
+                `flex rounded-xl font-semibold ${
+                  collapsed ? 'min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs' : 'min-h-12 items-center gap-3 px-3 text-lg'
+                } ${isActive ? 'bg-white text-brand' : 'hover:bg-brand-strong'}`
               }
             >
-              <Icon className="size-6" aria-hidden />
+              <Icon className={collapsed ? 'size-7' : 'size-6'} aria-hidden />
               {label}
             </NavLink>
           ))}
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            aria-expanded={!collapsed}
+            className={`mt-auto flex rounded-xl font-semibold text-white/90 hover:bg-brand-strong ${
+              collapsed ? 'min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs' : 'min-h-12 items-center gap-3 px-3 text-base'
+            }`}
+          >
+            {collapsed ? <PanelLeftOpen className="size-6" aria-hidden /> : <PanelLeftClose className="size-6" aria-hidden />}
+            {collapsed ? 'Mostrar menú' : 'Ocultar menú'}
+          </button>
         </nav>
 
         <main className="mx-auto w-full max-w-2xl px-4 py-5">

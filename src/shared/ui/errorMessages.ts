@@ -41,6 +41,9 @@ const MESSAGES: Record<string, string> = {
   EVENT_LIMIT_REACHED: 'Llegaste al máximo de 10 celebraciones activas.',
   NOT_A_MEMBER: 'No formas parte de esta celebración. Pide al organizador que te agregue.',
 
+  CHECKLIST_TITLE_INVALID: 'Escribe qué hay que hacer (ej. Confirma tu asistencia).',
+  CHECKLIST_FAMILY_REQUIRED: 'Elige la familia a la que le corresponde esta tarea.',
+  CHECKLIST_PERSON_REQUIRED: 'Elige la persona a la que le corresponde esta tarea.',
   FAMILY_NAME_INVALID: 'Escribe el nombre de la familia (ej. GARCÍA).',
   DUPLICATE_FAMILY: 'Ya existe una familia con ese nombre.',
 

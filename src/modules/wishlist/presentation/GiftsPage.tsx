@@ -12,6 +12,7 @@ import { formatMoney } from '@/shared/lib/money';
 import { Spinner } from '@/shared/ui/Button';
 import { Notice, PageTitle } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
+import { TextField } from '@/shared/ui/TextField';
 import { toTitleCase } from '@/shared/validation/names';
 import { WishlistService } from '../application/WishlistService';
 import type { WishlistItem } from '../domain/WishlistItem';
@@ -123,12 +124,16 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
   const participants = useParticipants(event.id);
   const families = useFamilies(event.id);
   const byPerson = useMemo(() => WishlistService.groupByParticipant(items), [items]);
+  const [search, setSearch] = useState('');
 
   if (participants.isLoading || families.isLoading) return <Spinner label="Cargando…" />;
   if (participants.error) return <Notice tone="error">{errorMessage(participants.error)}</Notice>;
 
   const familyList = families.data ?? [];
-  const people = participants.data ?? [];
+  // Búsqueda sin importar tildes ni mayúsculas: "jose" encuentra a "JOSÉ"
+  const plain = (v: string) => v.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+  const query = plain(search.trim());
+  const people = (participants.data ?? []).filter((p) => !query || plain(displayName(p)).includes(query));
   const groups: { key: string; family?: Family; people: Participant[] }[] = [
     ...familyList.map((f) => ({ key: f.id, family: f, people: people.filter((p) => p.familyId === f.id) })),
     { key: 'none', people: people.filter((p) => !p.familyId || !familyList.some((f) => f.id === p.familyId)) },
@@ -139,6 +144,10 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
       <p className="flex items-center gap-2 text-base text-ink-700">
         <Users className="size-5 shrink-0" aria-hidden /> Toca a una persona para ver qué le gustaría recibir.
       </p>
+      {(participants.data?.length ?? 0) > 6 && (
+        <TextField label="Buscar a una persona" type="search" placeholder="Escribe un nombre" value={search} onChange={(e) => setSearch(e.target.value)} />
+      )}
+      {groups.length === 0 && <Notice>No encontramos a nadie con ese nombre.</Notice>}
       {groups.map((g) => (
         <section key={g.key} className="space-y-2">
           <h2 className="text-lg font-bold">{g.family ? <FamilyBadge family={g.family} /> : 'Sin familia'}</h2>
