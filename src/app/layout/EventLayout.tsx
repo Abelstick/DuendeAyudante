@@ -1,6 +1,6 @@
 import { Dices, Gift, House, PanelLeftClose, PanelLeftOpen, PartyPopper, Settings, UserRound } from 'lucide-react';
 import { motion } from 'motion/react';
-import { createContext, useContext, useState, type CSSProperties } from 'react';
+import { createContext, Suspense, useContext, useEffect, useState, type CSSProperties } from 'react';
 import { Link, NavLink, Outlet, useLocation, useParams } from 'react-router-dom';
 import { canManageEvent, type ChristmasEvent, type EventContext } from '@/modules/events/domain/Event';
 import { useEvent, useEventContext } from '@/modules/events/presentation/hooks';
@@ -13,7 +13,9 @@ import { playSound } from '@/shared/lib/sound';
 import { Garland, SnowBackdrop } from '@/shared/ui/Ambience';
 import { Snowfall, Tree, WinterScene } from '@/shared/ui/illustrations';
 import { SoundToggle } from '@/shared/ui/SoundToggle';
+import { prefetchCommonSections } from '../prefetch';
 import { FullPageSpinner } from './FullPageSpinner';
+import { Spinner } from '@/shared/ui/Button';
 
 interface EventScope {
   event: ChristmasEvent;
@@ -55,6 +57,9 @@ export function EventLayout() {
   const myFamily = families.data?.find((f) => f.id === context.data?.me?.familyId);
   useFamilyTheme(myFamily?.color);
   const [collapsed, setCollapsed] = useState(readSidebarCollapsed);
+
+  // Con el teléfono libre, adelanta las secciones más visitadas
+  useEffect(() => prefetchCommonSections(), []);
 
   const toggleSidebar = () => {
     setCollapsed((prev) => {
@@ -180,7 +185,10 @@ export function EventLayout() {
           transition={{ type: 'spring', stiffness: 260, damping: 22 }}
           className="mx-auto w-full max-w-2xl px-4 py-4 md:py-6"
         >
-          <Outlet />
+          {/* La sección se descarga al abrirla; mientras tanto el menú sigue visible */}
+          <Suspense fallback={<Spinner label="Cargando…" />}>
+            <Outlet />
+          </Suspense>
         </motion.main>
 
         {/* Barra inferior en móvil: icono + texto siempre visibles */}

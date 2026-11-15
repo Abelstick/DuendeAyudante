@@ -1,14 +1,16 @@
 import { ChevronRight, Megaphone } from 'lucide-react';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { canEditContent } from '@/modules/events/domain/Event';
 import { Button, ButtonLink } from '@/shared/ui/Button';
 import { Pill } from '@/shared/ui/Card';
 import { CollapsibleCard } from '@/shared/ui/CollapsibleCard';
 import { announcementsForHome } from '../domain/Announcement';
-import { AnnouncementFormModal } from './AnnouncementFormModal';
 import { AnnouncementItem } from './AnnouncementItem';
 import { useAnnouncements } from './hooks';
+
+// El formulario (con su validación) se descarga recién al abrirlo: así el inicio carga más rápido
+const AnnouncementFormModal = lazy(() => import('./AnnouncementFormModal').then((m) => ({ default: m.AnnouncementFormModal })));
 
 /** En Inicio: anuncios importantes primero. Si no hay anuncios, no ocupa espacio (salvo para quien publica). */
 export function AnnouncementsHomeCard() {
@@ -50,7 +52,11 @@ export function AnnouncementsHomeCard() {
           </ButtonLink>
         )}
       </div>
-      {creating && <AnnouncementFormModal eventId={event.id} initial={null} onClose={() => setCreating(false)} />}
+      {creating && (
+        <Suspense fallback={null}>
+          <AnnouncementFormModal eventId={event.id} initial={null} onClose={() => setCreating(false)} />
+        </Suspense>
+      )}
     </CollapsibleCard>
   );
 }

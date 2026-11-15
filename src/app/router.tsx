@@ -1,25 +1,42 @@
+import { lazy, Suspense, type ComponentType } from 'react';
 import { createBrowserRouter, Navigate, Outlet, ScrollRestoration } from 'react-router-dom';
-import { LoginPage } from '@/modules/accounts/presentation/LoginPage';
-import { NewPasswordPage } from '@/modules/accounts/presentation/NewPasswordPage';
-import { ProfilePage } from '@/modules/accounts/presentation/ProfilePage';
-import { RecoverPage } from '@/modules/accounts/presentation/RecoverPage';
-import { SignUpPage } from '@/modules/accounts/presentation/SignUpPage';
 import { WelcomePage } from '@/modules/accounts/presentation/WelcomePage';
-import { OrganizePage } from '@/modules/admin/presentation/OrganizePage';
-import { FamilyLinkPage } from '@/modules/family-access/presentation/FamilyLinkPage';
-import { CreateEventPage } from '@/modules/events/presentation/CreateEventPage';
 import { HomePage } from '@/modules/events/presentation/HomePage';
-import { GamesPage } from '@/modules/games/presentation/GamesPage';
-import { MyEventsPage } from '@/modules/events/presentation/MyEventsPage';
-import { AnnouncementsPage } from '@/modules/announcements/presentation/AnnouncementsPage';
-import { CelebrationPage } from '@/modules/events/presentation/CelebrationPage';
-import { GiftsPage } from '@/modules/wishlist/presentation/GiftsPage';
-import { PersonGiftsPage } from '@/modules/wishlist/presentation/PersonGiftsPage';
-import { MessagesPage } from '@/modules/messages/presentation/MessagesPage';
-import { RecapPage } from '@/modules/events/presentation/RecapPage';
-import { TvPage } from '@/modules/events/presentation/TvPage';
+import { FamilyLinkPage } from '@/modules/family-access/presentation/FamilyLinkPage';
 import { RequireAuth } from './AuthContext';
 import { EventLayout } from './layout/EventLayout';
+import { FullPageSpinner } from './layout/FullPageSpinner';
+import { clearStaleChunkReload, RouteErrorPage } from './layout/RouteErrorPage';
+
+/**
+ * Carga por partes: cada pantalla poco frecuente se descarga recién al abrirla,
+ * así la primera visita (bienvenida, entrar, enlace de familia, inicio) pesa menos.
+ */
+function page<M>(load: () => Promise<M>, pick: (m: M) => ComponentType) {
+  return lazy(() =>
+    load().then((m) => {
+      clearStaleChunkReload(); // cargó bien: la próxima versión nueva puede recargar sola otra vez
+      return { default: pick(m) };
+    }),
+  );
+}
+
+const LoginPage = page(() => import('@/modules/accounts/presentation/LoginPage'), (m) => m.LoginPage);
+const SignUpPage = page(() => import('@/modules/accounts/presentation/SignUpPage'), (m) => m.SignUpPage);
+const RecoverPage = page(() => import('@/modules/accounts/presentation/RecoverPage'), (m) => m.RecoverPage);
+const NewPasswordPage = page(() => import('@/modules/accounts/presentation/NewPasswordPage'), (m) => m.NewPasswordPage);
+const ProfilePage = page(() => import('@/modules/accounts/presentation/ProfilePage'), (m) => m.ProfilePage);
+const CreateEventPage = page(() => import('@/modules/events/presentation/CreateEventPage'), (m) => m.CreateEventPage);
+const MyEventsPage = page(() => import('@/modules/events/presentation/MyEventsPage'), (m) => m.MyEventsPage);
+const CelebrationPage = page(() => import('@/modules/events/presentation/CelebrationPage'), (m) => m.CelebrationPage);
+const RecapPage = page(() => import('@/modules/events/presentation/RecapPage'), (m) => m.RecapPage);
+const TvPage = page(() => import('@/modules/events/presentation/TvPage'), (m) => m.TvPage);
+const OrganizePage = page(() => import('@/modules/admin/presentation/OrganizePage'), (m) => m.OrganizePage);
+const GamesPage = page(() => import('@/modules/games/presentation/GamesPage'), (m) => m.GamesPage);
+const AnnouncementsPage = page(() => import('@/modules/announcements/presentation/AnnouncementsPage'), (m) => m.AnnouncementsPage);
+const MessagesPage = page(() => import('@/modules/messages/presentation/MessagesPage'), (m) => m.MessagesPage);
+const GiftsPage = page(() => import('@/modules/wishlist/presentation/GiftsPage'), (m) => m.GiftsPage);
+const PersonGiftsPage = page(() => import('@/modules/wishlist/presentation/PersonGiftsPage'), (m) => m.PersonGiftsPage);
 
 /**
  * Raíz: al entrar a otra sección se empieza desde arriba; con «Atrás» se vuelve a
@@ -29,7 +46,9 @@ function RootLayout() {
   return (
     <>
       <ScrollRestoration />
-      <Outlet />
+      <Suspense fallback={<FullPageSpinner />}>
+        <Outlet />
+      </Suspense>
     </>
   );
 }
@@ -37,6 +56,7 @@ function RootLayout() {
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       { path: '/', element: <WelcomePage /> },
       { path: '/entrar', element: <LoginPage /> },
@@ -85,16 +105,22 @@ export const router = createBrowserRouter([
           </RequireAuth>
         ),
         children: [
-          { index: true, element: <HomePage /> },
-          { path: 'regalos', element: <GiftsPage /> },
-          { path: 'regalos/persona/:participantId', element: <PersonGiftsPage /> },
-          { path: 'juegos', element: <GamesPage /> },
-          { path: 'celebracion', element: <CelebrationPage /> },
-          { path: 'anuncios', element: <AnnouncementsPage /> },
-          { path: 'mensajes', element: <MessagesPage /> },
-          { path: 'recuerdos', element: <RecapPage /> },
-          { path: 'organizar', element: <OrganizePage /> },
-          { path: 'perfil', element: <ProfilePage /> },
+          {
+            // Si una sección falla, el error se muestra con el menú alrededor
+            errorElement: <RouteErrorPage />,
+            children: [
+              { index: true, element: <HomePage /> },
+              { path: 'regalos', element: <GiftsPage /> },
+              { path: 'regalos/persona/:participantId', element: <PersonGiftsPage /> },
+              { path: 'juegos', element: <GamesPage /> },
+              { path: 'celebracion', element: <CelebrationPage /> },
+              { path: 'anuncios', element: <AnnouncementsPage /> },
+              { path: 'mensajes', element: <MessagesPage /> },
+              { path: 'recuerdos', element: <RecapPage /> },
+              { path: 'organizar', element: <OrganizePage /> },
+              { path: 'perfil', element: <ProfilePage /> },
+            ],
+          },
         ],
       },
       { path: '*', element: <Navigate to="/" replace /> },
