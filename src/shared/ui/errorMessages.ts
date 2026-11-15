@@ -75,12 +75,27 @@ const MESSAGES: Record<string, string> = {
   TOO_MANY_LINKS: 'Puedes poner hasta 5 enlaces por regalo.',
   LINK_INVALID: 'Uno de los enlaces no es válido. Cópialo de nuevo desde la tienda.',
 
+  TOO_MANY_PHOTOS: 'Puedes poner hasta 6 fotos por regalo.',
+  PHOTO_TOO_LARGE: 'La foto es muy pesada. Prueba con otra o tómala de nuevo.',
+  PHOTO_TYPE_INVALID: 'Ese archivo no es una foto. Elige una imagen (JPG o PNG).',
+  PHOTO_READ_FAILED: 'No pudimos abrir esa foto. Prueba con otra.',
+  DRIVE_NOT_CONNECTED: 'Tu familia todavía no tiene un Google Drive para guardar fotos. Pide a quien organiza que lo conecte.',
+  DRIVE_NEEDS_RECONNECT: 'El Google Drive de tu familia perdió el acceso. Pide a quien organiza que lo vuelva a conectar.',
+  DRIVE_UPLOAD_FAILED: 'Google Drive no aceptó la foto. Vuelve a intentarlo en un momento.',
+  GOOGLE_ERROR: 'Google no respondió. Vuelve a intentarlo en un momento.',
+  GOOGLE_NOT_CONFIGURED: 'Las fotos con Google Drive todavía no están configuradas en el servidor.',
+  ORIGIN_NOT_ALLOWED: 'No pudimos preparar la conexión con Google desde esta dirección.',
+
   SECRET_WORD_INVALID: 'La palabra secreta debe tener entre 4 y 20 letras o números, sin espacios (ej. PANETON).',
   SECRET_WORD_WRONG: 'Esa no es la palabra secreta. Revisa el mensaje de WhatsApp que te enviaron e inténtalo de nuevo.',
   FAMILY_LINK_NOT_FOUND: 'Este enlace no existe. Pide a quien organiza tu Navidad que te lo envíe otra vez.',
   FAMILY_LINK_LOCKED: 'Hubo demasiados intentos con una palabra equivocada. Espera 15 minutos y vuelve a intentarlo.',
   MEMBER_NOT_ELIGIBLE: 'Esta persona no puede entrar con el enlace. Debe entrar con su usuario y contraseña.',
   FAMILY_PASS_EXPIRED: 'No pudimos terminar de entrar. Toca tu nombre otra vez.',
+
+  DELETE_CONFIRMATION_REQUIRED: 'Para confirmar, escribe la palabra BORRAR.',
+  OWNER_NEEDS_SUCCESSOR: 'Antes de borrar tu cuenta, elige quién queda a cargo de cada celebración que organizas (o bórrala).',
+  SUCCESSOR_INVALID: 'La persona elegida ya no es administradora de esa celebración. Cierra esta ventana, vuelve a abrirla y elige de nuevo.',
 
   FORBIDDEN: 'No tienes permiso para hacer esto.',
   NOT_FOUND_OR_FORBIDDEN: 'No puedes cambiar este regalo.',

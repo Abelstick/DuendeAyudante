@@ -1,4 +1,4 @@
-import { CalendarDays, Check, ChevronRight, ClipboardPlus, ListChecks, Settings, Table2, UserPlus, Users, Wallet } from 'lucide-react';
+import { CalendarDays, Camera, Check, ChevronRight, ClipboardPlus, ListChecks, Settings, Table2, UserPlus, Users, Wallet } from 'lucide-react';
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
@@ -18,6 +18,7 @@ import { BulkMembersModal } from './BulkMembersModal';
 import { ChecklistManager } from './ChecklistManager';
 import { JoinCodeEditor } from './JoinCodeEditor';
 import { FamiliesManager } from './FamiliesManager';
+import { FamilyDrivesManager } from './FamilyDrivesManager';
 import { MembersList } from './MembersList';
 
 /** Panel del organizador y administradores. */
@@ -84,6 +85,13 @@ export function OrganizePage() {
       <section className="space-y-3">
         <CardTitle icon={<Users className="size-6" />}>Familias</CardTitle>
         <FamiliesManager eventId={event.id} families={familyList} participants={memberList} />
+      </section>
+
+      <section id="fotos" className="scroll-mt-24 space-y-3">
+        <CardTitle icon={<Camera className="size-6" />} tone="berry">
+          Fotos de los regalos (Google Drive)
+        </CardTitle>
+        <FamilyDrivesManager eventId={event.id} families={familyList} />
       </section>
 
       <section className="space-y-4">

@@ -1,10 +1,12 @@
-import { ExternalLink, Pencil, Tag, Trash2 } from 'lucide-react';
+import { ExternalLink, Images, Pencil, Tag, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { formatMoney } from '@/shared/lib/money';
 import { hostnameOf } from '@/shared/lib/whatsapp';
 import { Button } from '@/shared/ui/Button';
 import { GiftBox, type GiftTone } from '@/shared/ui/illustrations';
 import { describePrice, isOverBudget, PRIORITY_LABELS, type WishlistItem } from '../domain/WishlistItem';
+import { DrivePhoto } from './DrivePhoto';
+import { PhotoViewer } from './PhotoViewer';
 
 interface Props {
   item: WishlistItem;
@@ -27,11 +29,30 @@ const priorityGift: Record<1 | 2 | 3, GiftTone> = { 1: 'berry', 2: 'pine', 3: 'n
 
 export function WishlistItemCard({ item, budget, currency, canEdit, deleting, onEdit, onDelete }: Props) {
   const [confirming, setConfirming] = useState(false);
+  const [viewing, setViewing] = useState<number | null>(null);
   const price = describePrice(item, (n) => formatMoney(n, currency));
   const isRange = item.priceMin !== null && item.priceMax !== null && item.priceMin !== item.priceMax;
 
+  const cover = item.photos[0];
+
   return (
     <article className="group animate-pop-in space-y-3 rounded-2xl border-2 border-night-900 bg-white p-5 shadow-block">
+      {/* Portada: la primera foto. Al tocarla se ven todas en grande. */}
+      {cover && (
+        <button
+          type="button"
+          onClick={() => setViewing(0)}
+          className="relative -mx-5 -mt-5 block w-[calc(100%+2.5rem)] overflow-hidden rounded-t-[0.9rem] border-b-2 border-night-900 bg-mist-200"
+          aria-label={item.photos.length === 1 ? `Ver la foto de ${item.title}` : `Ver las ${item.photos.length} fotos de ${item.title}`}
+        >
+          <DrivePhoto driveFileId={cover.driveFileId} alt="" width={900} className="aspect-4/3 w-full sm:aspect-video" />
+          <span className="absolute bottom-2 right-2 inline-flex items-center gap-1 rounded-lg border-2 border-night-900 bg-white px-2.5 py-1 text-sm font-bold text-night-900 shadow-card">
+            <Images className="size-4" aria-hidden />
+            {item.photos.length === 1 ? 'Ver foto' : `Ver ${item.photos.length} fotos`}
+          </span>
+        </button>
+      )}
+
       <div className="flex items-center gap-3">
         <span className="flex size-16 shrink-0 items-center justify-center rounded-xl border-2 border-night-900 bg-sky-100">
           <GiftBox tone={priorityGift[item.priority]} className="w-10 motion-safe:group-hover:animate-float" />
@@ -106,6 +127,8 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
             </Button>
           </div>
         ))}
+
+      {viewing !== null && <PhotoViewer title={item.title} photos={item.photos} startAt={viewing} onClose={() => setViewing(null)} />}
     </article>
   );
 }

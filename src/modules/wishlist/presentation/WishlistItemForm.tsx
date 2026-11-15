@@ -3,6 +3,7 @@ import { Link2, Plus, Save, Tag, X } from 'lucide-react';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import type { PhotoUploadStatus } from '@/modules/family-drive/domain/FamilyDrive';
 import { formatMoney, parseMoney } from '@/shared/lib/money';
 import { Button } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Card';
@@ -18,6 +19,8 @@ import {
   type WishlistItem,
   type WishPriority,
 } from '../domain/WishlistItem';
+import type { WishlistPhoto } from '../domain/WishlistPhoto';
+import { WishPhotosField } from './WishPhotosField';
 
 const priceText = z.string().refine((v) => !Number.isNaN(parseMoney(v)), 'Escribe el precio solo con números (ej. 45 o 45.50).');
 
@@ -53,6 +56,14 @@ export interface WishFormResult {
   priceMin: number | null;
   priceMax: number | null;
   priority: WishPriority;
+  /** Fotos elegidas para subir después de guardar. */
+  newPhotos: File[];
+}
+
+export interface WishFormPhotos {
+  status: PhotoUploadStatus;
+  removingId: string | null;
+  onRemoveExisting: (photo: WishlistPhoto) => void;
 }
 
 interface Props {
@@ -61,7 +72,10 @@ interface Props {
   currency: string;
   forName?: string;
   submitting: boolean;
+  /** Texto de avance mientras se suben las fotos (ej. "Subiendo foto 1 de 3…"). */
+  progress?: string | null;
   error: string | null;
+  photos: WishFormPhotos;
   onSubmit: (data: WishFormResult) => Promise<boolean>;
   onCancel: () => void;
 }
@@ -78,9 +92,10 @@ function toDefaults(item?: WishlistItem): WishFormValues {
   };
 }
 
-export function WishlistItemForm({ initial, budget, currency, forName, submitting, error, onSubmit, onCancel }: Props) {
+export function WishlistItemForm({ initial, budget, currency, forName, submitting, progress, error, photos, onSubmit, onCancel }: Props) {
   const [savedCount, setSavedCount] = useState(0);
   const [brandDraft, setBrandDraft] = useState('');
+  const [newPhotos, setNewPhotos] = useState<File[]>([]);
   const {
     register,
     control,
@@ -122,7 +137,9 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
       priceMin: parseMoney(v.priceMin),
       priceMax: parseMoney(v.priceMax),
       priority: Number(v.priority) as WishPriority,
+      newPhotos,
     });
+    if (ok) setNewPhotos([]);
     // Al crear, el formulario queda listo para el siguiente regalo
     if (ok && !initial) {
       reset(toDefaults());
@@ -247,6 +264,15 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
         )}
       </fieldset>
 
+      <WishPhotosField
+        status={photos.status}
+        existing={initial?.photos ?? []}
+        removingId={photos.removingId}
+        onRemoveExisting={photos.onRemoveExisting}
+        pending={newPhotos}
+        onPendingChange={setNewPhotos}
+      />
+
       <fieldset className="space-y-2">
         <legend className="text-base font-bold text-ink-900">
           Rango de precio ({currency === 'PEN' ? 'S/' : currency}) <span className="font-normal text-ink-500">(opcional)</span>
@@ -275,6 +301,7 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
         </div>
       </fieldset>
 
+      {progress && <Notice>📤 {progress}</Notice>}
       {error && <Notice tone="error">{error}</Notice>}
 
       <div className="flex flex-col gap-3 sm:flex-row">

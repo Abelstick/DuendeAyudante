@@ -1,4 +1,4 @@
-import { Bell, ChevronRight, KeyRound, LogOut, Type, UserRound } from 'lucide-react';
+import { Bell, ChevronRight, KeyRound, LogOut, Trash2, Type, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/AuthContext';
@@ -17,6 +17,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { useSoundEnabled } from '@/shared/ui/SoundToggle';
 import { applyTextSize, getTextSize, type TextSize } from '@/shared/ui/textSize';
 import { ChangePasswordForm } from './ChangePasswordForm';
+import { DeleteAccountModal } from './DeleteAccountModal';
 
 export function ProfilePage() {
   const { event, context } = useEventScope();
@@ -27,6 +28,7 @@ export function ProfilePage() {
   const myEvents = useMyEvents();
   const [textSize, setTextSize] = useState<TextSize>(getTextSize);
   const [changing, setChanging] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const [soundOn, setSoundOn] = useSoundEnabled();
 
   const me = context.me;
@@ -161,6 +163,17 @@ export function ProfilePage() {
       <Button variant="secondary" size="lg" onClick={signOut} icon={<LogOut className="size-6" aria-hidden />} className="text-berry-700!">
         Cerrar sesión
       </Button>
+
+      <section className="space-y-2 rounded-xl border-2 border-dashed border-berry-600/50 p-4" aria-labelledby="delete-account-title">
+        <h2 id="delete-account-title" className="text-lg font-extrabold text-berry-700">
+          Borrar mi cuenta
+        </h2>
+        <p className="text-base text-ink-700">Quita tu usuario y tu contraseña. Tus regalos y tu nombre se quedan en la celebración.</p>
+        <Button variant="ghost" onClick={() => setDeletingAccount(true)} icon={<Trash2 className="size-5" aria-hidden />} className="text-berry-700!">
+          Borrar mi cuenta
+        </Button>
+      </section>
+      {deletingAccount && <DeleteAccountModal onClose={() => setDeletingAccount(false)} />}
     </div>
   );
 }

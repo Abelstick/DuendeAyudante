@@ -11,6 +11,17 @@ export interface SignInCredentials {
   password: string;
 }
 
+/** Celebración que organizo: antes de borrar mi cuenta hay que pasarla a un administrador (o borrarla). */
+export interface OwnedEvent {
+  eventId: string;
+  eventName: string;
+  /** Administradores que pueden quedar como organizador. */
+  successors: { userId: string; name: string }[];
+}
+
+/** Para cada celebración que organizo: el userId del nuevo organizador, o 'DELETE' para borrarla. */
+export type OwnershipChoices = Record<string, string>;
+
 export interface IAuthService {
   getCurrentUser(): Promise<AuthUser | null>;
   onChange(listener: (user: AuthUser | null) => void): () => void;
@@ -23,4 +34,10 @@ export interface IAuthService {
   /** Comprueba la contraseña de quien tiene la sesión abierta (para ver datos privados). Falla con WRONG_PASSWORD. */
   verifyPassword(password: string): Promise<void>;
   signOut(): Promise<void>;
+  listOwnedEvents(): Promise<OwnedEvent[]>;
+  /**
+   * Borra la cuenta de quien tiene la sesión (su perfil queda en la celebración, sin usuario).
+   * `confirm` debe ser BORRAR. Al terminar, cierra la sesión en este dispositivo.
+   */
+  deleteAccount(confirm: string, choices: OwnershipChoices): Promise<void>;
 }

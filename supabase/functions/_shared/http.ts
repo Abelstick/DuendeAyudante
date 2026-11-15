@@ -5,6 +5,12 @@ const allowedOrigins = (Deno.env.get('APP_ORIGINS') ?? '')
   .map((o) => o.trim())
   .filter(Boolean);
 
+/** ¿Es un origen de la app? Sin APP_ORIGINS (desarrollo) se acepta cualquier http(s). */
+export function isAllowedOrigin(origin: string): boolean {
+  if (!/^https?:\/\/[^/]+$/.test(origin)) return false;
+  return allowedOrigins.length === 0 || allowedOrigins.includes(origin);
+}
+
 function corsHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get('Origin') ?? '';
   // Sin APP_ORIGINS configurado (desarrollo) se acepta cualquier origen.

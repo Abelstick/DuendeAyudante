@@ -817,3 +817,157 @@ describe('RLS: gestión del evento', () => {
     ).rejects.toThrow(/permission denied/);
   });
 });
+
+describe('fotos de regalos en Google Drive', () => {
+  let familyId = '';
+  let itemId = '';
+  const fileId = (n: number) => `driveFile_${n}_abcdefghij`;
+
+  beforeAll(async () => {
+    const fam = await db.query<{ id: string }>(`insert into public.families (event_id, name) values ($1, 'fotos') returning id`, [eventA]);
+    familyId = fam.rows[0]!.id;
+    // Lo que guarda la Edge Function google-drive al conectar (service role)
+    await db.query(
+      `insert into public.family_drives (family_id, event_id, google_email, refresh_token, folder_id) values ($1, $2, 'tia@gmail.com', 'secreto', 'carpeta')`,
+      [familyId, eventA],
+    );
+    const item = await db.query<{ id: string }>(
+      `insert into public.wishlist_items (event_id, participant_id, title) values ($1, $2, 'Polo') returning id`,
+      [eventA, participant.nino],
+    );
+    itemId = item.rows[0]!.id;
+  });
+
+  it('nadie lee el token de Google desde el navegador, ni el organizador', async () => {
+    for (const user of [ids.ownerA, ids.rosa, ids.editor]) {
+      await expectDenied(as(user, (tx) => tx.query(`select refresh_token from public.family_drives`)));
+      await expectDenied(as(user, (tx) => tx.query(`select * from public.drive_file_trash`)));
+    }
+  });
+
+  it('todos saben qué familias tienen Drive; el correo solo lo ve quien administra; otra Navidad no ve nada', async () => {
+    const forOwner = await as(ids.ownerA, (tx) =>
+      tx.query<{ family_id: string; google_email: string | null }>(`select family_id, google_email from public.list_family_drives($1)`, [eventA]),
+    );
+    expect(forOwner.rows).toEqual([{ family_id: familyId, google_email: 'tia@gmail.com' }]);
+    const forRosa = await as(ids.rosa, (tx) => tx.query<{ google_email: string | null }>(`select google_email from public.list_family_drives($1)`, [eventA]));
+    expect(forRosa.rows).toEqual([{ google_email: null }]);
+    const forOther = await as(ids.ownerB, (tx) => tx.query(`select * from public.list_family_drives($1)`, [eventA]));
+    expect(forOther.rows).toEqual([]);
+  });
+
+  it('can_edit_wishlist_item: la persona, su tutor y quien administra; nadie más', async () => {
+    const check = (user: string) =>
+      as(user, (tx) => tx.query<{ ok: boolean }>(`select public.can_edit_wishlist_item($1) as ok`, [itemId])).then((r) => r.rows[0]!.ok);
+    expect(await check(ids.papa)).toBe(true); // tutor de Pedrito
+    expect(await check(ids.ownerA)).toBe(true);
+    expect(await check(ids.rosa)).toBe(false);
+    expect(await check(ids.editor)).toBe(false);
+    expect(await check(ids.ownerB)).toBe(false);
+  });
+
+  it('los miembros ven las fotos pero no las escriben; máximo 6 por regalo', async () => {
+    for (let n = 1; n <= 6; n++) {
+      await db.query(`insert into public.wishlist_photos (item_id, event_id, family_id, drive_file_id, sort_order) values ($1, $2, $3, $4, $5)`, [
+        itemId,
+        eventA,
+        familyId,
+        fileId(n),
+        n,
+      ]);
+    }
+    await expect(
+      db.query(`insert into public.wishlist_photos (item_id, event_id, family_id, drive_file_id) values ($1, $2, $3, $4)`, [itemId, eventA, familyId, fileId(7)]),
+    ).rejects.toThrow(/TOO_MANY_PHOTOS/);
+
+    const seen = await as(ids.rosa, (tx) => tx.query(`select id from public.wishlist_photos where item_id = $1`, [itemId]));
+    expect(seen.rows).toHaveLength(6);
+    const other = await as(ids.ownerB, (tx) => tx.query(`select id from public.wishlist_photos where item_id = $1`, [itemId]));
+    expect(other.rows).toEqual([]);
+
+    await expectDenied(
+      as(ids.papa, (tx) =>
+        tx.query(`insert into public.wishlist_photos (item_id, event_id, family_id, drive_file_id) values ($1, $2, $3, $4)`, [itemId, eventA, familyId, fileId(9)]),
+      ),
+    );
+    await expectDenied(as(ids.ownerA, (tx) => tx.query(`delete from public.wishlist_photos where item_id = $1`, [itemId])));
+  });
+
+  it('al borrar el regalo, sus archivos quedan en la papelera para borrarlos de Drive', async () => {
+    await as(ids.papa, (tx) => tx.query(`delete from public.wishlist_items where id = $1`, [itemId]));
+    const trash = await db.query<{ drive_file_id: string }>(`select drive_file_id from public.drive_file_trash where family_id = $1 order by drive_file_id`, [familyId]);
+    expect(trash.rows.map((r) => r.drive_file_id)).toEqual([1, 2, 3, 4, 5, 6].map(fileId));
+  });
+});
+
+describe('borrar mi cuenta', () => {
+  const ownerC = '00000000-0000-0000-0000-0000000000c1';
+  const adminC = '00000000-0000-0000-0000-0000000000c2';
+  const memberC = '00000000-0000-0000-0000-0000000000c3';
+  let eventC = '';
+  let eventSolo = '';
+  let memberParticipant = '';
+
+  beforeAll(async () => {
+    await db.query(`insert into auth.users (id, email) values ($1, 'carla@example.com')`, [ownerC]);
+    eventC = await as(ownerC, async (tx) => {
+      const r = await tx.query<{ id: string }>(`select public.create_event('Navidad Ruiz', 'RUIZ26', '2026-12-24 20:00-05', 'Carla', 'Ruiz') as id`);
+      return r.rows[0]!.id;
+    });
+    eventSolo = await as(ownerC, async (tx) => {
+      const r = await tx.query<{ id: string }>(`select public.create_event('Prueba sola', 'SOLA26', '2026-12-25 20:00-05', 'Carla', 'Ruiz') as id`);
+      return r.rows[0]!.id;
+    });
+    await createMember({ userId: adminC, username: 'mario', eventId: eventC, first: 'Mario', paternal: 'Ruiz', role: 'admin' });
+    memberParticipant = await createMember({ userId: memberC, username: 'tere', eventId: eventC, first: 'Tere', paternal: 'Ruiz' });
+    await db.query(`insert into public.wishlist_items (event_id, participant_id, title) values ($1, $2, 'Bufanda')`, [eventC, memberParticipant]);
+  });
+
+  const deleteAccount = (user: string, confirm: string, successors: Record<string, string> = {}) =>
+    as(user, (tx) => tx.query(`select public.delete_my_account($1, $2::jsonb)`, [confirm, JSON.stringify(successors)]));
+
+  it('hay que escribir BORRAR', async () => {
+    await expect(deleteAccount(memberC, 'si')).rejects.toThrow(/DELETE_CONFIRMATION_REQUIRED/);
+  });
+
+  it('un familiar pierde el acceso, pero su perfil y sus regalos se quedan', async () => {
+    await deleteAccount(memberC, ' borrar ');
+    expect((await db.query(`select 1 from auth.users where id = $1`, [memberC])).rows).toEqual([]);
+    expect((await db.query(`select 1 from public.event_members where user_id = $1`, [memberC])).rows).toEqual([]);
+    const p = await db.query<{ user_id: string | null; status: string }>(`select user_id, status from public.participants where id = $1`, [memberParticipant]);
+    expect(p.rows[0]).toEqual({ user_id: null, status: 'active' });
+    expect((await db.query(`select 1 from public.wishlist_items where participant_id = $1`, [memberParticipant])).rows).toHaveLength(1);
+  });
+
+  it('el organizador ve a quién puede pasar cada celebración', async () => {
+    const r = await as(ownerC, (tx) =>
+      tx.query<{ event_id: string; successors: { userId: string; name: string }[] }>(`select event_id, successors from public.my_owned_events()`),
+    );
+    expect(r.rows).toEqual([
+      { event_id: eventC, successors: [{ userId: adminC, name: 'MARIO RUIZ' }] },
+      { event_id: eventSolo, successors: [] },
+    ]);
+  });
+
+  it('el organizador no puede irse sin resolver cada celebración, ni pasarla a quien no es administrador', async () => {
+    await expect(deleteAccount(ownerC, 'BORRAR', { [eventC]: adminC })).rejects.toThrow(/OWNER_NEEDS_SUCCESSOR/);
+    await expect(deleteAccount(ownerC, 'BORRAR', { [eventC]: ids.rosa, [eventSolo]: 'DELETE' })).rejects.toThrow(/SUCCESSOR_INVALID/);
+    await expect(deleteAccount(ownerC, 'BORRAR', { [eventC]: 'no-es-uuid', [eventSolo]: 'DELETE' })).rejects.toThrow(/SUCCESSOR_INVALID/);
+    // Nada cambió (todo o nada)
+    expect((await db.query(`select 1 from public.events where id = $1`, [eventSolo])).rows).toHaveLength(1);
+    expect((await db.query(`select 1 from auth.users where id = $1`, [ownerC])).rows).toHaveLength(1);
+  });
+
+  it('pasa la celebración al administrador elegido, borra la otra y luego la cuenta', async () => {
+    await deleteAccount(ownerC, 'BORRAR', { [eventC]: adminC, [eventSolo]: 'DELETE' });
+    const ev = await db.query<{ owner_user_id: string }>(`select owner_user_id from public.events where id = $1`, [eventC]);
+    expect(ev.rows[0]!.owner_user_id).toBe(adminC);
+    const role = await db.query<{ role: string }>(`select role from public.event_members where event_id = $1 and user_id = $2`, [eventC, adminC]);
+    expect(role.rows[0]!.role).toBe('owner');
+    expect((await db.query(`select 1 from public.events where id = $1`, [eventSolo])).rows).toEqual([]);
+    expect((await db.query(`select 1 from auth.users where id = $1`, [ownerC])).rows).toEqual([]);
+    // El nuevo organizador ya administra
+    const ctx = await as(adminC, (tx) => tx.query<{ ok: boolean }>(`select app.is_manager($1) as ok`, [eventC]));
+    expect(ctx.rows[0]!.ok).toBe(true);
+  });
+});

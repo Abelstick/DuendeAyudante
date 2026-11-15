@@ -13,6 +13,7 @@ import { ButtonLink } from '@/shared/ui/Button';
 import { Card, CardTitle, Pill } from '@/shared/ui/Card';
 import { toTitleCase } from '@/shared/validation/names';
 import { WishlistService } from '../application/WishlistService';
+import { DrivePhoto } from './DrivePhoto';
 import { useEventWishlist } from './hooks';
 
 /**
@@ -140,6 +141,9 @@ export function GiftsHomeCard() {
                     {toTitleCase(p.firstName)}
                     {p.distinguishingNote && <span className="font-semibold text-ink-700"> ({p.distinguishingNote})</span>}
                   </span>
+                  {wishes[0]?.photos[0] && (
+                    <DrivePhoto driveFileId={wishes[0].photos[0].driveFileId} alt="" width={360} className="h-24 w-full rounded-lg border-2 border-night-900/15" />
+                  )}
                   <span className="mt-auto line-clamp-2 text-sm text-ink-700">
                     {wishes[0] ? (
                       <>

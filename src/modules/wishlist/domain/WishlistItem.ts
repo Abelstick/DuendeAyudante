@@ -1,3 +1,5 @@
+import type { WishlistPhoto } from './WishlistPhoto';
+
 export type WishPriority = 1 | 2 | 3;
 
 export interface WishlistLink {
@@ -19,6 +21,8 @@ export interface WishlistItem {
   brands: string[];
   priority: WishPriority;
   links: WishlistLink[];
+  /** Fotos de referencia, en orden (la primera es la portada). */
+  photos: WishlistPhoto[];
   createdAt: Date;
 }
 

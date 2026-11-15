@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { fromPostgrestError } from '@/shared/infrastructure/supabase/errors';
+import { fromFunctionError, fromPostgrestError } from '@/shared/infrastructure/supabase/errors';
 import type { IWishlistRepository } from '../domain/IWishlistRepository';
 import type { SaveWishlistItemData, WishlistItem, WishPriority } from '../domain/WishlistItem';
 
@@ -15,7 +15,10 @@ interface WishlistRow {
   priority: WishPriority;
   created_at: string;
   wishlist_item_links: { url: string; label: string | null; sort_order: number }[] | null;
+  wishlist_photos: { id: string; drive_file_id: string; sort_order: number }[] | null;
 }
+
+const PHOTOS_FUNCTION = 'google-drive';
 
 export class SupabaseWishlistRepository implements IWishlistRepository {
   constructor(private readonly supabase: SupabaseClient) {}
@@ -24,7 +27,7 @@ export class SupabaseWishlistRepository implements IWishlistRepository {
     const { data, error } = await this.supabase
       .from('wishlist_items')
       .select(
-        'id, event_id, participant_id, title, description, price_estimate, price_max, brands, priority, created_at, wishlist_item_links(url, label, sort_order)',
+        'id, event_id, participant_id, title, description, price_estimate, price_max, brands, priority, created_at, wishlist_item_links(url, label, sort_order), wishlist_photos(id, drive_file_id, sort_order)',
       )
       .eq('event_id', eventId)
       .order('priority')
@@ -45,7 +48,21 @@ export class SupabaseWishlistRepository implements IWishlistRepository {
       links: [...(r.wishlist_item_links ?? [])]
         .sort((a, b) => a.sort_order - b.sort_order)
         .map((l) => ({ url: l.url, label: l.label })),
+      photos: [...(r.wishlist_photos ?? [])].sort((a, b) => a.sort_order - b.sort_order).map((p) => ({ id: p.id, driveFileId: p.drive_file_id })),
     }));
+  }
+
+  async uploadPhoto(itemId: string, image: Blob): Promise<void> {
+    const form = new FormData();
+    form.append('itemId', itemId);
+    form.append('file', image, image instanceof File ? image.name : 'foto.jpg');
+    const { error } = await this.supabase.functions.invoke(PHOTOS_FUNCTION, { body: form });
+    if (error) throw await fromFunctionError(error);
+  }
+
+  async removePhoto(photoId: string): Promise<void> {
+    const { error } = await this.supabase.functions.invoke(PHOTOS_FUNCTION, { body: { action: 'delete-photo', photoId } });
+    if (error) throw await fromFunctionError(error);
   }
 
   async save(data: SaveWishlistItemData): Promise<string> {

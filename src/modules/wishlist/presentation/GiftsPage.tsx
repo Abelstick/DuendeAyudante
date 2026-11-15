@@ -21,6 +21,7 @@ import { errorMessage } from '@/shared/ui/errorMessages';
 import { toTitleCase } from '@/shared/validation/names';
 import { WishlistService } from '../application/WishlistService';
 import type { WishlistItem } from '../domain/WishlistItem';
+import { DrivePhoto } from './DrivePhoto';
 import { EditableWishlist } from './EditableWishlist';
 import { useEventWishlist } from './hooks';
 
@@ -240,6 +241,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
               const wishes = WishlistService.byPriority(byPerson.get(p.id) ?? []);
               const count = wishes.length;
               const preview = wishes.slice(0, 2).map((w) => w.title);
+              const cover = wishes.find((w) => w.photos.length > 0)?.photos[0];
               return (
                 <li key={p.id}>
                   <Link
@@ -259,6 +261,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
                         </span>
                       )}
                     </span>
+                    {cover && <DrivePhoto driveFileId={cover.driveFileId} alt="" width={160} className="size-14 shrink-0 rounded-lg border-2 border-night-900/15" />}
                     {count > 0 && (
                       <Pill tone="berry">
                         🎁 {count}

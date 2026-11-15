@@ -1,5 +1,6 @@
 import type { SupabaseClient, User } from '@supabase/supabase-js';
-import type { AuthUser, IAuthService, SignInCredentials } from '@/shared/application/ports/IAuthService';
+import type { AuthUser, IAuthService, OwnedEvent, OwnershipChoices, SignInCredentials } from '@/shared/application/ports/IAuthService';
+import { fromPostgrestError } from '@/shared/infrastructure/supabase/errors';
 import { AppError } from '@/shared/domain/errors';
 import { normalizeJoinCode, normalizeUsername } from '@/shared/validation/names';
 
@@ -112,5 +113,22 @@ export class SupabaseAuthService implements IAuthService {
 
   async signOut(): Promise<void> {
     await this.supabase.auth.signOut();
+  }
+
+  async listOwnedEvents(): Promise<OwnedEvent[]> {
+    const { data, error } = await this.supabase.rpc('my_owned_events');
+    if (error) throw fromPostgrestError(error);
+    return ((data ?? []) as { event_id: string; event_name: string; successors: OwnedEvent['successors'] | null }[]).map((r) => ({
+      eventId: r.event_id,
+      eventName: r.event_name,
+      successors: r.successors ?? [],
+    }));
+  }
+
+  async deleteAccount(confirm: string, choices: OwnershipChoices): Promise<void> {
+    const { error } = await this.supabase.rpc('delete_my_account', { p_confirm: confirm, p_successors: choices });
+    if (error) throw fromPostgrestError(error);
+    // La cuenta ya no existe: se limpia la sesión solo en este dispositivo (el servidor ya no la reconoce)
+    await this.supabase.auth.signOut({ scope: 'local' });
   }
 }

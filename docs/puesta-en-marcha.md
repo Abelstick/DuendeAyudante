@@ -45,7 +45,8 @@ npx supabase db push                              # aplica supabase/migrations/*
 **Alternativa sin CLI:** en Supabase → **SQL Editor**, pega y ejecuta, **en este orden**, el contenido de:
 `20261114000001_core_schema.sql`, `20261114000002_security.sql`, `20261114000003_wishlist_rpc.sql`,
 `20261114000004_event_join_code.sql`, `20261114000005_code_history_white_color.sql`, `20261114000006_checklist.sql`, `20261114000007_responsibilities.sql`, `20261114000008_games.sql`, `20261114000009_secret_friend.sql`, `20261114000010_schedule_announcements.sql`,
-`20261115000011_family_access.sql`.
+`20261115000011_family_access.sql`, `20261115000012_service_role_app_schema.sql`, `20261115000013_wishlist_brands_price_range.sql`,
+`20261115000014_wishlist_photos_drive.sql`, `20261115000015_delete_account.sql`.
 
 > Si ya habías aplicado las primeras migraciones, `npx supabase db push` aplica solo las nuevas.
 
@@ -76,6 +77,41 @@ Cuando tengas la URL de Render, limita quién puede llamar a las funciones:
 ```powershell
 npx supabase secrets set APP_ORIGINS=https://TU-APP.onrender.com,http://localhost:5173
 ```
+
+## 5b. Fotos de los regalos con Google Drive (opcional)
+
+Cada familia guarda las fotos de sus regalos en un Google Drive que conecta el organizador o un administrador
+(**Organizar → Fotos de los regalos**). Para eso la app necesita un "cliente OAuth" de Google. Se configura una sola vez:
+
+1. Entra a <https://console.cloud.google.com> → crea un proyecto (ej. `duende-ayudante`).
+2. **APIs y servicios → Biblioteca** → busca **Google Drive API** → **Habilitar**.
+3. **APIs y servicios → Pantalla de consentimiento de OAuth** (Google Auth Platform):
+   - Tipo de usuario: **Externo**. Nombre de la app, tu correo de soporte y de contacto.
+   - **Acceso a los datos → Agregar permisos**: `openid`, `.../auth/userinfo.email` y `.../auth/drive.file`.
+     `drive.file` solo deja ver los archivos que crea la app, y Google **no** lo considera un permiso sensible:
+     no hace falta verificación.
+   - **Público**: mientras esté "En prueba", agrega como *usuarios de prueba* los correos de Google que se van a
+     conectar (máximo 100). Para no depender de esa lista, toca **Publicar app**.
+4. **Clientes → Crear cliente** → tipo **Aplicación web**.
+   - *URI de redireccionamiento autorizados*: `https://TU-PROYECTO.supabase.co/functions/v1/google-drive`
+   - Copia el **ID de cliente** y el **secreto**. El secreto **no** va en el frontend ni en el chat.
+5. Publica la función y guarda los secretos:
+
+```powershell
+npx supabase functions deploy google-drive --use-api --no-verify-jwt   # Google vuelve aquí sin sesión; los POST verifican la sesión adentro
+npx supabase secrets set GOOGLE_CLIENT_ID=xxxx.apps.googleusercontent.com
+npx supabase secrets set GOOGLE_CLIENT_SECRET=GOCSPX-xxxx
+npx supabase secrets set GOOGLE_OAUTH_STATE_SECRET=<texto-al-azar-de-al-menos-32-caracteres>
+npx supabase secrets set APP_URL=https://TU-APP.onrender.com   # a dónde volver si el navegador no envía su origen
+```
+
+Para generar el texto al azar en PowerShell:
+`-join ((48..57)+(65..90)+(97..122) | Get-Random -Count 48 | % {[char]$_})`
+
+> **Privacidad.** El token de Google se guarda solo en la base (`family_drives`), y ningún usuario de la app puede leerlo,
+> ni siquiera el organizador. Las fotos quedan como "cualquiera con el enlace puede ver" para que la app las muestre;
+> los enlaces no se pueden adivinar y solo los ven quienes están en la celebración. Si se desconecta un Drive, las fotos
+> ya subidas siguen en esa cuenta.
 
 ## 6. Probar en tu computadora
 

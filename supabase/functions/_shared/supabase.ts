@@ -30,6 +30,16 @@ export async function getCallerId(req: Request): Promise<string> {
   return data.user.id;
 }
 
+/** Cliente con la sesión de quien llama: se aplican sus políticas RLS. */
+export function userClient(req: Request): SupabaseClient {
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) throw new HttpError(401, 'NOT_AUTHENTICATED');
+  return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    global: { headers: { Authorization: authHeader } },
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+}
+
 export type EventRole = 'owner' | 'admin' | 'editor' | 'participant';
 
 export async function getRole(admin: SupabaseClient, eventId: string, userId: string): Promise<EventRole | null> {

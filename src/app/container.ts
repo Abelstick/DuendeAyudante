@@ -12,6 +12,8 @@ import { SupabaseChecklistRepository } from '@/modules/checklist/infrastructure/
 import { EventService } from '@/modules/events/application/EventService';
 import { SupabaseEventRepository } from '@/modules/events/infrastructure/SupabaseEventRepository';
 import { FamilyService } from '@/modules/families/application/FamilyService';
+import { FamilyDriveService } from '@/modules/family-drive/application/FamilyDriveService';
+import { SupabaseFamilyDriveRepository } from '@/modules/family-drive/infrastructure/SupabaseFamilyDriveRepository';
 import { FamilyAccessService } from '@/modules/family-access/application/FamilyAccessService';
 import { SupabaseFamilyAccessRepository } from '@/modules/family-access/infrastructure/SupabaseFamilyAccessRepository';
 import { SupabaseFamilyRepository } from '@/modules/families/infrastructure/SupabaseFamilyRepository';
@@ -36,6 +38,7 @@ export interface Container {
   events: EventService;
   families: FamilyService;
   familyAccess: FamilyAccessService;
+  familyDrives: FamilyDriveService;
   members: MemberService;
   wishlist: WishlistService;
   checklist: ChecklistService;
@@ -53,6 +56,7 @@ export function createContainer(): Container {
     events: new EventService(new SupabaseEventRepository(supabase)),
     families: new FamilyService(new SupabaseFamilyRepository(supabase)),
     familyAccess: new FamilyAccessService(new SupabaseFamilyAccessRepository(supabase)),
+    familyDrives: new FamilyDriveService(new SupabaseFamilyDriveRepository(supabase)),
     members: new MemberService(new SupabaseParticipantRepository(supabase), new EdgeFunctionMemberAccountService(supabase)),
     wishlist: new WishlistService(new SupabaseWishlistRepository(supabase)),
     checklist: new ChecklistService(new SupabaseChecklistRepository(supabase)),

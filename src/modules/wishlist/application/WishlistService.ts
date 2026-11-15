@@ -10,6 +10,7 @@ import {
   type SaveWishlistItemData,
   type WishlistItem,
 } from '../domain/WishlistItem';
+import { MAX_PHOTOS_PER_ITEM } from '../domain/WishlistPhoto';
 
 const isBadPrice = (p: number | null) => p !== null && (Number.isNaN(p) || p < 0);
 
@@ -34,6 +35,38 @@ export class WishlistService {
   /** Los regalos que más ilusión le hacen primero ("Me encantaría"); a igual prioridad, los más antiguos. */
   static byPriority(items: readonly WishlistItem[]): WishlistItem[] {
     return [...items].sort((a, b) => a.priority - b.priority || a.createdAt.getTime() - b.createdAt.getTime());
+  }
+
+  /**
+   * Sube las fotos de a una (en el celular, varias a la vez saturan la conexión).
+   * Respeta el máximo por regalo y no se detiene si una falla: devuelve cuántas
+   * se subieron y el primer error, para avisar sin perder las demás.
+   */
+  async uploadPhotos(
+    itemId: string,
+    images: readonly Blob[],
+    alreadyAttached: number,
+    onProgress?: (done: number, total: number) => void,
+  ): Promise<{ uploaded: number; failed: number; skipped: number; firstError: unknown }> {
+    const room = Math.max(0, MAX_PHOTOS_PER_ITEM - alreadyAttached);
+    const batch = images.slice(0, room);
+    let uploaded = 0;
+    let firstError: unknown = null;
+    for (const [i, image] of batch.entries()) {
+      onProgress?.(i, batch.length);
+      try {
+        await this.wishes.uploadPhoto(itemId, image);
+        uploaded++;
+      } catch (err) {
+        firstError ??= err;
+      }
+    }
+    onProgress?.(batch.length, batch.length);
+    return { uploaded, failed: batch.length - uploaded, skipped: images.length - batch.length, firstError };
+  }
+
+  removePhoto(photoId: string) {
+    return this.wishes.removePhoto(photoId);
   }
 
   async save(data: SaveWishlistItemData): Promise<string> {
