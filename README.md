@@ -24,7 +24,7 @@ participa sin aprender a usar una aplicación complicada.
 | Crear la Navidad del próximo año copiando familias, integrantes y más | ✅ |
 | Recuerdos del año (resumen para compartir) | ✅ |
 | Mensajes navideños que se abren a la medianoche (pueden ser anónimos) | ✅ |
-| Ideas de regalo por edad y presupuesto · llenar un regalo pegando el enlace | ✅ |
+| Ideas de regalo por edad y presupuesto | ✅ |
 | Publicar en Render | ⏳ |
 | Mascotas e ilustraciones por familia | ⏳ (la identidad de color por familia ya está) |
 

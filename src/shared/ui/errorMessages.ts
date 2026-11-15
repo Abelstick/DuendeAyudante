@@ -114,10 +114,6 @@ const MESSAGES: Record<string, string> = {
   TOO_MANY_MESSAGES: 'Llegaste al máximo de 30 mensajes. Puedes cambiar o quitar alguno.',
 
   FUNCTION_NOT_DEPLOYED: 'Esta opción todavía no está activada en el servidor. Avísale a quien organiza la Navidad.',
-  LINK_PREVIEW_UNAVAILABLE: 'Leer el enlace todavía no está activado. Llena los datos a mano; el enlace sí se guarda.',
-  LINK_NOT_ALLOWED: 'Ese enlace no se puede leer. Copia el enlace de la página de la tienda.',
-  LINK_PREVIEW_FAILED: 'No pudimos leer esa página (algunas tiendas no lo permiten). Llena los datos a mano; el enlace sí se guarda.',
-  LINK_PREVIEW_EMPTY: 'Esa página no tiene datos del producto. Llena los datos a mano; el enlace sí se guarda.',
 
   FORBIDDEN: 'No tienes permiso para hacer esto.',
   NOT_FOUND_OR_FORBIDDEN: 'No puedes cambiar este regalo.',

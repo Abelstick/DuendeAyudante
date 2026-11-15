@@ -9,12 +9,6 @@ export function useEventWishlist(eventId: string) {
   return useQuery({ queryKey: wishlistKeys.event(eventId), queryFn: () => wishlist.listByEvent(eventId) });
 }
 
-/** Lee nombre y precio del enlace de una tienda (Edge Function link-preview). */
-export function useLinkPreview() {
-  const { linkPreview } = useServices();
-  return useMutation({ mutationFn: (url: string) => linkPreview.read(url) });
-}
-
 /** Guardar, quitar y quitar fotos. Las fotos nuevas se suben con la cola (ver photoQueue.ts). */
 export function useWishlistMutations(eventId: string) {
   const { wishlist } = useServices();

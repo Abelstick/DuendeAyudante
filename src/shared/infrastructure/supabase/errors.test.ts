@@ -6,7 +6,7 @@ const httpError = (status: number, body: unknown) => new FunctionsHttpError(new 
 
 describe('errores de Edge Functions', () => {
   it('usa el código que devuelve nuestra función', async () => {
-    expect((await fromFunctionError(httpError(422, { error: 'LINK_PREVIEW_FAILED' }))).code).toBe('LINK_PREVIEW_FAILED');
+    expect((await fromFunctionError(httpError(422, { error: 'JOIN_CODE_TAKEN' }))).code).toBe('JOIN_CODE_TAKEN');
   });
 
   it('reconoce cuando la función no está publicada (no es un problema de internet)', async () => {

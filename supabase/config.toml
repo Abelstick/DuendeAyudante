@@ -18,6 +18,3 @@ verify_jwt = false
 [functions.google-drive]
 verify_jwt = false
 
-# Lee el enlace de una tienda para llenar un regalo (solo con sesión).
-[functions.link-preview]
-verify_jwt = true

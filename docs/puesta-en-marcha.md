@@ -63,14 +63,9 @@ npx supabase functions deploy create-member --use-api
 npx supabase functions deploy reset-member-password --use-api
 npx supabase functions deploy change-join-code --use-api
 npx supabase functions deploy family-access --use-api --no-verify-jwt   # pública: enlace de la familia
-npx supabase functions deploy link-preview --use-api                     # «Pega el enlace» al agregar un regalo
 npx supabase secrets set MEMBER_EMAIL_DOMAIN=usuarios.navidad.invalid
 ```
 
-> **Pegar el enlace de la tienda.** `link-preview` lee la página del producto (nombre, precio y foto que la tienda publica para
-> compartir enlaces) y no guarda nada. Es gratis: no usa ninguna API de pago y entra en el plan gratuito de Edge Functions de
-> Supabase. Solo la pueden usar personas con sesión, y solo lee direcciones públicas. Algunas tiendas no dejan leer sus
-> páginas; en ese caso la app guarda el enlace y pide llenar los datos a mano.
 
 > **Enlace de la familia.** `family-access` es la única función pública (`--no-verify-jwt`): la usan los familiares antes de
 > tener sesión. Valida el enlace y la palabra secreta, y solo deja entrar a cuentas con rol *participante*. No requiere

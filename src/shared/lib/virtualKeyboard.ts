@@ -74,7 +74,12 @@ export function installKeyboardTracking(): void {
   };
 
   let frame = 0;
-  const update = () => {
+  let lastInset = 0;
+  // Traer el campo a la vista solo al enfocarlo o cuando el teclado recién aparece/crece.
+  // Nunca mientras la persona desplaza la pantalla (en iOS eso mueve la vista y la "devolvería" al campo).
+  let revealOnNextFrame = false;
+  const update = (reveal = false) => {
+    revealOnNextFrame ||= reveal;
     cancelAnimationFrame(frame);
     frame = requestAnimationFrame(() => {
       const typing = isTextEntry(document.activeElement);
@@ -82,22 +87,25 @@ export function installKeyboardTracking(): void {
       root.style.setProperty('--kb-inset', `${inset}px`);
       if (typing) root.dataset.keyboard = 'open';
       else delete root.dataset.keyboard;
-      if (typing) ensureVisible();
+      const keyboardGrew = inset > lastInset + 80;
+      lastInset = inset;
+      if (typing && (revealOnNextFrame || keyboardGrew)) ensureVisible();
+      revealOnNextFrame = false;
     });
   };
 
   let blurTimer = 0;
   document.addEventListener('focusin', () => {
     clearTimeout(blurTimer);
-    update();
+    update(true);
   });
   // Al pasar de un campo a otro hay un instante sin foco: esperar evita que la barra parpadee
   document.addEventListener('focusout', () => {
     clearTimeout(blurTimer);
-    blurTimer = window.setTimeout(update, 120);
+    blurTimer = window.setTimeout(() => update(), 120);
   });
-  vv?.addEventListener('resize', update);
-  vv?.addEventListener('scroll', update);
+  vv?.addEventListener('resize', () => update());
+  vv?.addEventListener('scroll', () => update());
 }
 
 /** Para buscadores que filtran mientras se escribe: Enter solo cierra el teclado para ver los resultados. */

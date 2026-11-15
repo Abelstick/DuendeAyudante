@@ -136,7 +136,7 @@ export function MessagesPage() {
         )}
       </section>
 
-      {editing && (
+      {editing && senders.length > 0 && (
         <MessageFormModal
           key={editing.initial?.id ?? 'nuevo'}
           eventId={event.id}
