@@ -23,15 +23,21 @@ export function fromPostgrestError(error: PostgrestError): AppError {
 /** Convierte la respuesta de error de una Edge Function en AppError. */
 export async function fromFunctionError(error: unknown): Promise<AppError> {
   if (error instanceof FunctionsHttpError) {
+    const status = (error.context as Response | undefined)?.status;
     try {
-      const body = (await error.context.json()) as { error?: string } & Record<string, unknown>;
+      const body = (await error.context.json()) as { error?: string; code?: string; message?: string } & Record<string, unknown>;
       if (body?.error) {
         const { error: code, ...details } = body;
         return new AppError(code, details);
       }
+      // Respuesta de Supabase (no de nuestra función): la función no está publicada en el proyecto
+      if (body?.code === 'NOT_FOUND' || /function was not found/i.test(body?.message ?? '')) return new AppError('FUNCTION_NOT_DEPLOYED');
     } catch {
       // respuesta sin JSON
     }
+    // Hubo respuesta del servidor: no es un problema de internet
+    if (status === 404) return new AppError('FUNCTION_NOT_DEPLOYED');
+    if (status) return new AppError('UNEXPECTED', { status });
   }
   return new AppError('NETWORK');
 }

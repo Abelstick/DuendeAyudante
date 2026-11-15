@@ -12,7 +12,11 @@ export class EdgeFunctionLinkPreviewService implements ILinkPreviewService {
     const url = normalizeUrl(rawUrl);
     if (!isValidHttpUrl(url)) throw new AppError('LINK_INVALID');
     const { data, error } = await this.supabase.functions.invoke<LinkPreview>('link-preview', { body: { url } });
-    if (error || !data) throw await fromFunctionError(error);
+    if (error || !data) {
+      const appError = await fromFunctionError(error);
+      // Para quien llena su regalo: que siga a mano, sin palabras técnicas
+      throw appError.code === 'FUNCTION_NOT_DEPLOYED' ? new AppError('LINK_PREVIEW_UNAVAILABLE') : appError;
+    }
     return data;
   }
 }

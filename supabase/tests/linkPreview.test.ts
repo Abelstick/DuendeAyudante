@@ -50,6 +50,23 @@ describe('vista previa de enlaces: datos de la página', () => {
     });
   });
 
+  it('lee tiendas Magento como La Curacao (sin og:title, precio en product:price y JSON-LD)', () => {
+    const html = `<title>Mouse Pad Gamer Razer Gigantus V2 Soft Medium Black</title>
+      <meta property="og:type" content="product" />
+      <meta property="product:price:amount" content="69"/>
+      <meta itemprop="priceCurrency" content="PEN" />
+      <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Mouse Pad Gamer Razer Gigantus V2 Soft Medium Black",
+        "image":"https://www.lacuracao.pe/media/catalog/product/e/f/efegc03132_1.jpg","brand":{"@type":"Brand","name":"RAZER"},
+        "offers":{"@type":"Offer","price":69,"priceCurrency":"PEN"}}</script>`;
+    expect(parseLinkMetadata(html, 'https://www.lacuracao.pe/x.html')).toEqual({
+      title: 'Mouse Pad Gamer Razer Gigantus V2 Soft Medium Black',
+      price: 69,
+      currency: 'PEN',
+      image: 'https://www.lacuracao.pe/media/catalog/product/e/f/efegc03132_1.jpg',
+      siteName: null,
+    });
+  });
+
   it('sin datos de producto, al menos el título de la página', () => {
     expect(parseLinkMetadata('<title> Mi página </title>', 'https://x.com')).toEqual({ title: 'Mi página', price: null, currency: null, image: null, siteName: null });
   });
