@@ -1,7 +1,6 @@
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { photoUploadStatus } from '@/modules/family-drive/domain/FamilyDrive';
-import { useFamilyDrives } from '@/modules/family-drive/presentation/hooks';
+import { usePhotoUploadStatus } from '@/modules/family-drive/presentation/hooks';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { Button } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/Card';
@@ -29,16 +28,15 @@ interface Props {
 export function EditableWishlist({ eventId, participantId, items, budget, currency, forName, startAdding = false }: Props) {
   const { save, remove, uploadPhotos, removePhoto } = useWishlistMutations(eventId);
   const participants = useParticipants(eventId);
-  const drives = useFamilyDrives(eventId);
   const toast = useToast();
   const [adding, setAdding] = useState(startAdding);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [progress, setProgress] = useState<string | null>(null);
 
-  // Las fotos van al Google Drive de la familia de esta persona
+  // Las fotos van al Google Drive de la familia de esta persona o, si no tiene, al general
   const familyId = participants.data?.find((p) => p.id === participantId)?.familyId;
-  const status = photoUploadStatus(familyId, drives.data ?? []);
+  const status = usePhotoUploadStatus(eventId, familyId);
 
   /** Sube las fotos nuevas. Devuelve false si alguna falló (el regalo ya quedó guardado). */
   const sendPhotos = async (itemId: string, files: File[], alreadyAttached: number): Promise<boolean> => {

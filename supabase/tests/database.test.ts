@@ -971,3 +971,37 @@ describe('borrar mi cuenta', () => {
     expect(ctx.rows[0]!.ok).toBe(true);
   });
 });
+
+describe('Google Drive general de la celebración', () => {
+  it('es secreto; todos saben si existe y solo quien administra ve el correo', async () => {
+    await db.query(
+      `insert into public.event_drives (event_id, google_email, refresh_token, folder_id) values ($1, 'abuela@gmail.com', 'secreto', 'carpeta')`,
+      [eventA],
+    );
+    for (const user of [ids.ownerA, ids.rosa]) {
+      await expectDenied(as(user, (tx) => tx.query(`select refresh_token from public.event_drives`)));
+    }
+    const owner = await as(ids.ownerA, (tx) => tx.query<{ google_email: string | null }>(`select google_email from public.get_event_drive($1)`, [eventA]));
+    expect(owner.rows).toEqual([{ google_email: 'abuela@gmail.com' }]);
+    const rosa = await as(ids.rosa, (tx) => tx.query<{ google_email: string | null }>(`select google_email from public.get_event_drive($1)`, [eventA]));
+    expect(rosa.rows).toEqual([{ google_email: null }]);
+    const other = await as(ids.ownerB, (tx) => tx.query(`select * from public.get_event_drive($1)`, [eventA]));
+    expect(other.rows).toEqual([]);
+  });
+
+  it('al borrar una foto del Drive general, va a la papelera de la celebración', async () => {
+    const item = await db.query<{ id: string }>(`insert into public.wishlist_items (event_id, participant_id, title) values ($1, $2, 'Taza') returning id`, [
+      eventA,
+      participant.rosa,
+    ]);
+    const photo = await db.query<{ id: string }>(
+      `insert into public.wishlist_photos (item_id, event_id, drive_file_id, in_event_drive) values ($1, $2, 'generalFile_abcdefghij', true) returning id`,
+      [item.rows[0]!.id, eventA],
+    );
+    await db.query(`delete from public.wishlist_photos where id = $1`, [photo.rows[0]!.id]);
+    const trash = await db.query<{ event_id: string; family_id: string | null }>(
+      `select event_id, family_id from public.drive_file_trash where drive_file_id = 'generalFile_abcdefghij'`,
+    );
+    expect(trash.rows).toEqual([{ event_id: eventA, family_id: null }]);
+  });
+});

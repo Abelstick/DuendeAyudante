@@ -1,10 +1,12 @@
-// Edge Function: Google Drive de cada familia para las fotos de los regalos.
+// Edge Function: Google Drive para las fotos de los regalos.
+// Puede haber un Drive general de la celebración y/o uno por familia.
+// Al subir, se usa el de la familia de la persona si funciona; si no, el general.
 //
 //  POST (con sesión, JSON):
-//    { action: 'auth-url',   familyId }  → organizador/admin: enlace para conectar la cuenta de Google
-//    { action: 'disconnect', familyId }  → organizador/admin: desconecta (las fotos quedan en ese Drive)
+//    { action: 'auth-url',   familyId } | { action: 'auth-url',   eventId } → organizador/admin: enlace para conectar
+//    { action: 'disconnect', familyId } | { action: 'disconnect', eventId } → organizador/admin: desconecta
 //    { action: 'delete-photo', photoId } → quien puede cambiar el regalo
-//  POST (con sesión, multipart): itemId + file → sube una foto al Drive de la familia de esa persona
+//  POST (con sesión, multipart): itemId + file → sube una foto
 //  GET  ?code&state → Google vuelve aquí; guarda la conexión y regresa a la app
 //
 // verify_jwt = false porque Google llama por GET sin sesión; los POST verifican la sesión aquí.
@@ -20,56 +22,82 @@ const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const STATE_TTL_MS = 15 * 60 * 1000;
 const FALLBACK_APP_URL = (Deno.env.get('APP_URL') ?? '').replace(/\/+$/, '');
 
+/** Dónde se guardan las fotos: el Drive de una familia o el general de la celebración. */
+type Target = { kind: 'family'; familyId: string; eventId: string } | { kind: 'event'; eventId: string };
+
 interface DriveRow {
-  family_id: string;
-  event_id: string;
-  refresh_token: string;
-  folder_id: string;
-  needs_reconnect: boolean;
+  target: Target;
+  refreshToken: string;
+  folderId: string;
+  needsReconnect: boolean;
 }
 
-async function requireManagerOfFamily(admin: SupabaseClient, callerId: string, familyId: string) {
-  const { data: family, error } = await admin.from('families').select('id, name, event_id, events!inner(name)').eq('id', familyId).maybeSingle();
-  if (error) throw error;
-  if (!family) throw new HttpError(404, 'NOT_FOUND');
-  const role = await getRole(admin, family.event_id, callerId);
+const tableOf = (t: Target) => (t.kind === 'family' ? 'family_drives' : 'event_drives');
+const keyOf = (t: Target): [string, string] => (t.kind === 'family' ? ['family_id', t.familyId] : ['event_id', t.eventId]);
+
+/** Verifica que quien llama administre la celebración y arma el destino. */
+async function requireManagerTarget(admin: SupabaseClient, callerId: string, body: { familyId?: unknown; eventId?: unknown }) {
+  let target: Target;
+  let label: string;
+  let eventName: string;
+  if (body.familyId !== undefined) {
+    const familyId = requireUuid(body.familyId, 'familyId');
+    const { data: family, error } = await admin.from('families').select('id, name, event_id, events!inner(name)').eq('id', familyId).maybeSingle();
+    if (error) throw error;
+    if (!family) throw new HttpError(404, 'NOT_FOUND');
+    target = { kind: 'family', familyId, eventId: family.event_id };
+    eventName = (family.events as unknown as { name: string }).name;
+    label = `Familia ${family.name}`;
+  } else {
+    const eventId = requireUuid(body.eventId, 'eventId');
+    const { data: event, error } = await admin.from('events').select('id, name').eq('id', eventId).is('deleted_at', null).maybeSingle();
+    if (error) throw error;
+    if (!event) throw new HttpError(404, 'NOT_FOUND');
+    target = { kind: 'event', eventId };
+    eventName = event.name;
+    label = 'Todas las familias';
+  }
+  const role = await getRole(admin, target.eventId, callerId);
   if (role !== 'owner' && role !== 'admin') throw new HttpError(403, 'FORBIDDEN');
-  const eventName = (family.events as unknown as { name: string }).name;
-  return { familyName: family.name as string, eventId: family.event_id as string, eventName, role };
+  return { target, folderName: `Duende Ayudante · ${eventName} · ${label}` };
 }
 
-async function getDrive(admin: SupabaseClient, familyId: string | null): Promise<DriveRow | null> {
-  if (!familyId) return null;
-  const { data, error } = await admin
-    .from('family_drives')
-    .select('family_id, event_id, refresh_token, folder_id, needs_reconnect')
-    .eq('family_id', familyId)
-    .maybeSingle();
+async function getDrive(admin: SupabaseClient, target: Target): Promise<DriveRow | null> {
+  const [col, key] = keyOf(target);
+  const { data, error } = await admin.from(tableOf(target)).select('refresh_token, folder_id, needs_reconnect').eq(col, key).maybeSingle();
   if (error) throw error;
-  return data as DriveRow | null;
+  return data ? { target, refreshToken: data.refresh_token, folderId: data.folder_id, needsReconnect: data.needs_reconnect } : null;
 }
 
-/** Token de acceso; si Google lo rechaza, marca la familia para volver a conectar. */
+/** Token de acceso; si Google lo rechaza, marca ese Drive para volver a conectar. */
 async function accessToken(admin: SupabaseClient, drive: DriveRow): Promise<string> {
-  if (drive.needs_reconnect) throw new HttpError(409, 'DRIVE_NEEDS_RECONNECT');
+  if (drive.needsReconnect) throw new HttpError(409, 'DRIVE_NEEDS_RECONNECT');
   try {
-    return await google.accessTokenFrom(drive.refresh_token);
+    return await google.accessTokenFrom(drive.refreshToken);
   } catch (err) {
     if (err instanceof HttpError && err.code === 'DRIVE_NEEDS_RECONNECT') {
-      await admin.from('family_drives').update({ needs_reconnect: true }).eq('family_id', drive.family_id);
+      const [col, key] = keyOf(drive.target);
+      await admin.from(tableOf(drive.target)).update({ needs_reconnect: true }).eq(col, key);
     }
     throw err;
   }
 }
 
-/** Borra de Drive los archivos pendientes de esa familia (lo mejor posible: si falla, se reintenta otra vez). */
-async function emptyTrash(admin: SupabaseClient, familyId: string, token: string) {
-  const { data } = await admin.from('drive_file_trash').select('id, drive_file_id').eq('family_id', familyId).limit(20);
+/** Borra de Drive los archivos pendientes de ese Drive (lo mejor posible: si falla, se reintenta otra vez). */
+async function emptyTrash(admin: SupabaseClient, target: Target, token: string) {
+  let q = admin.from('drive_file_trash').select('id, drive_file_id').limit(20);
+  q = target.kind === 'family' ? q.eq('family_id', target.familyId) : q.eq('event_id', target.eventId).is('family_id', null);
+  const { data } = await q;
   for (const row of data ?? []) {
     if (await google.deleteFile(token, row.drive_file_id).catch(() => false)) {
       await admin.from('drive_file_trash').delete().eq('id', row.id);
     }
   }
+}
+
+async function clearTrash(admin: SupabaseClient, target: Target) {
+  const q = admin.from('drive_file_trash').delete();
+  await (target.kind === 'family' ? q.eq('family_id', target.familyId) : q.eq('event_id', target.eventId).is('family_id', null));
 }
 
 async function requireCanEditItem(req: Request, itemId: string) {
@@ -78,31 +106,56 @@ async function requireCanEditItem(req: Request, itemId: string) {
   if (data !== true) throw new HttpError(403, 'FORBIDDEN');
 }
 
+/**
+ * Elige el Drive para una foto: el de la familia si funciona; si no, el general.
+ * Si ninguno sirve, explica por qué (sin conectar o hay que volver a conectar).
+ */
+async function pickDriveFor(admin: SupabaseClient, eventId: string, familyId: string | null): Promise<DriveRow> {
+  const familyDrive = familyId ? await getDrive(admin, { kind: 'family', familyId, eventId }) : null;
+  if (familyDrive && !familyDrive.needsReconnect) return familyDrive;
+  const eventDrive = await getDrive(admin, { kind: 'event', eventId });
+  if (eventDrive && !eventDrive.needsReconnect) return eventDrive;
+  if (familyDrive || eventDrive) throw new HttpError(409, 'DRIVE_NEEDS_RECONNECT');
+  throw new HttpError(409, 'DRIVE_NOT_CONNECTED');
+}
+
 // ---------------------------------------------------------------------
 // Acciones
 // ---------------------------------------------------------------------
 
-async function startConnect(req: Request, callerId: string, familyId: string) {
+async function startConnect(req: Request, callerId: string, body: Record<string, unknown>) {
   google.assertConfigured();
   const admin = adminClient();
-  const { eventId } = await requireManagerOfFamily(admin, callerId, familyId);
+  const { target } = await requireManagerTarget(admin, callerId, body);
   const origin = req.headers.get('Origin') ?? '';
   const appOrigin = isAllowedOrigin(origin) ? origin : FALLBACK_APP_URL;
   if (!appOrigin) throw new HttpError(400, 'ORIGIN_NOT_ALLOWED');
-  const state = await signState({ familyId, eventId, userId: callerId, origin: appOrigin, exp: Date.now() + STATE_TTL_MS });
+  const state = await signState({
+    familyId: target.kind === 'family' ? target.familyId : null,
+    eventId: target.eventId,
+    userId: callerId,
+    origin: appOrigin,
+    exp: Date.now() + STATE_TTL_MS,
+  });
   return { url: google.authUrl(state) };
 }
 
-async function disconnect(callerId: string, familyId: string) {
+async function disconnect(callerId: string, body: Record<string, unknown>) {
   const admin = adminClient();
-  const { eventId } = await requireManagerOfFamily(admin, callerId, familyId);
-  const drive = await getDrive(admin, familyId);
+  const { target } = await requireManagerTarget(admin, callerId, body);
+  const drive = await getDrive(admin, target);
   if (drive) {
-    await google.revoke(drive.refresh_token);
-    await admin.from('family_drives').delete().eq('family_id', familyId);
-    // Los archivos por borrar ya no se pueden alcanzar sin la conexión
-    await admin.from('drive_file_trash').delete().eq('family_id', familyId);
-    await audit(admin, { eventId, actor: callerId, action: 'family_drive.disconnected', entity: 'family', entityId: familyId });
+    await google.revoke(drive.refreshToken);
+    const [col, key] = keyOf(target);
+    await admin.from(tableOf(target)).delete().eq(col, key);
+    await clearTrash(admin, target); // sin la conexión ya no se pueden alcanzar
+    await audit(admin, {
+      eventId: target.eventId,
+      actor: callerId,
+      action: target.kind === 'family' ? 'family_drive.disconnected' : 'event_drive.disconnected',
+      entity: target.kind,
+      entityId: key,
+    });
   }
   return { ok: true };
 }
@@ -124,8 +177,7 @@ async function uploadPhoto(req: Request, callerId: string) {
   if (!item) throw new HttpError(404, 'NOT_FOUND');
   const { data: person } = await admin.from('participants').select('family_id').eq('id', item.participant_id).maybeSingle();
 
-  const drive = await getDrive(admin, person?.family_id ?? null);
-  if (!drive) throw new HttpError(409, 'DRIVE_NOT_CONNECTED');
+  const drive = await pickDriveFor(admin, item.event_id, person?.family_id ?? null);
 
   const { data: existing } = await admin.from('wishlist_photos').select('sort_order').eq('item_id', itemId).order('sort_order', { ascending: false });
   if ((existing?.length ?? 0) >= MAX_PHOTOS) throw new HttpError(400, 'TOO_MANY_PHOTOS');
@@ -134,11 +186,19 @@ async function uploadPhoto(req: Request, callerId: string) {
   const token = await accessToken(admin, drive);
   const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
   const safeTitle = String(item.title).replace(/[^\p{L}\p{N} _-]/gu, '').slice(0, 60).trim() || 'regalo';
-  const fileId = await google.uploadPhoto(token, drive.folder_id, `${safeTitle} ${nextOrder + 1}.${ext}`, file);
+  const fileId = await google.uploadPhoto(token, drive.folderId, `${safeTitle} ${nextOrder + 1}.${ext}`, file);
 
   const { data: photo, error: insErr } = await admin
     .from('wishlist_photos')
-    .insert({ item_id: itemId, event_id: item.event_id, family_id: drive.family_id, drive_file_id: fileId, sort_order: nextOrder, created_by: callerId })
+    .insert({
+      item_id: itemId,
+      event_id: item.event_id,
+      family_id: drive.target.kind === 'family' ? drive.target.familyId : null,
+      in_event_drive: drive.target.kind === 'event',
+      drive_file_id: fileId,
+      sort_order: nextOrder,
+      created_by: callerId,
+    })
     .select('id')
     .single();
   if (insErr) {
@@ -147,13 +207,17 @@ async function uploadPhoto(req: Request, callerId: string) {
     throw insErr;
   }
 
-  await emptyTrash(admin, drive.family_id, token);
+  await emptyTrash(admin, drive.target, token);
   return { id: photo.id, driveFileId: fileId };
 }
 
 async function deletePhoto(req: Request, photoId: string) {
   const admin = adminClient();
-  const { data: photo, error } = await admin.from('wishlist_photos').select('id, item_id, family_id').eq('id', photoId).maybeSingle();
+  const { data: photo, error } = await admin
+    .from('wishlist_photos')
+    .select('id, item_id, event_id, family_id, in_event_drive')
+    .eq('id', photoId)
+    .maybeSingle();
   if (error) throw error;
   if (!photo) return { ok: true }; // ya no existe
   await requireCanEditItem(req, photo.item_id);
@@ -161,10 +225,15 @@ async function deletePhoto(req: Request, photoId: string) {
   // El trigger lo pasa a la papelera; luego se borra de Drive si la conexión sigue viva
   const { error: delErr } = await admin.from('wishlist_photos').delete().eq('id', photoId);
   if (delErr) throw delErr;
-  const drive = await getDrive(admin, photo.family_id);
-  if (drive && !drive.needs_reconnect) {
+  const target: Target | null = photo.in_event_drive
+    ? { kind: 'event', eventId: photo.event_id }
+    : photo.family_id
+      ? { kind: 'family', familyId: photo.family_id, eventId: photo.event_id }
+      : null;
+  const drive = target ? await getDrive(admin, target) : null;
+  if (drive && !drive.needsReconnect) {
     try {
-      await emptyTrash(admin, drive.family_id, await accessToken(admin, drive));
+      await emptyTrash(admin, drive.target, await accessToken(admin, drive));
     } catch (err) {
       console.error('trash cleanup failed', err); // la foto ya se quitó de la app; Drive se limpia después
     }
@@ -191,7 +260,11 @@ async function oauthCallback(req: Request): Promise<Response> {
   try {
     const admin = adminClient();
     // Se vuelve a comprobar: pudo dejar de ser administrador en estos minutos
-    const { familyName, eventName } = await requireManagerOfFamily(admin, state.userId, state.familyId);
+    const { target, folderName } = await requireManagerTarget(
+      admin,
+      state.userId,
+      state.familyId ? { familyId: state.familyId } : { eventId: state.eventId },
+    );
 
     const tokens = await google.exchangeCode(code);
     if (!tokens.refresh_token) return back('error');
@@ -200,30 +273,32 @@ async function oauthCallback(req: Request): Promise<Response> {
       return back('sin-permiso'); // desmarcó el permiso de Drive
     }
     const email = await google.userEmail(tokens.access_token);
-    const folderId = await google.createFolder(tokens.access_token, `Duende Ayudante · ${eventName} · Familia ${familyName}`);
+    const folderId = await google.createFolder(tokens.access_token, folderName);
 
-    const previous = await getDrive(admin, state.familyId);
-    const { error } = await admin.from('family_drives').upsert({
-      family_id: state.familyId,
-      event_id: state.eventId,
+    const previous = await getDrive(admin, target);
+    const [col, key] = keyOf(target);
+    const row = {
+      [col]: key,
+      ...(target.kind === 'family' ? { event_id: target.eventId } : {}),
       google_email: email,
       refresh_token: tokens.refresh_token,
       folder_id: folderId,
       needs_reconnect: false,
       connected_by: state.userId,
-    });
+    };
+    const { error } = await admin.from(tableOf(target)).upsert(row);
     if (error) throw error;
-    if (previous && previous.refresh_token !== tokens.refresh_token) {
-      await google.revoke(previous.refresh_token);
-      await admin.from('drive_file_trash').delete().eq('family_id', state.familyId);
+    if (previous && previous.refreshToken !== tokens.refresh_token) {
+      await google.revoke(previous.refreshToken);
+      await clearTrash(admin, target);
     }
 
     await audit(admin, {
-      eventId: state.eventId,
+      eventId: target.eventId,
       actor: state.userId,
-      action: 'family_drive.connected',
-      entity: 'family',
-      entityId: state.familyId,
+      action: target.kind === 'family' ? 'family_drive.connected' : 'event_drive.connected',
+      entity: target.kind,
+      entityId: key,
       metadata: { email },
     });
     return back('conectado');
@@ -240,9 +315,9 @@ const api = handler(async (req) => {
   const body = await readJson(req);
   switch (body.action) {
     case 'auth-url':
-      return startConnect(req, callerId, requireUuid(body.familyId, 'familyId'));
+      return startConnect(req, callerId, body);
     case 'disconnect':
-      return disconnect(callerId, requireUuid(body.familyId, 'familyId'));
+      return disconnect(callerId, body);
     case 'delete-photo':
       return deletePhoto(req, requireUuid(body.photoId, 'photoId'));
     default:

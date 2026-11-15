@@ -46,7 +46,7 @@ npx supabase db push                              # aplica supabase/migrations/*
 `20261114000001_core_schema.sql`, `20261114000002_security.sql`, `20261114000003_wishlist_rpc.sql`,
 `20261114000004_event_join_code.sql`, `20261114000005_code_history_white_color.sql`, `20261114000006_checklist.sql`, `20261114000007_responsibilities.sql`, `20261114000008_games.sql`, `20261114000009_secret_friend.sql`, `20261114000010_schedule_announcements.sql`,
 `20261115000011_family_access.sql`, `20261115000012_service_role_app_schema.sql`, `20261115000013_wishlist_brands_price_range.sql`,
-`20261115000014_wishlist_photos_drive.sql`, `20261115000015_delete_account.sql`.
+`20261115000014_wishlist_photos_drive.sql`, `20261115000015_delete_account.sql`, `20261115000016_event_drive.sql`.
 
 > Si ya habías aplicado las primeras migraciones, `npx supabase db push` aplica solo las nuevas.
 
@@ -80,7 +80,8 @@ npx supabase secrets set APP_ORIGINS=https://TU-APP.onrender.com,http://localhos
 
 ## 5b. Fotos de los regalos con Google Drive (opcional)
 
-Cada familia guarda las fotos de sus regalos en un Google Drive que conecta el organizador o un administrador
+Las fotos de los regalos se guardan en Google Drive. El organizador o un administrador conecta **una sola cuenta para todas
+las familias** y, si alguna familia quiere, **una cuenta propia** que reemplaza a la general solo para ella
 (**Organizar → Fotos de los regalos**). Para eso la app necesita un "cliente OAuth" de Google. Se configura una sola vez:
 
 1. Entra a <https://console.cloud.google.com> → crea un proyecto (ej. `duende-ayudante`).

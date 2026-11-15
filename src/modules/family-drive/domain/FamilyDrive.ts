@@ -1,6 +1,5 @@
-/** Google Drive conectado a una familia: ahí se guardan las fotos de sus regalos. */
-export interface FamilyDrive {
-  familyId: string;
+/** Estado de un Google Drive conectado (sin secretos). */
+export interface DriveConnection {
   /** Cuenta de Google conectada. Solo la ve quien administra (null para los demás). */
   googleEmail: string | null;
   /** Google rechazó el acceso (lo quitaron desde la cuenta): hay que volver a conectar. */
@@ -8,25 +7,39 @@ export interface FamilyDrive {
   connectedAt: Date;
 }
 
+/** Google Drive propio de una familia: reemplaza al general para esa familia. */
+export interface FamilyDrive extends DriveConnection {
+  familyId: string;
+}
+
+/** Dónde conectar: el Drive general de la celebración o el de una familia. */
+export type DriveTarget = { eventId: string } | { familyId: string };
+
 export interface IFamilyDriveRepository {
   listForEvent(eventId: string): Promise<FamilyDrive[]>;
+  /** Drive general de la celebración (para todas las familias), si hay. */
+  getEventDrive(eventId: string): Promise<DriveConnection | null>;
   /** Enlace de Google para conectar la cuenta (organizador/administradores). */
-  getConnectUrl(familyId: string): Promise<string>;
-  disconnect(familyId: string): Promise<void>;
+  getConnectUrl(target: DriveTarget): Promise<string>;
+  disconnect(target: DriveTarget): Promise<void>;
 }
 
 /**
  * ¿Puede esta persona subir fotos?
- *  · ready      → su familia tiene Drive conectado
- *  · no-family  → no pertenece a ninguna familia
- *  · no-drive   → su familia todavía no conecta un Drive
- *  · reconnect  → el Drive de su familia perdió el acceso
+ *  · ready      → hay un Drive que funciona (el de su familia o, si no, el general)
+ *  · no-drive   → no hay ningún Drive conectado para ella
+ *  · reconnect  → hay Drive, pero perdió el acceso y no hay otro que lo reemplace
  */
-export type PhotoUploadStatus = 'ready' | 'no-family' | 'no-drive' | 'reconnect';
+export type PhotoUploadStatus = 'ready' | 'no-drive' | 'reconnect';
 
-export function photoUploadStatus(familyId: string | null | undefined, drives: readonly FamilyDrive[]): PhotoUploadStatus {
-  if (!familyId) return 'no-family';
-  const drive = drives.find((d) => d.familyId === familyId);
-  if (!drive) return 'no-drive';
-  return drive.needsReconnect ? 'reconnect' : 'ready';
+/** Igual que la Edge Function: primero el Drive de la familia, si no, el general. */
+export function photoUploadStatus(
+  familyId: string | null | undefined,
+  familyDrives: readonly FamilyDrive[],
+  eventDrive: DriveConnection | null | undefined,
+): PhotoUploadStatus {
+  const own = familyId ? familyDrives.find((d) => d.familyId === familyId) : undefined;
+  if (own && !own.needsReconnect) return 'ready';
+  if (eventDrive && !eventDrive.needsReconnect) return 'ready';
+  return own || eventDrive ? 'reconnect' : 'no-drive';
 }

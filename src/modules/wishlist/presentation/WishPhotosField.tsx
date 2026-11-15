@@ -17,9 +17,8 @@ interface Props {
 }
 
 const BLOCKED: Record<Exclude<PhotoUploadStatus, 'ready'>, string> = {
-  'no-family': 'Para subir fotos, esta persona debe pertenecer a una familia. Pide a quien organiza que la agregue a una.',
-  'no-drive': 'Para subir fotos, quien organiza debe conectar el Google Drive de tu familia (en Organizar).',
-  reconnect: 'El Google Drive de tu familia perdió el acceso. Pide a quien organiza que lo vuelva a conectar para subir fotos.',
+  'no-drive': 'Para subir fotos, quien organiza debe conectar un Google Drive (en Organizar).',
+  reconnect: 'El Google Drive donde se guardan las fotos perdió el acceso. Pide a quien organiza que lo vuelva a conectar.',
 };
 
 /** En celulares y tablets se ofrece la cámara directamente; en la computadora, solo elegir archivos. */

@@ -1,4 +1,4 @@
-import type { IFamilyDriveRepository } from '../domain/FamilyDrive';
+import type { DriveTarget, IFamilyDriveRepository } from '../domain/FamilyDrive';
 
 export class FamilyDriveService {
   constructor(private readonly drives: IFamilyDriveRepository) {}
@@ -7,11 +7,15 @@ export class FamilyDriveService {
     return this.drives.listForEvent(eventId);
   }
 
-  getConnectUrl(familyId: string) {
-    return this.drives.getConnectUrl(familyId);
+  getEventDrive(eventId: string) {
+    return this.drives.getEventDrive(eventId);
   }
 
-  disconnect(familyId: string) {
-    return this.drives.disconnect(familyId);
+  getConnectUrl(target: DriveTarget) {
+    return this.drives.getConnectUrl(target);
+  }
+
+  disconnect(target: DriveTarget) {
+    return this.drives.disconnect(target);
   }
 }

@@ -1,17 +1,28 @@
 import { describe, expect, it } from 'vitest';
-import { photoUploadStatus, type FamilyDrive } from './FamilyDrive';
+import { photoUploadStatus, type DriveConnection, type FamilyDrive } from './FamilyDrive';
 
-const drive = (familyId: string, needsReconnect = false): FamilyDrive => ({ familyId, googleEmail: null, needsReconnect, connectedAt: new Date() });
+const conn = (needsReconnect = false): DriveConnection => ({ googleEmail: null, needsReconnect, connectedAt: new Date() });
+const family = (familyId: string, needsReconnect = false): FamilyDrive => ({ familyId, ...conn(needsReconnect) });
 
 describe('photoUploadStatus', () => {
-  it('sin familia no se puede subir', () => {
-    expect(photoUploadStatus(null, [drive('a')])).toBe('no-family');
+  it('sin ningún Drive no se puede subir', () => {
+    expect(photoUploadStatus('a', [], null)).toBe('no-drive');
+    expect(photoUploadStatus(null, [family('a')], null)).toBe('no-drive');
   });
-  it('depende del Drive de SU familia', () => {
-    expect(photoUploadStatus('b', [drive('a')])).toBe('no-drive');
-    expect(photoUploadStatus('a', [drive('a')])).toBe('ready');
+
+  it('usa el Drive de su familia', () => {
+    expect(photoUploadStatus('a', [family('a')], null)).toBe('ready');
+    expect(photoUploadStatus('b', [family('a')], null)).toBe('no-drive');
   });
-  it('si Google quitó el acceso, hay que volver a conectar', () => {
-    expect(photoUploadStatus('a', [drive('a', true)])).toBe('reconnect');
+
+  it('con el Drive general pueden subir todos, incluso quien no tiene familia', () => {
+    expect(photoUploadStatus('b', [family('a')], conn())).toBe('ready');
+    expect(photoUploadStatus(null, [], conn())).toBe('ready');
+  });
+
+  it('si el de su familia perdió el acceso, usa el general; si no hay otro, hay que volver a conectar', () => {
+    expect(photoUploadStatus('a', [family('a', true)], conn())).toBe('ready');
+    expect(photoUploadStatus('a', [family('a', true)], null)).toBe('reconnect');
+    expect(photoUploadStatus(null, [], conn(true))).toBe('reconnect');
   });
 });

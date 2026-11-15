@@ -3,7 +3,8 @@
 import { HttpError } from '../_shared/http.ts';
 
 export interface OAuthState {
-  familyId: string;
+  /** null = Drive general de la celebración. */
+  familyId: string | null;
   eventId: string;
   userId: string;
   /** Origen de la app a donde volver (ya validado contra APP_ORIGINS). */
