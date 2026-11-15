@@ -82,25 +82,33 @@ export function ProfilePage() {
         <CardTitle icon={<Type className="size-6" />} tone="night">
           Tamaño de la letra
         </CardTitle>
-        <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Tamaño de la letra">
+        <p className="text-base text-ink-700">Si ya agrandaste la letra en tu celular y aquí se ve muy grande, elige «Compacta».</p>
+        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Tamaño de la letra">
           {(
             [
-              ['normal', 'Normal'],
-              ['large', 'Grande'],
+              ['compact', 'Compacta', 'text-sm'],
+              ['normal', 'Normal', 'text-base'],
+              ['large', 'Grande', 'text-xl'],
             ] as const
-          ).map(([value, label]) => (
+          ).map(([value, label, size]) => (
             <button
               key={value}
               type="button"
               role="radio"
               aria-checked={textSize === value}
               onClick={() => chooseSize(value)}
-              className={`min-h-14 rounded-2xl border-2 font-extrabold transition-colors ${
+              className={`flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-2xl border-2 px-1 font-extrabold transition-colors ${
                 textSize === value ? 'border-brand bg-brand text-white' : 'border-mist-300 bg-white text-ink-900 hover:border-brand'
-              } ${value === 'large' ? 'text-xl' : 'text-base'}`}
+              }`}
             >
-              {textSize === value ? '✓ ' : ''}
-              {label}
+              {/* Muestra de cómo se ve cada tamaño */}
+              <span className={`${size} leading-none`} aria-hidden>
+                Aa
+              </span>
+              <span className="text-sm">
+                {textSize === value ? '✓ ' : ''}
+                {label}
+              </span>
             </button>
           ))}
         </div>

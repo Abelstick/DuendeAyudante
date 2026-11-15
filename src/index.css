@@ -97,11 +97,16 @@
   --color-brand-accent: var(--brand-accent);
 }
 
-/* Tamaño de letra base cómodo (18 px) y opción "Letra grande" (21 px). */
+/* Tamaño de letra base cómodo (18 px), "Compacta" (16 px, para quien ya agrandó la letra
+   en el sistema de su celular) y "Grande" (21 px). Todo se mide en rem, así que la
+   interfaz entera se ajusta junto con la letra. */
 html {
   font-size: 112.5%;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+}
+html[data-text-size='compact'] {
+  font-size: 100%;
 }
 html[data-text-size='large'] {
   font-size: 131.25%;

@@ -1,10 +1,18 @@
-export type TextSize = 'normal' | 'large';
+/**
+ * Tamaño de la letra de la app (se suma al del sistema del celular):
+ *  · compact → 16 px, para quien ya agrandó la letra en su teléfono
+ *  · normal  → 18 px (la de siempre)
+ *  · large   → 21 px
+ */
+export type TextSize = 'compact' | 'normal' | 'large';
 
 const KEY = 'nf-text-size';
+const SIZES: readonly TextSize[] = ['compact', 'normal', 'large'];
 
 export function getTextSize(): TextSize {
   try {
-    return localStorage.getItem(KEY) === 'large' ? 'large' : 'normal';
+    const stored = localStorage.getItem(KEY);
+    return SIZES.includes(stored as TextSize) ? (stored as TextSize) : 'normal';
   } catch {
     return 'normal';
   }
