@@ -19,7 +19,7 @@ export function SegmentedTabs<T extends string>({ label, value, options, onChang
     <div
       role="tablist"
       aria-label={label}
-      className="grid gap-1.5 rounded-2xl border-[3px] border-night-900 bg-night-800 p-1.5 shadow-block"
+      className="grid gap-1.5 rounded-2xl border-2 border-night-900 bg-night-800 p-1.5 shadow-block"
       style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
     >
       {options.map((o) => {
@@ -31,7 +31,7 @@ export function SegmentedTabs<T extends string>({ label, value, options, onChang
             role="tab"
             aria-selected={active}
             onClick={() => onChange(o.value)}
-            className={`font-display flex min-h-13 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-sm font-semibold leading-tight transition-colors sm:flex-row sm:gap-2 sm:text-base ${
+            className={`font-display flex min-h-13 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-sm font-bold leading-tight transition-colors sm:flex-row sm:gap-2 sm:text-base ${
               active ? 'animate-hop bg-gold-400 text-night-900' : 'text-white hover:bg-white/15'
             }`}
           >
@@ -46,7 +46,7 @@ export function SegmentedTabs<T extends string>({ label, value, options, onChang
 
 /** Estilo de las opciones tipo "ficha" (elegir persona, filtro, etc.). */
 export function chipClasses(active: boolean) {
-  return `btn-3d font-display min-h-12 rounded-xl border-2 border-night-900 px-4 text-base font-semibold ${
+  return `btn-3d font-display min-h-12 rounded-xl border-2 border-night-900 px-4 text-base font-bold ${
     active ? 'bg-brand text-white' : 'bg-white text-night-900 hover:bg-brand-soft'
   }`;
 }

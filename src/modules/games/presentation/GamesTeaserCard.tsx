@@ -10,7 +10,7 @@ export function GamesTeaserCard() {
   if (poll.data?.status !== 'open') return null;
 
   return (
-    <section className="sky-bg snow-bg animate-pop-in flex flex-col gap-3 rounded-2xl border-[3px] border-night-900 p-5 text-white shadow-block sm:flex-row sm:items-center" aria-labelledby="poll-open-title">
+    <section className="sky-bg snow-bg animate-pop-in flex flex-col gap-3 rounded-2xl border-2 border-night-900 p-5 text-white shadow-block sm:flex-row sm:items-center" aria-labelledby="poll-open-title">
       <div className="flex flex-1 items-center gap-3">
         <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-night-900 bg-gold-400 text-night-900 motion-safe:animate-float" aria-hidden>
           <Vote className="size-7" />

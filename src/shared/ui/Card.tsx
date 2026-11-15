@@ -21,7 +21,7 @@ export function IconBubble({ children, tone = 'brand', size = 'md' }: { children
 
 export function Card({ className = '', children, ...rest }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={`animate-pop-in rounded-2xl border-[3px] border-night-900 bg-white p-5 shadow-block ${className}`} {...rest}>
+    <div className={`animate-pop-in rounded-xl border-2 border-night-900 bg-white p-5 shadow-block ${className}`} {...rest}>
       {children}
     </div>
   );
@@ -32,7 +32,7 @@ export function CardTitle({ icon, tone = 'brand', children, action }: { icon?: R
   return (
     <div className="flex items-center gap-3">
       {icon && <IconBubble tone={tone}>{icon}</IconBubble>}
-      <h2 className="min-w-0 flex-1 text-[1.35rem] font-semibold leading-tight text-night-900">{children}</h2>
+      <h2 className="min-w-0 flex-1 text-[1.4rem] font-extrabold leading-tight text-night-900">{children}</h2>
       {action && <span className="shrink-0">{action}</span>}
     </div>
   );
@@ -47,24 +47,24 @@ export function PageTitle({ icon, title, subtitle, tone = 'brand' }: { icon?: Re
         </IconBubble>
       )}
       <div className="min-w-0">
-        <h1 className="text-[1.7rem] font-bold leading-tight text-night-900 sm:text-3xl">{title}</h1>
-        {subtitle && <p className="text-base text-ink-700">{subtitle}</p>}
+        <h1 className="text-[2rem] font-extrabold leading-none text-night-900 sm:text-4xl">{title}</h1>
+        {subtitle && <p className="mt-1 text-base text-ink-700">{subtitle}</p>}
       </div>
     </header>
   );
 }
 
 export function SectionTitle({ children }: { children: ReactNode }) {
-  return <h2 className="mb-3 text-[1.35rem] font-semibold text-night-900">{children}</h2>;
+  return <h2 className="mb-3 text-[1.4rem] font-extrabold text-night-900">{children}</h2>;
 }
 
 export function EmptyState({ emoji, title, children }: { emoji: string; title: string; children?: ReactNode }) {
   return (
-    <div className="rounded-2xl border-[3px] border-dashed border-night-900/40 bg-white p-6 text-center">
-      <div className="mx-auto flex size-20 items-center justify-center rounded-2xl border-[3px] border-night-900 bg-sky-100 text-5xl shadow-block motion-safe:animate-float" aria-hidden>
+    <div className="rounded-2xl border-2 border-dashed border-night-900/40 bg-white p-6 text-center">
+      <div className="mx-auto flex size-20 items-center justify-center rounded-2xl border-2 border-night-900 bg-sky-100 text-5xl shadow-block motion-safe:animate-float" aria-hidden>
         {emoji}
       </div>
-      <p className="font-display mt-4 text-xl font-semibold text-night-900">{title}</p>
+      <p className="font-display mt-4 text-xl font-extrabold text-night-900">{title}</p>
       {children && <div className="mt-2 text-ink-700">{children}</div>}
     </div>
   );

@@ -28,7 +28,7 @@ export function NowNextCard() {
   return (
     <Link
       to={`/e/${event.id}/celebracion?vista=cronograma`}
-      className="tap-card flex items-center gap-3 rounded-2xl border-[3px] border-night-900 bg-sky-100 p-4 shadow-block active:shadow-none"
+      className="tap-card flex items-center gap-3 rounded-2xl border-2 border-night-900 bg-sky-100 p-4 shadow-block active:shadow-none"
       aria-label="Ver el cronograma completo"
     >
       <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-night-900 bg-night-700 text-gold-300" aria-hidden>

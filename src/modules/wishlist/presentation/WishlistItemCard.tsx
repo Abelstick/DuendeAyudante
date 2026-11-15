@@ -29,7 +29,7 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
   const [confirming, setConfirming] = useState(false);
 
   return (
-    <article className="group animate-pop-in space-y-3 rounded-2xl border-[3px] border-night-900 bg-white p-5 shadow-block">
+    <article className="group animate-pop-in space-y-3 rounded-2xl border-2 border-night-900 bg-white p-5 shadow-block">
       <div className="flex items-center gap-3">
         <span className="flex size-16 shrink-0 items-center justify-center rounded-xl border-2 border-night-900 bg-sky-100">
           <GiftBox tone={priorityGift[item.priority]} className="w-10 motion-safe:group-hover:animate-float" />

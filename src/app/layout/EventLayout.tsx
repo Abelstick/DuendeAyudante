@@ -8,7 +8,7 @@ import { useFamilies } from '@/modules/families/presentation/hooks';
 import { ButtonLink } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
-import { PixelTree } from '@/shared/ui/illustrations';
+import { Tree } from '@/shared/ui/illustrations';
 import { FullPageSpinner } from './FullPageSpinner';
 
 interface EventScope {
@@ -89,10 +89,10 @@ export function EventLayout() {
     <EventScopeContext.Provider value={{ event: event.data, context: context.data }}>
       <div className={`min-h-dvh pb-[calc(6.5rem+env(safe-area-inset-bottom))] transition-[padding] duration-200 md:pb-0 ${collapsed ? 'md:pl-24' : 'md:pl-64'}`}>
         {/* Encabezado móvil: nombre de la Navidad + acceso a Organizar (solo quien administra) */}
-        <header className="sky-bg snow-bg snow-cap flex items-center justify-between gap-2 border-b-[3px] border-night-900 px-4 pb-6 pt-[calc(0.75rem+env(safe-area-inset-top))] text-white md:hidden">
+        <header className="sky-bg snow-bg snow-cap flex items-center justify-between gap-2 px-4 pb-6 pt-[calc(0.75rem+env(safe-area-inset-top))] text-white md:hidden">
           <Link to={base} className="flex min-h-12 min-w-0 items-center gap-2.5 rounded-xl">
-            <PixelTree className="h-10 w-auto shrink-0" />
-            <span className="font-display line-clamp-2 min-w-0 text-lg font-semibold leading-tight">{event.data.name}</span>
+            <Tree className="h-10 w-auto shrink-0" />
+            <span className="font-display line-clamp-2 min-w-0 text-lg font-extrabold leading-tight">{event.data.name}</span>
           </Link>
           {isManager && (
             <Link
@@ -108,17 +108,17 @@ export function EventLayout() {
         {/* Navegación lateral en escritorio: se puede plegar (sigue mostrando icono + texto) */}
         <nav
           aria-label="Menú principal"
-          className={`sky-bg snow-bg fixed inset-y-0 left-0 z-30 hidden flex-col gap-2 border-r-[3px] border-night-900 text-white transition-[width] duration-200 md:flex ${
+          className={`sky-bg snow-bg fixed inset-y-0 left-0 z-30 hidden flex-col gap-2 border-r-2 border-night-900 text-white transition-[width] duration-200 md:flex ${
             collapsed ? 'w-24 p-2' : 'w-64 p-4'
           }`}
         >
           {collapsed ? (
             <p className="mb-4 mt-2 flex justify-center" title={event.data.name} aria-hidden>
-              <PixelTree className="h-12 w-auto" />
+              <Tree className="h-12 w-auto" />
             </p>
           ) : (
-            <p className="font-display mb-4 mt-2 flex items-center gap-3 px-2 text-xl font-semibold leading-tight">
-              <PixelTree className="h-12 w-auto shrink-0" />
+            <p className="font-display mb-4 mt-2 flex items-center gap-3 px-2 text-xl font-extrabold leading-tight">
+              <Tree className="h-12 w-auto shrink-0" />
               <span className="min-w-0">{event.data.name}</span>
             </p>
           )}
@@ -128,7 +128,7 @@ export function EventLayout() {
               to={to}
               end={end}
               className={({ isActive }) =>
-                `font-display flex rounded-xl border-2 font-semibold transition-colors ${
+                `font-display flex rounded-[10px] border-2 font-bold transition-colors ${
                   collapsed ? 'min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs' : 'min-h-13 items-center gap-3 px-4 text-lg'
                 } ${isActive ? 'border-night-900 bg-gold-400 text-night-900 shadow-[0_4px_0_0_#000]' : 'border-transparent text-white hover:bg-white/15'}`
               }
@@ -158,7 +158,7 @@ export function EventLayout() {
         {/* Barra inferior en móvil: icono + texto siempre visibles */}
         <nav
           aria-label="Menú principal"
-          className="fixed inset-x-0 bottom-0 z-40 border-t-[3px] border-night-900 bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-night-900 bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
         >
           <ul className="mx-auto grid max-w-2xl px-1" style={{ gridTemplateColumns: `repeat(${mobileItems.length}, minmax(0, 1fr))` }}>
             {mobileItems.map(({ to, label, icon: Icon, end }) => (
@@ -168,7 +168,7 @@ export function EventLayout() {
                   end={end}
                   className={({ isActive }) =>
                     `group font-display flex min-h-[4.5rem] flex-col items-center justify-center gap-1 px-0.5 text-center text-xs leading-tight ${
-                      isActive ? 'font-semibold text-night-900' : 'font-medium text-ink-700'
+                      isActive ? 'font-extrabold text-night-900' : 'font-semibold text-ink-700'
                     }`
                   }
                 >

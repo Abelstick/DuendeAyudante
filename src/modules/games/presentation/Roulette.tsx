@@ -88,7 +88,7 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
   if (games.length === 0) return null;
 
   return (
-    <section aria-labelledby="roulette-title" className="sky-bg snow-bg relative space-y-4 overflow-hidden rounded-2xl border-[3px] border-night-900 p-5 text-white shadow-lift">
+    <section aria-labelledby="roulette-title" className="sky-bg snow-bg relative space-y-4 overflow-hidden rounded-2xl border-2 border-night-900 p-5 text-white shadow-lift">
       <div className="flex items-center gap-4">
         {/* Ruleta (decorativa: el resultado siempre aparece escrito) */}
         <div className="relative size-28 shrink-0" aria-hidden>
@@ -116,7 +116,7 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
       </div>
 
       {display && (
-        <div className={`rounded-xl border-[3px] bg-white p-4 text-center text-ink-900 ${spinning ? 'border-white' : 'animate-pop-in border-gold-400'}`} aria-live={spinning ? 'off' : 'polite'}>
+        <div className={`rounded-xl border-2 bg-white p-4 text-center text-ink-900 ${spinning ? 'border-white' : 'animate-pop-in border-gold-400'}`} aria-live={spinning ? 'off' : 'polite'}>
           <p className="text-sm font-bold uppercase tracking-wide text-ink-500">{spinning ? 'Eligiendo…' : '¡Les toca jugar!'}</p>
           <p className={`font-display text-2xl font-semibold leading-tight ${spinning ? 'text-ink-500' : 'text-night-900'}`}>
             {!spinning && <span aria-hidden>🎉 </span>}

@@ -75,7 +75,7 @@ export function ResponsibilitiesSection() {
       )}
 
       {/* Filtros: siempre visibles, sin menús escondidos */}
-      <section aria-label="Filtros" className="space-y-3 rounded-2xl border-[3px] border-night-900 bg-white p-4 shadow-block">
+      <section aria-label="Filtros" className="space-y-3 rounded-2xl border-2 border-night-900 bg-white p-4 shadow-block">
         <div className="flex flex-wrap gap-2" role="group" aria-label="Qué mostrar">
           {(
             [

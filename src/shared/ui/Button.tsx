@@ -5,7 +5,7 @@ type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'whatsapp' | 'gold
 type Size = 'md' | 'lg';
 
 const base =
-  'font-display [&>svg]:shrink-0 inline-flex items-center justify-center gap-2 rounded-xl font-semibold tracking-wide select-none text-center disabled:opacity-55 disabled:cursor-not-allowed';
+  'font-display [&>svg]:shrink-0 inline-flex items-center justify-center gap-2 rounded-[10px] font-bold select-none text-center disabled:opacity-55 disabled:cursor-not-allowed';
 
 /**
  * Jerarquía de acciones:
@@ -68,7 +68,7 @@ export function ButtonLink({ variant, size, icon, children, className = '', ...r
 export function Spinner({ label }: { label?: string }) {
   return (
     <span role="status" className="inline-flex items-center gap-2">
-      <span className="size-5 animate-spin rounded-full border-[3px] border-current border-t-transparent" aria-hidden />
+      <span className="size-5 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden />
       {label ? <span>{label}</span> : <span className="sr-only">Cargando</span>}
     </span>
   );

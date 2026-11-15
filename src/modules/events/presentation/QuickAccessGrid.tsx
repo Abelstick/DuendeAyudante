@@ -80,7 +80,7 @@ export function QuickAccessGrid() {
           <li key={to}>
             <Link
               to={to}
-              className={`tap-card select-ring relative flex h-full min-h-32 flex-col justify-between gap-2 overflow-hidden rounded-2xl border-[3px] border-night-900 p-3.5 shadow-block active:shadow-none ${style}`}
+              className={`tap-card select-ring relative flex h-full min-h-32 flex-col justify-between gap-2 overflow-hidden rounded-2xl border-2 border-night-900 p-3.5 shadow-block active:shadow-none ${style}`}
             >
               {/* franja de brillo, como la carátula de un juego */}
               <span className="pointer-events-none absolute inset-x-0 top-0 h-2 bg-white/25" aria-hidden />

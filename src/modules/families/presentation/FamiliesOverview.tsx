@@ -32,8 +32,8 @@ export function FamiliesOverview() {
         );
         const isMine = context.me?.familyId === f.id;
         return (
-          <article key={f.id} className={`overflow-hidden rounded-2xl border-[3px] border-night-900 bg-white ${isMine ? 'shadow-[0_5px_0_0_var(--color-gold-400)]' : 'shadow-block'}`}>
-            <header className="snow-bg border-b-[3px] border-night-900 px-4 py-3 text-white" style={{ backgroundColor: FAMILY_THEMES[f.color].strong }}>
+          <article key={f.id} className={`overflow-hidden rounded-2xl border-2 border-night-900 bg-white ${isMine ? 'shadow-[0_5px_0_0_var(--color-gold-400)]' : 'shadow-block'}`}>
+            <header className="snow-bg border-b-2 border-night-900 px-4 py-3 text-white" style={{ backgroundColor: FAMILY_THEMES[f.color].strong }}>
               <h3 className="text-xl font-black">Familia {f.name}</h3>
               <p className="flex flex-wrap items-center gap-2 text-sm font-semibold">
                 Color: {color.label}

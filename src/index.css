@@ -1,22 +1,22 @@
 @import 'tailwindcss';
 
 /* ==========================================================================
-   SISTEMA DE DISEÑO · Navidad en Familia — "plataformas navideño"
+   SISTEMA DE DISEÑO · Navidad en Familia — "plataformas moderno"
    --------------------------------------------------------------------------
-   Lenguaje visual (inspirado en consolas de juegos familiares, con identidad propia):
-     · Colores PLANOS, sin degradados suaves.
-     · Contorno de tinta (azul noche) en lo importante.
-     · Sombras DURAS hacia abajo: todo parece un bloque que se puede presionar.
-     · Pixel art propio (árbol, regalo, estrella, muñeco) y nieve que cae.
-     · Movimiento de videojuego: saltitos, rebotes y bloques que "se golpean".
+   Lenguaje visual (videojuego familiar actual, con identidad propia):
+     · Ilustración VECTORIAL suave: colinas redondas, pinos, luna. Sin píxeles.
+     · Colores planos y tipografía de titulares grande y muy gruesa.
+     · Rótulos pequeños en MAYÚSCULAS espaciadas ("eyebrow") sobre cada bloque.
+     · Bordes finos de tinta y sombra dura hacia abajo: todo se puede presionar.
+     · Movimiento de juego: saltitos, rebotes, nieve que cae.
    Roles de color
      · brand → color de la familia (verde pino por defecto): acción principal y selección.
      · berry → rojo navideño: regalos, "ahora", acciones de riesgo.
-     · gold  → bloques premio, momentos especiales, avisos importantes.
-     · night → tinta/contornos y barra de navegación.
-     · sky   → cielo del banner y anillo de selección.
+     · gold  → premios, momentos especiales, avisos importantes.
+     · night → tinta/contornos, navegación y cielo nocturno.
+     · sky   → información y anillo de selección.
      · mist  → fondos y bordes neutros.  · ink → textos.
-   Radios: 12 px (campos, botones) · 16 px (tarjetas). Bordes: 2–3 px.
+   Radios: 10–12 px (campos, botones, tarjetas). Bordes: 2 px.
    Espaciado: múltiplos de 4 px; 16 px de margen lateral; 20 px entre tarjetas.
    ========================================================================== */
 
@@ -64,24 +64,19 @@
   --color-ink-500: #667085;
 
   --font-sans: 'Nunito', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-display: 'Fredoka', 'Nunito', 'Segoe UI', system-ui, sans-serif;
-  /* Solo para números y rótulos cortos decorativos (nunca para párrafos) */
-  --font-pixel: 'Press Start 2P', 'Fredoka', monospace;
-
+  --font-display: 'Bricolage Grotesque', 'Nunito', 'Segoe UI', system-ui, sans-serif;
   /* Sombras duras: el objeto parece un bloque con grosor */
   --shadow-card: 0 4px 0 0 var(--color-mist-300);
-  --shadow-block: 0 5px 0 0 var(--color-night-900);
-  --shadow-lift: 0 7px 0 0 var(--color-night-900);
+  --shadow-block: 0 4px 0 0 var(--color-night-900);
+  --shadow-lift: 0 6px 0 0 var(--color-night-900);
 
   --animate-pop-in: pop-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
   --animate-rise: rise 0.35s ease-out both;
-  --animate-twinkle: twinkle 1.6s steps(2, jump-none) infinite;
+  --animate-twinkle: twinkle 2.8s ease-in-out infinite;
   --animate-float: bob 1.8s ease-in-out infinite;
   --animate-wiggle: wiggle 0.5s ease-in-out;
   --animate-tick: bump 0.35s ease-out;
   --animate-hop: hop 0.45s ease-out;
-  --animate-spin-coin: spin-coin 1.4s linear infinite;
-  --animate-drift: drift 38s linear infinite;
 }
 
 /* Identidad de color de la familia: EventLayout cambia estas variables
@@ -131,7 +126,7 @@ h3,
 legend,
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: 0.005em;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
@@ -159,123 +154,51 @@ summary,
    Piezas del lenguaje visual
    -------------------------------------------------------------------------- */
 
-/* Panel de navegación / momentos especiales: azul noche plano con nieve en píxeles */
+/* Rótulo pequeño en mayúsculas espaciadas, sobre títulos y bloques */
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Cielo nocturno plano (navegación, banners, momentos especiales) */
 .sky-bg {
   background-color: var(--color-night-800);
 }
+/* Estrellitas redondas, estáticas */
 .snow-bg {
   background-image:
-    linear-gradient(#fff, #fff), linear-gradient(#fff, #fff), linear-gradient(#fff, #fff), linear-gradient(#fff, #fff),
-    linear-gradient(#fff, #fff), linear-gradient(#fff, #fff);
-  background-repeat: no-repeat;
-  background-size:
-    4px 4px,
-    4px 4px,
-    3px 3px,
-    4px 4px,
-    3px 3px,
-    3px 3px;
-  background-position:
-    12% 28%,
-    78% 16%,
-    45% 72%,
-    92% 70%,
-    26% 86%,
-    60% 38%;
+    radial-gradient(circle at 12% 28%, rgb(255 255 255 / 0.55) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 78% 16%, rgb(255 255 255 / 0.45) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 45% 72%, rgb(255 255 255 / 0.35) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 92% 70%, rgb(255 255 255 / 0.5) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 26% 86%, rgb(255 255 255 / 0.3) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 60% 38%, rgb(255 255 255 / 0.4) 0 1px, transparent 1.6px);
 }
 
-/* Cielo de día del banner (nivel nevado) */
-.day-sky {
-  background-color: var(--color-sky-500);
-}
-
-/* Nieve acumulada en el borde inferior, con "goteras" cuadradas */
+/* Borde inferior ondulado, como nieve acumulada */
 .snow-cap {
   position: relative;
 }
 .snow-cap::after {
   content: '';
   position: absolute;
-  inset: auto 0 0 0;
-  height: 14px;
-  background:
-    linear-gradient(#fff, #fff) 0 100% / 100% 6px no-repeat,
-    repeating-linear-gradient(90deg, #fff 0 14px, transparent 14px 20px, #fff 20px 26px, transparent 26px 44px) 0 0 / 100% 8px no-repeat;
+  inset: auto 0 -1px 0;
+  height: 12px;
+  background: var(--brand-page);
+  -webkit-mask: radial-gradient(12px 12px at 12px 12px, #000 98%, transparent) -12px 0 / 24px 100% repeat-x;
+  mask: radial-gradient(12px 12px at 12px 12px, #000 98%, transparent) -12px 0 / 24px 100% repeat-x;
   pointer-events: none;
 }
 
-/* Nieve acumulada en el borde superior (sobre el suelo del nivel) */
-.snow-top {
-  position: relative;
-}
-.snow-top::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 14px;
-  background:
-    linear-gradient(#fff, #fff) 0 0 / 100% 6px no-repeat,
-    repeating-linear-gradient(90deg, #fff 0 14px, transparent 14px 20px, #fff 20px 26px, transparent 26px 44px) 0 6px / 100% 8px no-repeat;
-  pointer-events: none;
-}
-
-/* Suelo del nivel: bloques de galleta con nieve encima */
-.ground-blocks {
-  background-color: #c9783a;
-  background-image:
-    linear-gradient(var(--color-night-900) 3px, transparent 3px), linear-gradient(90deg, var(--color-night-900) 3px, transparent 3px),
-    linear-gradient(rgb(255 255 255 / 0.28) 3px, transparent 3px);
-  background-size:
-    28px 28px,
-    28px 28px,
-    28px 28px;
-  background-position:
-    0 0,
-    0 0,
-    0 3px;
-}
-
-/* Título sobre el cielo: blanco con contorno de tinta, como el rótulo de un juego */
-.text-outline {
-  color: #fff;
-  text-shadow:
-    2px 0 0 var(--color-night-900),
-    -2px 0 0 var(--color-night-900),
-    0 2px 0 var(--color-night-900),
-    0 -2px 0 var(--color-night-900),
-    2px 2px 0 var(--color-night-900),
-    -2px 2px 0 var(--color-night-900),
-    2px -2px 0 var(--color-night-900),
-    -2px -2px 0 var(--color-night-900),
-    0 5px 0 var(--color-night-900);
-}
-
-/* Bloque premio (cuenta regresiva): dorado, con remaches en las esquinas */
-.prize-block {
-  position: relative;
-  border: 3px solid var(--color-night-900);
+/* Ficha de la cuenta regresiva: bloque oscuro con números dorados */
+.count-tile {
+  border: 2px solid rgb(255 255 255 / 0.22);
   border-radius: 10px;
-  background-color: var(--color-gold-400);
-  background-image:
-    linear-gradient(var(--color-night-900), var(--color-night-900)), linear-gradient(var(--color-night-900), var(--color-night-900)),
-    linear-gradient(var(--color-night-900), var(--color-night-900)), linear-gradient(var(--color-night-900), var(--color-night-900)),
-    linear-gradient(var(--color-gold-300), var(--color-gold-300));
-  background-repeat: no-repeat;
-  background-size:
-    4px 4px,
-    4px 4px,
-    4px 4px,
-    4px 4px,
-    100% 5px;
-  background-position:
-    5px 5px,
-    calc(100% - 5px) 5px,
-    5px calc(100% - 5px),
-    calc(100% - 5px) calc(100% - 5px),
-    0 0;
-  box-shadow:
-    inset 0 -5px 0 0 rgb(138 100 16 / 0.55),
-    0 4px 0 0 var(--color-night-900);
+  background-color: var(--color-night-900);
+  box-shadow: 0 4px 0 0 rgb(0 0 0 / 0.45);
 }
 
 /* Botón con relieve: se hunde al presionarlo (feedback táctil visible) */
@@ -324,17 +247,13 @@ summary,
   animation: ring-pulse 1s ease-in-out infinite;
 }
 
-/* Sprites en pixel art: sin suavizado */
-.pixelated {
-  image-rendering: pixelated;
-  shape-rendering: crispEdges;
-}
-
-/* Copos de nieve cuadrados que caen dentro de un contenedor `relative overflow-hidden` */
+/* Copos de nieve redondos que caen dentro de un contenedor `relative overflow-hidden` */
 .snowflake {
   position: absolute;
   top: -8px;
+  border-radius: 9999px;
   background: #fff;
+  opacity: 0.9;
   animation: snowfall linear infinite;
   will-change: transform;
 }
@@ -359,13 +278,14 @@ summary,
   animation-delay: 240ms;
 }
 
-/* Confeti en píxeles: momentos especiales (completar todo, ganar, guardar un regalo) */
+/* Confeti: momentos especiales (completar todo, ganar, guardar un regalo) */
 .confetti-piece {
   position: absolute;
   top: 0;
   left: 50%;
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 14px;
+  border-radius: 3px;
   opacity: 0;
   animation: confetti 1.5s cubic-bezier(0.15, 0.7, 0.3, 1) forwards;
   animation-delay: var(--delay, 0ms);
@@ -416,10 +336,12 @@ dialog[open] > div {
 @keyframes twinkle {
   0%,
   100% {
-    opacity: 1;
+    opacity: 0.4;
+    transform: scale(0.85);
   }
   50% {
-    opacity: 0.25;
+    opacity: 1;
+    transform: scale(1.1);
   }
 }
 /* Flotar arriba y abajo, como un objeto por recoger */
@@ -469,23 +391,6 @@ dialog[open] > div {
   }
   100% {
     transform: none;
-  }
-}
-@keyframes spin-coin {
-  0%,
-  100% {
-    transform: scaleX(1);
-  }
-  50% {
-    transform: scaleX(0.15);
-  }
-}
-@keyframes drift {
-  from {
-    transform: translateX(-30%);
-  }
-  to {
-    transform: translateX(130%);
   }
 }
 @keyframes snowfall {

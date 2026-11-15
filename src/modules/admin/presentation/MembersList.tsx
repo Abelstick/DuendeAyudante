@@ -67,7 +67,7 @@ export function MembersList({ members, families, myRole }: Props) {
         const isOpen = panel?.memberId === m.id;
         const guardians = m.guardianIds.map((id) => byId.get(id)).filter((g): g is Member => Boolean(g));
         return (
-          <li key={m.id} className="space-y-3 rounded-2xl border-[3px] border-night-900 bg-white p-4 shadow-block">
+          <li key={m.id} className="space-y-3 rounded-2xl border-2 border-night-900 bg-white p-4 shadow-block">
             <div className="space-y-1">
               <p className="text-lg font-bold">{displayName(m)}</p>
               <div className="flex flex-wrap items-center gap-2">

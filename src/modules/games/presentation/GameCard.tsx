@@ -92,9 +92,9 @@ export function GameCard({ game, rank, votes = 0, percent = 0, showVotes, credit
   const medal = showVotes && rank !== undefined && rank <= 3 && votes > 0 ? ['🥇', '🥈', '🥉'][rank - 1] : null;
 
   return (
-    <article className={`group animate-pop-in overflow-hidden rounded-2xl border-[3px] border-night-900 bg-white ${selected || voting?.hasVoted ? 'shadow-[0_5px_0_0_var(--brand)]' : 'shadow-block'}`}>
+    <article className={`group animate-pop-in overflow-hidden rounded-2xl border-2 border-night-900 bg-white ${selected || voting?.hasVoted ? 'shadow-[0_5px_0_0_var(--brand)]' : 'shadow-block'}`}>
       {selecting && (
-        <label className="flex min-h-12 cursor-pointer items-center gap-3 border-b-[3px] border-night-900 bg-brand-soft px-4 font-bold text-brand">
+        <label className="flex min-h-12 cursor-pointer items-center gap-3 border-b-2 border-night-900 bg-brand-soft px-4 font-bold text-brand">
           <input type="checkbox" className="size-6 accent-brand" checked={selected} onChange={onToggleSelect} />
           Elegir para unir
         </label>
@@ -102,7 +102,7 @@ export function GameCard({ game, rank, votes = 0, percent = 0, showVotes, credit
 
       <div className="flex items-stretch">
         {/* Carátula: emoji de la categoría, como la caja de un videojuego */}
-        <div className={`relative flex w-20 shrink-0 items-center justify-center border-r-[3px] border-night-900 text-4xl ${CATEGORY_COVER[game.category]}`} aria-hidden>
+        <div className={`relative flex w-20 shrink-0 items-center justify-center border-r-2 border-night-900 text-4xl ${CATEGORY_COVER[game.category]}`} aria-hidden>
           <span className="motion-safe:group-hover:animate-wiggle">{cat.emoji}</span>
           {showVotes && rank !== undefined && (
             <span className="font-display absolute left-1.5 top-1.5 flex size-8 items-center justify-center rounded-lg border-2 border-night-900 bg-white text-base font-semibold text-night-900">

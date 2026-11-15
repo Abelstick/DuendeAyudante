@@ -65,7 +65,7 @@ export function ScheduleSection() {
                 return (
                   <li
                     key={item.id}
-                    className={`relative rounded-xl border-[3px] border-night-900 p-4 ${isNow ? 'bg-gold-100 shadow-[0_5px_0_0_var(--color-berry-600)]' : 'bg-white shadow-block'} ${muted ? 'opacity-70' : ''}`}
+                    className={`relative rounded-xl border-2 border-night-900 p-4 ${isNow ? 'bg-gold-100 shadow-[0_5px_0_0_var(--color-berry-600)]' : 'bg-white shadow-block'} ${muted ? 'opacity-70' : ''}`}
                     aria-current={isNow ? 'step' : undefined}
                   >
                     <span className={`absolute -left-[2.05rem] top-5 size-5 rounded-md border-2 border-night-900 ${isNow ? 'bg-berry-600' : item.status === 'done' ? 'bg-pine-600' : 'bg-night-600'}`} aria-hidden />
