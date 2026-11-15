@@ -27,3 +27,10 @@ describe('cuenta regresiva', () => {
     expect(countdownTo(new Date('2020-01-01'), new Date('2026-01-01')).isOver).toBe(true);
   });
 });
+
+describe('fecha límite', () => {
+  it('muestra el día correcto sin desfases de zona horaria', async () => {
+    const { formatDateOnly } = await import('./datetime');
+    expect(formatDateOnly('2026-12-23')).toBe('miércoles, 23 de diciembre');
+  });
+});

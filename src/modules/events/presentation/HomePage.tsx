@@ -11,6 +11,9 @@ import { Card, SectionTitle } from '@/shared/ui/Card';
 import { toTitleCase } from '@/shared/validation/names';
 import { canManageEvent } from '../domain/Event';
 import { ChecklistCard } from '@/modules/checklist/presentation/ChecklistCard';
+import { MyResponsibilitiesCard } from '@/modules/responsibilities/presentation/MyResponsibilitiesCard';
+import { GamesTeaserCard } from '@/modules/games/presentation/GamesTeaserCard';
+import { SecretFriendCard } from '@/modules/secret-friend/presentation/SecretFriendCard';
 import { Countdown } from './Countdown';
 
 export function HomePage() {
@@ -33,6 +36,12 @@ export function HomePage() {
       <Countdown target={event.celebrationAt} timezone={event.timezone} />
 
       <ChecklistCard />
+
+      <SecretFriendCard />
+
+      <MyResponsibilitiesCard />
+
+      <GamesTeaserCard />
 
       {/* Acción principal: registrar regalos */}
       <Card className="space-y-3">

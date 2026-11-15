@@ -12,9 +12,9 @@ participa sin aprender a usar una aplicación complicada.
 |---|---|
 | Análisis y arquitectura | ✅ [docs/](docs/README.md) |
 | **Primera entrega**: evento, familias, familiares con usuario y contraseña, acceso por WhatsApp, regalos con enlaces | ✅ Código y pruebas listos · ⏳ falta conectar a tu proyecto de Supabase |
-| Responsabilidades (ver y marcar) | ⏳ |
-| Juegos, votación y ruleta | ⏳ |
-| Amigo secreto | ⏳ |
+| Responsabilidades y aportes (sección Celebración) | ✅ |
+| Juegos, votación, unir juegos parecidos y ruleta | ✅ |
+| Amigo secreto (opcional: cada persona anota el suyo, en privado) | ✅ |
 | Checklist de preparación (automático + tareas del organizador) | ✅ |
 | Cronograma y anuncios | ⏳ |
 | Mascotas e ilustraciones por familia | ⏳ (la identidad de color por familia ya está) |

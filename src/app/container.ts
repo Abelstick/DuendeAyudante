@@ -9,9 +9,15 @@ import { EventService } from '@/modules/events/application/EventService';
 import { SupabaseEventRepository } from '@/modules/events/infrastructure/SupabaseEventRepository';
 import { FamilyService } from '@/modules/families/application/FamilyService';
 import { SupabaseFamilyRepository } from '@/modules/families/infrastructure/SupabaseFamilyRepository';
+import { GameService } from '@/modules/games/application/GameService';
+import { SupabaseGameRepository } from '@/modules/games/infrastructure/SupabaseGameRepository';
 import { MemberService } from '@/modules/members/application/MemberService';
 import { EdgeFunctionMemberAccountService } from '@/modules/members/infrastructure/EdgeFunctionMemberAccountService';
 import { SupabaseParticipantRepository } from '@/modules/members/infrastructure/SupabaseParticipantRepository';
+import { ResponsibilityService } from '@/modules/responsibilities/application/ResponsibilityService';
+import { SupabaseResponsibilityRepository } from '@/modules/responsibilities/infrastructure/SupabaseResponsibilityRepository';
+import { SecretFriendService } from '@/modules/secret-friend/application/SecretFriendService';
+import { SupabaseSecretFriendRepository } from '@/modules/secret-friend/infrastructure/SupabaseSecretFriendRepository';
 import { WishlistService } from '@/modules/wishlist/application/WishlistService';
 import { SupabaseWishlistRepository } from '@/modules/wishlist/infrastructure/SupabaseWishlistRepository';
 import type { IAuthService } from '@/shared/application/ports/IAuthService';
@@ -26,6 +32,9 @@ export interface Container {
   members: MemberService;
   wishlist: WishlistService;
   checklist: ChecklistService;
+  responsibilities: ResponsibilityService;
+  games: GameService;
+  secretFriend: SecretFriendService;
 }
 
 export function createContainer(): Container {
@@ -37,5 +46,8 @@ export function createContainer(): Container {
     members: new MemberService(new SupabaseParticipantRepository(supabase), new EdgeFunctionMemberAccountService(supabase)),
     wishlist: new WishlistService(new SupabaseWishlistRepository(supabase)),
     checklist: new ChecklistService(new SupabaseChecklistRepository(supabase)),
+    responsibilities: new ResponsibilityService(new SupabaseResponsibilityRepository(supabase)),
+    games: new GameService(new SupabaseGameRepository(supabase)),
+    secretFriend: new SecretFriendService(new SupabaseSecretFriendRepository(supabase)),
   };
 }

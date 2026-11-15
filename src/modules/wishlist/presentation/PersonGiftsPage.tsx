@@ -10,6 +10,7 @@ import { ButtonLink, Spinner } from '@/shared/ui/Button';
 import { EmptyState, Notice } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { toTitleCase } from '@/shared/validation/names';
+import { useMySecretFriends } from '@/modules/secret-friend/presentation/hooks';
 import { EditableWishlist } from './EditableWishlist';
 import { useEventWishlist } from './hooks';
 import { WishlistItemCard } from './WishlistItemCard';
@@ -19,6 +20,7 @@ export function PersonGiftsPage() {
   const { participantId = '' } = useParams();
   const { event, context } = useEventScope();
   const participants = useParticipants(event.id);
+  const secretNotes = useMySecretFriends(event.id);
   const families = useFamilies(event.id);
   const wishlist = useEventWishlist(event.id);
   const budget = event.giftExchange?.budgetMax ?? null;
@@ -41,6 +43,10 @@ export function PersonGiftsPage() {
         <h1 className="text-2xl font-bold text-brand">{displayName(person)}</h1>
         <FamilyBadge family={families.data?.find((f) => f.id === person.familyId)} showColorName />
       </header>
+
+      {secretNotes.data?.some((n) => n.receiverId === person.id) && (
+        <Notice tone="success">🎁 Anotaste que es tu amigo secreto. Solo tú ves este aviso. 🤫</Notice>
+      )}
 
       {canEdit ? (
         <EditableWishlist

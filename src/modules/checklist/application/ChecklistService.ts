@@ -12,6 +12,8 @@ export interface PersonalChecklistInput {
   progress: ChecklistProgress[];
   /** Cantidad de regalos por participante. */
   wishCount: (participantId: string) => number;
+  /** Responsabilidades que le tocan (a ella, su familia o sus hijos). */
+  responsibilities?: { total: number; done: number };
 }
 
 export interface PersonalChecklist {
@@ -66,7 +68,7 @@ export class ChecklistService {
    * Checklist personal: primero las tareas automáticas (se marcan solas según
    * lo que la persona hizo), luego las que creó el organizador para ella.
    */
-  static buildPersonal({ eventId, me, wards, items, progress, wishCount }: PersonalChecklistInput): PersonalChecklist {
+  static buildPersonal({ eventId, me, wards, items, progress, wishCount, responsibilities }: PersonalChecklistInput): PersonalChecklist {
     const giftsLink = `/e/${eventId}/regalos?agregar=1`;
     const entries: ChecklistEntry[] = [
       {
@@ -90,6 +92,19 @@ export class ChecklistService {
         linkLabel: 'Ir a regalos',
       })),
     ];
+
+    if (responsibilities && responsibilities.total > 0) {
+      entries.push({
+        key: 'auto:responsibilities',
+        title: `Cumple tus responsabilidades (${responsibilities.done} de ${responsibilities.total})`,
+        description: 'Se marca solo cuando todas tus responsabilidades están completadas.',
+        done: responsibilities.done === responsibilities.total,
+        kind: 'auto',
+        participantId: me.id,
+        link: `/e/${eventId}/celebracion`,
+        linkLabel: 'Ver mis responsabilidades',
+      });
+    }
 
     const doneSet = new Set(progress.map((p) => `${p.itemId}:${p.participantId}`));
     const mine = items.filter((i) => appliesTo(i, me)).sort((a, b) => a.sortOrder - b.sortOrder);

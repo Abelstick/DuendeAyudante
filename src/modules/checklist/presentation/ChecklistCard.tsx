@@ -2,6 +2,9 @@ import { Check, ChevronRight, ListChecks } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
+import { ResponsibilityService } from '@/modules/responsibilities/application/ResponsibilityService';
+import { useResponsibilities } from '@/modules/responsibilities/presentation/hooks';
+import { actingParticipants } from '@/modules/events/domain/Event';
 import { useEventWishlist } from '@/modules/wishlist/presentation/hooks';
 import { Spinner } from '@/shared/ui/Button';
 import { Card } from '@/shared/ui/Card';
@@ -17,11 +20,13 @@ export function ChecklistCard() {
   const items = useChecklistItems(event.id);
   const progress = useChecklistProgress(event.id);
   const wishlist = useEventWishlist(event.id);
+  const responsibilities = useResponsibilities(event.id);
   const { setDone } = useChecklistMutations(event.id);
   const toast = useToast();
 
   const checklist = useMemo(() => {
     if (!context.me || !items.data || !progress.data || !wishlist.data) return null;
+    const mine = ResponsibilityService.mine(responsibilities.data ?? [], actingParticipants(context));
     const counts = new Map<string, number>();
     for (const w of wishlist.data) counts.set(w.participantId, (counts.get(w.participantId) ?? 0) + 1);
     return ChecklistService.buildPersonal({
@@ -31,8 +36,9 @@ export function ChecklistCard() {
       items: items.data,
       progress: progress.data,
       wishCount: (id) => counts.get(id) ?? 0,
+      responsibilities: { total: mine.length, done: mine.filter((r) => r.status === 'done').length },
     });
-  }, [context.me, context.wards, event.id, items.data, progress.data, wishlist.data]);
+  }, [context, event.id, items.data, progress.data, wishlist.data, responsibilities.data]);
 
   if (!context.me) return null;
 

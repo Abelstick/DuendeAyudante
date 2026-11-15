@@ -1,6 +1,6 @@
-import { Gift, House, PanelLeftClose, PanelLeftOpen, Settings, UserRound } from 'lucide-react';
+import { Dices, Gift, House, PanelLeftClose, PanelLeftOpen, PartyPopper, Settings, UserRound } from 'lucide-react';
 import { createContext, useContext, useState } from 'react';
-import { NavLink, Outlet, useParams } from 'react-router-dom';
+import { Link, NavLink, Outlet, useParams } from 'react-router-dom';
 import { canManageEvent, type ChristmasEvent, type EventContext } from '@/modules/events/domain/Event';
 import { useEvent, useEventContext } from '@/modules/events/presentation/hooks';
 import { useFamilyTheme } from '@/modules/families/presentation/familyTheme';
@@ -74,15 +74,29 @@ export function EventLayout() {
   const items = [
     { to: base, label: 'Inicio', icon: House, end: true },
     { to: `${base}/regalos`, label: 'Regalos', icon: Gift, end: false },
+    { to: `${base}/juegos`, label: 'Juegos', icon: Dices, end: false },
+    { to: `${base}/celebracion`, label: 'Celebración', icon: PartyPopper, end: false },
     ...(isManager ? [{ to: `${base}/organizar`, label: 'Organizar', icon: Settings, end: false }] : []),
     { to: `${base}/perfil`, label: 'Perfil', icon: UserRound, end: false },
   ];
 
+  // En el celular, "Organizar" va en el encabezado para no saturar la barra inferior
+  const mobileItems = items.filter((i) => !i.to.endsWith('/organizar'));
+
   return (
     <EventScopeContext.Provider value={{ event: event.data, context: context.data }}>
       <div className={`min-h-dvh pb-28 transition-[padding] duration-200 md:pb-0 ${collapsed ? 'md:pl-24' : 'md:pl-60'}`}>
-        <header className="snow-bg bg-brand px-4 py-4 text-white md:hidden">
-          <p className="truncate text-lg font-bold">🎄 {event.data.name}</p>
+        <header className="snow-bg flex items-center justify-between gap-2 bg-brand px-4 py-3 text-white md:hidden">
+          <p className="min-w-0 truncate text-lg font-bold">🎄 {event.data.name}</p>
+          {isManager && (
+            <Link
+              to={`${base}/organizar`}
+              className="flex min-h-12 shrink-0 items-center gap-1.5 rounded-xl bg-white/15 px-3 text-base font-semibold hover:bg-white/25"
+            >
+              <Settings className="size-5" aria-hidden />
+              Organizar
+            </Link>
+          )}
         </header>
 
         {/* Navegación lateral en escritorio: se puede plegar (sigue mostrando icono + texto) */}
@@ -136,14 +150,14 @@ export function EventLayout() {
           aria-label="Menú principal"
           className="fixed inset-x-0 bottom-0 z-40 border-t border-cream-200 bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
         >
-          <ul className="mx-auto grid max-w-2xl" style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}>
-            {items.map(({ to, label, icon: Icon, end }) => (
+          <ul className="mx-auto grid max-w-2xl" style={{ gridTemplateColumns: `repeat(${mobileItems.length}, minmax(0, 1fr))` }}>
+            {mobileItems.map(({ to, label, icon: Icon, end }) => (
               <li key={to}>
                 <NavLink
                   to={to}
                   end={end}
                   className={({ isActive }) =>
-                    `flex min-h-16 flex-col items-center justify-center gap-0.5 text-sm font-semibold ${
+                    `flex min-h-16 flex-col items-center justify-center gap-0.5 px-0.5 text-center text-xs font-semibold leading-tight ${
                       isActive ? 'text-brand' : 'text-ink-700'
                     }`
                   }

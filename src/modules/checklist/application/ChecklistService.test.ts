@@ -52,6 +52,15 @@ describe('checklist personal', () => {
     expect(r).toMatchObject({ done: 1, total: 2, percent: 50 });
   });
 
+  it('agrega «Cumple tus responsabilidades» solo si tiene alguna, y se marca sola al completarlas', () => {
+    const none = ChecklistService.buildPersonal({ eventId: 'e', me, wards: [], items: [], progress: [], wishCount: () => 0, responsibilities: { total: 0, done: 0 } });
+    expect(none.entries.some((e) => e.key === 'auto:responsibilities')).toBe(false);
+    const some = ChecklistService.buildPersonal({ eventId: 'e', me, wards: [], items: [], progress: [], wishCount: () => 0, responsibilities: { total: 2, done: 1 } });
+    expect(some.entries.find((e) => e.key === 'auto:responsibilities')).toMatchObject({ done: false, title: 'Cumple tus responsabilidades (1 de 2)' });
+    const all = ChecklistService.buildPersonal({ eventId: 'e', me, wards: [], items: [], progress: [], wishCount: () => 0, responsibilities: { total: 2, done: 2 } });
+    expect(all.entries.find((e) => e.key === 'auto:responsibilities')?.done).toBe(true);
+  });
+
   it('solo muestra las tareas que le corresponden: todos, su familia o ella', () => {
     const items = [
       item('todos'),

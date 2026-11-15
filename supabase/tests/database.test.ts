@@ -445,6 +445,230 @@ describe('checklist', () => {
   });
 });
 
+describe('responsabilidades y aportes', () => {
+  let pavo = '';
+  let deco = '';
+  let famPerez = '';
+  const save = (userId: string, args: unknown[]) =>
+    as(userId, (tx) =>
+      tx.query<{ id: string }>(
+        `select public.save_responsibility($1, $2, $3, $4, $5, $6, $7, $8, $9::uuid[], $10::uuid[], $11) as id`,
+        args,
+      ),
+    );
+  const setStatus = (userId: string, id: string, status: string) =>
+    as(userId, (tx) => tx.query(`select public.set_responsibility_status($1, $2)`, [id, status]));
+
+  beforeAll(async () => {
+    const f = await db.query<{ id: string }>(`insert into public.families (event_id, name, color_key) values ($1, 'PÉREZ', 'gold') returning id`, [eventA]);
+    famPerez = f.rows[0]!.id;
+    await db.query(`update public.participants set family_id = $1 where id in ($2, $3)`, [famPerez, participant.papa, participant.nino]);
+  });
+
+  it('el editor crea un aporte con varias personas y una familia como responsables', async () => {
+    const r = await save(ids.editor, [eventA, 'contribution', 'food', 'Pavo al horno', null, '2026-12-23', 'pending', null, `{${participant.rosa}}`, `{${famPerez}}`, null]);
+    pavo = r.rows[0]!.id;
+    const a = await db.query(`select 1 from public.responsibility_assignees where responsibility_id = $1`, [pavo]);
+    expect(a.rows).toHaveLength(2);
+    const d = await save(ids.ownerA, [eventA, 'task', 'decoration', 'Armar el árbol', null, null, 'pending', null, `{${participant.editor}}`, '{}', null]);
+    deco = d.rows[0]!.id;
+  });
+
+  it('un participante no puede crear ni editar responsabilidades', async () => {
+    await expectDenied(save(ids.rosa, [eventA, 'task', 'other', 'X', null, null, 'pending', null, '{}', '{}', null]));
+    const upd = await as(ids.rosa, (tx) => tx.query(`update public.responsibilities set title = 'Hack' where id = $1`, [pavo]));
+    expect(upd.affectedRows).toBe(0);
+  });
+
+  it('el responsable (directo o por su familia) marca el estado, y queda registrado quién lo hizo', async () => {
+    await setStatus(ids.rosa, pavo, 'in_progress');
+    await setStatus(ids.papa, pavo, 'done'); // por su familia PÉREZ
+    const r = await db.query<{ status: string; completed_by_user_id: string | null }>(
+      `select status, completed_by_user_id from public.responsibilities where id = $1`,
+      [pavo],
+    );
+    expect(r.rows[0]).toEqual({ status: 'done', completed_by_user_id: ids.papa });
+    await setStatus(ids.rosa, pavo, 'pending');
+    const back = await db.query<{ completed_by_user_id: string | null }>(`select completed_by_user_id from public.responsibilities where id = $1`, [pavo]);
+    expect(back.rows[0]!.completed_by_user_id).toBeNull();
+  });
+
+  it('quien no es responsable no puede cambiar el estado', async () => {
+    await expect(setStatus(ids.rosa, deco, 'done')).rejects.toThrow(/FORBIDDEN/);
+    await expect(setStatus(ids.ownerB, deco, 'done')).rejects.toThrow(/NOT_FOUND/);
+    await expect(setStatus(ids.editor, deco, 'terminado')).rejects.toThrow(/STATUS_INVALID/);
+  });
+
+  it('todos los del evento ven todas las responsabilidades; los de otra Navidad no', async () => {
+    const mine = await as(ids.rosa, (tx) => tx.query(`select 1 from public.responsibilities`));
+    expect(mine.rows).toHaveLength(2);
+    const other = await as(ids.ownerB, (tx) => tx.query(`select 1 from public.responsibilities`));
+    expect(other.rows).toHaveLength(0);
+  });
+
+  it('al editar se reemplazan los responsables', async () => {
+    await save(ids.editor, [eventA, 'contribution', 'food', 'Pavo', null, null, 'pending', 'Dos pavos', `{${participant.editor}}`, '{}', pavo]);
+    const a = await db.query<{ participant_id: string }>(`select participant_id from public.responsibility_assignees where responsibility_id = $1`, [pavo]);
+    expect(a.rows.map((x) => x.participant_id)).toEqual([participant.editor]);
+    await db.query(`update public.participants set family_id = null where id in ($1, $2)`, [participant.papa, participant.nino]);
+    await db.query(`delete from public.families where id = $1`, [famPerez]);
+  });
+});
+
+describe('juegos y votación', () => {
+  const g = {} as Record<'charadas' | 'mimica' | 'sillas' | 'bingo' | 'merged', string>;
+  const addGame = (userId: string, proposer: string | undefined, name: string) =>
+    as(userId, (tx) =>
+      tx.query<{ id: string }>(
+        `insert into public.games (event_id, proposed_by_participant_id, name) values ($1, $2, $3) returning id`,
+        [eventA, proposer, name],
+      ),
+    ).then((r) => r.rows[0]!.id);
+  const vote = (userId: string, game: string, participantId: string | undefined) =>
+    as(userId, (tx) => tx.query(`select public.cast_game_vote($1, $2)`, [game, participantId]));
+  const poll = (userId: string, status: string, max: number | null = null) =>
+    as(userId, (tx) => tx.query(`select public.set_game_poll($1, $2, $3)`, [eventA, status, max]));
+  const votesOf = async (game: string) =>
+    (await db.query<{ n: number }>(`select count(*)::int as n from public.game_votes where game_id = $1`, [game])).rows[0]!.n;
+
+  it('cualquiera propone juegos (a su nombre o al de su hijo), sin aprobación', async () => {
+    g.charadas = await addGame(ids.rosa, participant.rosa, 'Charadas navideñas');
+    g.mimica = await addGame(ids.papa, participant.papa, 'Mímica de películas');
+    g.sillas = await addGame(ids.papa, participant.nino, 'Las sillas musicales');
+    g.bingo = await addGame(ids.editor, participant.editor, 'Bingo');
+    await expectDenied(addGame(ids.rosa, participant.papa, 'A nombre de otro'));
+  });
+
+  it('no permite dos juegos con el mismo nombre (sin importar tildes, mayúsculas ni signos)', async () => {
+    await expect(addGame(ids.editor, participant.editor, '  CHARADAS   Navidenas! ')).rejects.toThrow(/games_unique_name/);
+  });
+
+  it('quien propuso edita o quita su idea; los demás participantes no', async () => {
+    await as(ids.rosa, (tx) => tx.query(`update public.games set description = 'Adivina sin hablar' where id = $1`, [g.charadas]));
+    const other = await as(ids.rosa, (tx) => tx.query(`update public.games set description = 'X' where id = $1`, [g.mimica]));
+    expect(other.affectedRows).toBe(0);
+    await expectDenied(as(ids.rosa, (tx) => tx.query(`update public.games set status = 'played' where id = $1`, [g.charadas])));
+  });
+
+  it('solo se vota con la votación abierta, y la abren organizador/editores', async () => {
+    await expect(vote(ids.rosa, g.charadas, participant.rosa)).rejects.toThrow(/POLL_CLOSED/);
+    await expect(poll(ids.rosa, 'open')).rejects.toThrow(/FORBIDDEN/);
+    await poll(ids.editor, 'open', 2);
+  });
+
+  it('respeta el máximo de votos por persona y un voto por juego; el tutor vota por su hijo', async () => {
+    await vote(ids.rosa, g.charadas, participant.rosa);
+    await vote(ids.rosa, g.charadas, participant.rosa); // repetido: no cuenta doble
+    await vote(ids.rosa, g.mimica, participant.rosa);
+    await expect(vote(ids.rosa, g.bingo, participant.rosa)).rejects.toThrow(/VOTE_LIMIT_REACHED/);
+    await expect(vote(ids.rosa, g.bingo, participant.papa)).rejects.toThrow(/FORBIDDEN/);
+    await vote(ids.papa, g.mimica, participant.papa);
+    await vote(ids.papa, g.charadas, participant.nino);
+    expect(await votesOf(g.charadas)).toBe(2);
+    expect(await votesOf(g.mimica)).toBe(2);
+    await as(ids.rosa, (tx) => tx.query(`select public.remove_game_vote($1, $2)`, [g.mimica, participant.rosa]));
+    expect(await votesOf(g.mimica)).toBe(1);
+    await vote(ids.rosa, g.mimica, participant.rosa);
+  });
+
+  it('nadie puede insertar votos directamente', async () => {
+    const p = await db.query<{ id: string }>(`select id from public.game_polls where event_id = $1`, [eventA]);
+    await expectDenied(
+      as(ids.rosa, (tx) =>
+        tx.query(`insert into public.game_votes (poll_id, game_id, participant_id) values ($1, $2, $3)`, [p.rows[0]!.id, g.bingo, participant.rosa]),
+      ),
+    );
+  });
+
+  it('unir juegos en uno nuevo: los votos pasan, contando una vez a quien votó por ambos', async () => {
+    await expect(
+      as(ids.rosa, (tx) => tx.query(`select public.merge_games($1, $2::uuid[], null, 'X')`, [eventA, `{${g.charadas},${g.mimica}}`])),
+    ).rejects.toThrow(/FORBIDDEN/);
+
+    // Rosa votó por ambos; Juan por mímica; el niño por charadas → 3 personas distintas
+    const r = await as(ids.editor, (tx) =>
+      tx.query<{ id: string }>(
+        `select public.merge_games($1, $2::uuid[], null, 'Charadas navideñas', 'competition', 'Charadas y mímica juntas') as id`,
+        [eventA, `{${g.charadas},${g.mimica}}`],
+      ),
+    );
+    const merged = r.rows[0]!.id;
+    expect(await votesOf(merged)).toBe(3);
+    expect(await votesOf(g.charadas)).toBe(0);
+    const old = await db.query<{ status: string; merged_into_game_id: string }>(
+      `select status, merged_into_game_id from public.games where id = any($1::uuid[]) order by name`,
+      [`{${g.charadas},${g.mimica}}`],
+    );
+    expect(old.rows.every((x) => x.status === 'merged' && x.merged_into_game_id === merged)).toBe(true);
+    // Rosa recuperó un voto: ahora puede votar por bingo
+    await vote(ids.rosa, g.bingo, participant.rosa);
+    g.merged = merged;
+  });
+
+  it('unir conservando uno existente; no se pueden votar juegos unidos', async () => {
+    const r = await as(ids.ownerA, (tx) =>
+      tx.query<{ id: string }>(`select public.merge_games($1, $2::uuid[], $3) as id`, [eventA, `{${g.sillas},${g.bingo}}`, g.bingo]),
+    );
+    expect(r.rows[0]!.id).toBe(g.bingo);
+    await expect(vote(ids.papa, g.sillas, participant.papa)).rejects.toThrow(/GAME_NOT_VOTABLE/);
+    await expect(
+      as(ids.editor, (tx) => tx.query(`select public.merge_games($1, $2::uuid[])`, [eventA, `{${g.bingo}}`])),
+    ).rejects.toThrow(/MERGE_NEEDS_TWO_GAMES/);
+  });
+
+  it('la otra Navidad no ve juegos ni votos', async () => {
+    const r = await as(ids.ownerB, (tx) => tx.query(`select 1 from public.games union all select 1 from public.game_votes`));
+    expect(r.rows).toHaveLength(0);
+  });
+});
+
+describe('amigo secreto (opcional y privado)', () => {
+  const note = (userId: string, giver: string | undefined, receiver: string | undefined) =>
+    as(userId, (tx) =>
+      tx.query(`insert into public.secret_friend_notes (event_id, giver_participant_id, receiver_participant_id) values ($1, $2, $3)`, [
+        eventA,
+        giver,
+        receiver,
+      ]),
+    );
+
+  it('cada quien anota el suyo; el tutor también por su hijo', async () => {
+    await note(ids.rosa, participant.rosa, participant.papa);
+    await note(ids.papa, participant.nino, participant.rosa);
+  });
+
+  it('nadie más lo ve: ni el organizador, ni el editor, ni otros participantes', async () => {
+    for (const user of [ids.ownerA, ids.editor, ids.papa]) {
+      const r = await as(user, (tx) => tx.query(`select 1 from public.secret_friend_notes where giver_participant_id = $1`, [participant.rosa]));
+      expect(r.rows).toHaveLength(0);
+    }
+    const own = await as(ids.rosa, (tx) => tx.query<{ receiver_participant_id: string }>(`select receiver_participant_id from public.secret_friend_notes`));
+    expect(own.rows.map((x) => x.receiver_participant_id)).toEqual([participant.papa]);
+  });
+
+  it('no puede anotar por otra persona, ni a sí mismo, ni a alguien de otra Navidad', async () => {
+    await expectDenied(note(ids.rosa, participant.editor, participant.papa));
+    await expect(note(ids.editor, participant.editor, participant.editor)).rejects.toThrow(/check constraint/);
+    const otherEvent = await db.query<{ id: string }>(`select id from public.participants where event_id = $1 limit 1`, [eventB]);
+    await expect(note(ids.editor, participant.editor, otherEvent.rows[0]!.id)).rejects.toThrow(/foreign key/);
+  });
+
+  it('dos personas pueden anotar a la misma (la app no revela quién ya fue elegido)', async () => {
+    await note(ids.editor, participant.editor, participant.papa);
+  });
+
+  it('puede cambiarlo o quitarlo; el organizador no puede borrarlo', async () => {
+    const upd = await as(ids.rosa, (tx) =>
+      tx.query(`update public.secret_friend_notes set receiver_participant_id = $1 where giver_participant_id = $2`, [participant.editor, participant.rosa]),
+    );
+    expect(upd.affectedRows).toBe(1);
+    const del = await as(ids.ownerA, (tx) => tx.query(`delete from public.secret_friend_notes where giver_participant_id = $1`, [participant.rosa]));
+    expect(del.affectedRows).toBe(0);
+    const own = await as(ids.rosa, (tx) => tx.query(`delete from public.secret_friend_notes where giver_participant_id = $1`, [participant.rosa]));
+    expect(own.affectedRows).toBe(1);
+  });
+});
+
 describe('RLS: gestión del evento', () => {
   it('solo organizador/administradores gestionan familias (no editores ni participantes)', async () => {
     await as(ids.ownerA, (tx) => tx.query(`insert into public.families (event_id, name, color_key) values ($1, ' garcía ', 'red')`, [eventA]));

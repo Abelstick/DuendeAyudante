@@ -44,7 +44,7 @@ npx supabase db push                              # aplica supabase/migrations/*
 
 **Alternativa sin CLI:** en Supabase → **SQL Editor**, pega y ejecuta, **en este orden**, el contenido de:
 `20261114000001_core_schema.sql`, `20261114000002_security.sql`, `20261114000003_wishlist_rpc.sql`,
-`20261114000004_event_join_code.sql`, `20261114000005_code_history_white_color.sql`, `20261114000006_checklist.sql`.
+`20261114000004_event_join_code.sql`, `20261114000005_code_history_white_color.sql`, `20261114000006_checklist.sql`, `20261114000007_responsibilities.sql`, `20261114000008_games.sql`, `20261114000009_secret_friend.sql`.
 
 > Si ya habías aplicado las primeras migraciones, `npx supabase db push` aplica solo las nuevas.
 
@@ -99,7 +99,7 @@ Recorrido de prueba:
 ## Pruebas automáticas
 
 ```powershell
-npm test         # 104 pruebas: reglas de la app + base de datos real (PGlite) con políticas RLS por rol
+npm test         # 141 pruebas: reglas de la app + base de datos real (PGlite) con políticas RLS por rol
 npm run build    # verificación de tipos + build de producción
 ```
 

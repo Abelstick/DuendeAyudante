@@ -71,3 +71,11 @@ export function countdownTo(target: Date, now: Date = new Date()): CountdownPart
     isOver: diff === 0,
   };
 }
+
+/** "2026-12-23" → "martes 23 de diciembre" (fecha sin hora, sin desfases de zona horaria). */
+export function formatDateOnly(date: string): string {
+  const [y, m, d] = date.split('-').map(Number);
+  return new Intl.DateTimeFormat('es-PE', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'long' }).format(
+    new Date(Date.UTC(y ?? 0, (m ?? 1) - 1, d ?? 1, 12)),
+  );
+}

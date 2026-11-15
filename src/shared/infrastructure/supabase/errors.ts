@@ -9,6 +9,7 @@ export function fromPostgrestError(error: PostgrestError): AppError {
   if (error.code === '23505') {
     if (message.includes('JOIN_CODE_TAKEN') || message.includes('events_join_code_key')) return new AppError('JOIN_CODE_TAKEN');
     if (message.includes('participants_unique_name')) return new AppError('DUPLICATE_NAME');
+    if (message.includes('games_unique_name')) return new AppError('GAME_NAME_TAKEN');
     if (message.includes('families_event_id_name_key')) return new AppError('DUPLICATE_FAMILY');
     return new AppError('DUPLICATE');
   }
