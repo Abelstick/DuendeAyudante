@@ -2,19 +2,46 @@ import { ArrowLeft, Megaphone } from 'lucide-react';
 import { useState } from 'react';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { canEditContent } from '@/modules/events/domain/Event';
+import { applySort, DEFAULT_LIST_PREFS, matchesSearch, type ListPrefs, type SortValue } from '@/shared/lib/listing';
+import { useSessionState } from '@/shared/lib/useSessionState';
 import { Button, ButtonLink, Spinner } from '@/shared/ui/Button';
 import { EmptyState, Notice, PageTitle } from '@/shared/ui/Card';
 import { errorMessage } from '@/shared/ui/errorMessages';
+import { FilterSelect, ListToolbar } from '@/shared/ui/ListToolbar';
 import type { Announcement } from '../domain/Announcement';
 import { AnnouncementFormModal } from './AnnouncementFormModal';
 import { AnnouncementItem } from './AnnouncementItem';
 import { useAnnouncements } from './hooks';
 
+interface AnnouncementPrefs extends ListPrefs {
+  /** '' = todos · prioridad */
+  priority: string;
+}
+
+// Por defecto, los más nuevos primero
+const DEFAULT_PREFS: AnnouncementPrefs = { ...DEFAULT_LIST_PREFS, sort: 'date', dir: 'desc', priority: '' };
+
+const SORTERS: Record<string, (a: Announcement) => SortValue> = {
+  date: (a) => a.publishedAt.getTime(),
+  title: (a) => a.title,
+  author: (a) => a.authorName,
+};
+
 export function AnnouncementsPage() {
   const { event, context } = useEventScope();
   const announcements = useAnnouncements(event.id);
   const [editing, setEditing] = useState<{ item: Announcement | null } | null>(null);
+  const [prefs, setPrefs] = useSessionState<AnnouncementPrefs>(`${event.id}:anuncios`, DEFAULT_PREFS);
   const isEditor = canEditContent(context.role);
+  const all = announcements.data ?? [];
+  const patch = (p: Partial<AnnouncementPrefs>) => setPrefs((prev) => ({ ...prev, ...p }));
+  const visible = applySort(
+    all.filter((a) => (!prefs.priority || a.priority === prefs.priority) && matchesSearch(prefs.q, a.title, a.body, a.authorName)),
+    SORTERS,
+    prefs.sort,
+    prefs.dir,
+  );
+  const hasFilters = Boolean(prefs.q || prefs.priority);
 
   return (
     <div className="space-y-5">
@@ -33,8 +60,30 @@ export function AnnouncementsPage() {
       {announcements.error && <Notice tone="error">{errorMessage(announcements.error)}</Notice>}
       {announcements.data?.length === 0 && <EmptyState emoji="📢" title="Todavía no hay anuncios." />}
 
+      {all.length > 1 && (
+        <ListToolbar
+          prefs={prefs}
+          onChange={patch}
+          searchLabel="Buscar anuncio"
+          sortOptions={[
+            { value: 'date', label: 'Fecha' },
+            { value: 'title', label: 'Título' },
+            { value: 'author', label: 'Autor' },
+          ]}
+          summary={hasFilters ? `${visible.length} de ${all.length} anuncios` : undefined}
+          onReset={hasFilters ? () => patch({ q: '', priority: '' }) : null}
+        >
+          <FilterSelect label="Importancia" value={prefs.priority} onChange={(priority) => patch({ priority })}>
+            <option value="">Todos</option>
+            <option value="important">Solo importantes</option>
+            <option value="normal">Solo normales</option>
+          </FilterSelect>
+        </ListToolbar>
+      )}
+      {all.length > 0 && visible.length === 0 && <Notice>No hay anuncios con esos filtros.</Notice>}
+
       <div className="stagger space-y-3">
-        {(announcements.data ?? []).map((a) => (
+        {visible.map((a) => (
           <AnnouncementItem
             key={a.id}
             announcement={a}

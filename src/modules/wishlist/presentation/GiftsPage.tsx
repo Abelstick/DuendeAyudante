@@ -8,13 +8,16 @@ import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { displayName, type Participant } from '@/modules/members/domain/Participant';
 import { useParticipants } from '@/modules/members/presentation/hooks';
+import { applySort, DEFAULT_LIST_PREFS, matchesSearch, toggleSort, type ListPrefs, type SortValue } from '@/shared/lib/listing';
 import { formatMoney } from '@/shared/lib/money';
+import { useSessionState } from '@/shared/lib/useSessionState';
 import { Avatar } from '@/shared/ui/Avatar';
 import { Spinner } from '@/shared/ui/Button';
 import { Notice, PageTitle, Pill } from '@/shared/ui/Card';
+import { DataTable, type Column } from '@/shared/ui/DataTable';
+import { FilterSelect, ListToolbar } from '@/shared/ui/ListToolbar';
 import { chipClasses, SegmentedTabs } from '@/shared/ui/Tabs';
 import { errorMessage } from '@/shared/ui/errorMessages';
-import { TextField } from '@/shared/ui/TextField';
 import { toTitleCase } from '@/shared/validation/names';
 import { WishlistService } from '../application/WishlistService';
 import type { WishlistItem } from '../domain/WishlistItem';
@@ -114,21 +117,69 @@ function MyGifts({ items, startAdding }: { items: WishlistItem[]; startAdding: b
   );
 }
 
+interface GiftListPrefs extends ListPrefs {
+  /** '' = todas · 'none' = sin familia · id de familia */
+  familyId: string;
+  /** '' = todos · 'with' = ya agregó regalos · 'without' = todavía no */
+  gifts: string;
+}
+
+const GIFT_LIST_DEFAULTS: GiftListPrefs = { ...DEFAULT_LIST_PREFS, sort: 'name', familyId: '', gifts: '' };
+
 function EveryonesGifts({ items }: { items: WishlistItem[] }) {
   const { event } = useEventScope();
   const participants = useParticipants(event.id);
   const families = useFamilies(event.id);
   const byPerson = useMemo(() => WishlistService.groupByParticipant(items), [items]);
-  const [search, setSearch] = useState('');
+  const [prefs, setPrefs] = useSessionState<GiftListPrefs>(`${event.id}:regalos:todos`, GIFT_LIST_DEFAULTS);
 
   if (participants.isLoading || families.isLoading) return <Spinner label="Cargando…" />;
   if (participants.error) return <Notice tone="error">{errorMessage(participants.error)}</Notice>;
 
   const familyList = families.data ?? [];
+  const everyone = participants.data ?? [];
+  const patch = (p: Partial<GiftListPrefs>) => setPrefs((prev) => ({ ...prev, ...p }));
+  const familyOf = (p: Participant) => familyList.find((f) => f.id === p.familyId);
+  const countOf = (p: Participant) => byPerson.get(p.id)?.length ?? 0;
+  const sorters: Record<string, (p: Participant) => SortValue> = {
+    name: (p) => displayName(p),
+    family: (p) => familyOf(p)?.name,
+    count: countOf,
+  };
   // Búsqueda sin importar tildes ni mayúsculas: "jose" encuentra a "JOSÉ"
-  const plain = (v: string) => v.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
-  const query = plain(search.trim());
-  const people = (participants.data ?? []).filter((p) => !query || plain(displayName(p)).includes(query));
+  const people = applySort(
+    everyone.filter((p) => {
+      if (!matchesSearch(prefs.q, displayName(p), familyOf(p)?.name)) return false;
+      if (prefs.familyId && (prefs.familyId === 'none' ? Boolean(familyOf(p)) : p.familyId !== prefs.familyId)) return false;
+      if (prefs.gifts && (prefs.gifts === 'with') !== countOf(p) > 0) return false;
+      return true;
+    }),
+    sorters,
+    prefs.sort,
+    prefs.dir,
+  );
+  const hasFilters = Boolean(prefs.q || prefs.familyId || prefs.gifts);
+  const columns: Column<Participant>[] = [
+    {
+      key: 'name',
+      header: 'Persona',
+      sortKey: 'name',
+      cell: (p) => (
+        <Link to={`/e/${event.id}/regalos/persona/${p.id}`} className="flex min-h-10 items-center gap-1 font-bold text-brand underline decoration-2 underline-offset-4">
+          {displayName(p)}
+          <ChevronRight className="size-5 shrink-0" aria-hidden />
+        </Link>
+      ),
+    },
+    { key: 'family', header: 'Familia', sortKey: 'family', cell: (p) => <FamilyBadge family={familyOf(p)} /> },
+    {
+      key: 'count',
+      header: 'Regalos',
+      sortKey: 'count',
+      className: 'whitespace-nowrap tabular-nums',
+      cell: (p) => (countOf(p) === 0 ? <span className="text-ink-500">Todavía ninguno</span> : `🎁 ${countOf(p)}`),
+    },
+  ];
   const groups: { key: string; family?: Family; people: Participant[] }[] = [
     ...familyList.map((f) => ({ key: f.id, family: f, people: people.filter((p) => p.familyId === f.id) })),
     { key: 'none', people: people.filter((p) => !p.familyId || !familyList.some((f) => f.id === p.familyId)) },
@@ -139,11 +190,48 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
       <p className="flex items-center gap-2 text-base text-ink-700">
         <Users className="size-5 shrink-0" aria-hidden /> Toca a una persona para ver qué le gustaría recibir.
       </p>
-      {(participants.data?.length ?? 0) > 6 && (
-        <TextField label="Buscar a una persona" type="search" placeholder="Escribe un nombre" value={search} onChange={(e) => setSearch(e.target.value)} />
+      <ListToolbar
+        prefs={prefs}
+        onChange={patch}
+        searchLabel="Buscar a una persona"
+        sortOptions={[
+          { value: 'name', label: 'Nombre' },
+          { value: 'family', label: 'Familia' },
+          { value: 'count', label: 'Cantidad de regalos' },
+        ]}
+        showView
+        summary={hasFilters ? `${people.length} de ${everyone.length} personas` : undefined}
+        onReset={hasFilters ? () => patch({ q: '', familyId: '', gifts: '' }) : null}
+      >
+        {familyList.length > 0 && (
+          <FilterSelect label="Familia" value={prefs.familyId} onChange={(familyId) => patch({ familyId })}>
+            <option value="">Todas</option>
+            {familyList.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
+            <option value="none">Sin familia</option>
+          </FilterSelect>
+        )}
+        <FilterSelect label="Lista de regalos" value={prefs.gifts} onChange={(gifts) => patch({ gifts })}>
+          <option value="">Todos</option>
+          <option value="with">Ya agregó regalos</option>
+          <option value="without">Todavía no agregó</option>
+        </FilterSelect>
+      </ListToolbar>
+      {people.length === 0 && <Notice>No encontramos a nadie con esos filtros.</Notice>}
+      {prefs.view === 'table' && people.length > 0 && (
+        <DataTable
+          label="Regalos de todos"
+          rows={people}
+          columns={columns}
+          rowKey={(p) => p.id}
+          sort={{ field: prefs.sort, dir: prefs.dir }}
+          onSort={(field) => patch(toggleSort(prefs, field))}
+        />
       )}
-      {groups.length === 0 && <Notice>No encontramos a nadie con ese nombre.</Notice>}
-      {groups.map((g) => (
+      {(prefs.view === 'table' ? [] : groups).map((g) => (
         <section key={g.key} className="space-y-2">
           <h2 className="text-lg font-bold">{g.family ? <FamilyBadge family={g.family} /> : 'Sin familia'}</h2>
           <ul className="stagger space-y-2">

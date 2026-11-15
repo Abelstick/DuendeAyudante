@@ -7,8 +7,12 @@ import { FAMILY_COLOR_KEYS, FAMILY_COLORS, FAMILY_THEMES, type Family, type Fami
 import { useFamilyMutations } from '@/modules/families/presentation/hooks';
 import { useFamilyAccessList } from '@/modules/family-access/presentation/hooks';
 import type { Member } from '@/modules/members/domain/Participant';
+import { applySort, DEFAULT_LIST_PREFS, matchesSearch, toggleSort, type ListPrefs, type SortValue } from '@/shared/lib/listing';
+import { useSessionState } from '@/shared/lib/useSessionState';
 import { Button } from '@/shared/ui/Button';
 import { EmptyState, Notice } from '@/shared/ui/Card';
+import { DataTable, RowAction, type Column } from '@/shared/ui/DataTable';
+import { ListToolbar } from '@/shared/ui/ListToolbar';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { Modal } from '@/shared/ui/Modal';
 import { useToast } from '@/shared/ui/Toast';
@@ -25,17 +29,100 @@ export function FamiliesManager({ eventId, families, participants }: { eventId: 
   const linkFamily = families.find((f) => f.id === linkFamilyId);
   /** Quiénes podrán entrar con el enlace: participantes activos con usuario propio. */
   const eligible = (familyId: string) => participants.filter((p) => p.familyId === familyId && p.status === 'active' && p.hasAccount && p.role === 'participant').length;
+  const [prefs, setPrefs] = useSessionState<ListPrefs>(`${eventId}:organizar:familias`, { ...DEFAULT_LIST_PREFS, sort: 'name' });
+  const patch = (p: Partial<ListPrefs>) => setPrefs((prev) => ({ ...prev, ...p }));
+  const countOf = (f: Family) => participants.filter((p) => p.familyId === f.id).length;
+  const hasLink = (f: Family) => Boolean(accessList.data?.some((a) => a.familyId === f.id));
+
+  const sorters: Record<string, (f: Family) => SortValue> = {
+    name: (f) => f.name,
+    count: countOf,
+    color: (f) => FAMILY_COLORS[f.color].label,
+  };
+  const visible = applySort(
+    families.filter((f) => matchesSearch(prefs.q, f.name, FAMILY_COLORS[f.color].label, f.dressCodeNote)),
+    sorters,
+    prefs.sort,
+    prefs.dir,
+  );
+
+  const columns: Column<Family>[] = [
+    {
+      key: 'name',
+      header: 'Familia',
+      sortKey: 'name',
+      cell: (f) => (
+        <span className="font-bold" style={{ color: FAMILY_COLORS[f.color].text }}>
+          Familia {f.name}
+        </span>
+      ),
+    },
+    {
+      key: 'color',
+      header: 'Color',
+      sortKey: 'color',
+      cell: (f) => (
+        <span className="flex items-center gap-2 whitespace-nowrap">
+          <span className="size-4 rounded-full border border-black/25" style={{ backgroundColor: FAMILY_COLORS[f.color].swatch }} aria-hidden />
+          {FAMILY_COLORS[f.color].label}
+        </span>
+      ),
+    },
+    { key: 'count', header: 'Integrantes', sortKey: 'count', className: 'tabular-nums', cell: countOf },
+    { key: 'dress', header: 'Vestimenta', cell: (f) => f.dressCodeNote ?? <span className="text-ink-500">—</span> },
+    {
+      key: 'actions',
+      header: 'Acciones',
+      cell: (f) => (
+        <div className="flex gap-1.5">
+          <RowAction onClick={() => setLinkFamilyId(f.id)} icon={<Link2 className="size-4" aria-hidden />}>
+            {hasLink(f) ? 'Enlace' : 'Crear enlace'}
+          </RowAction>
+          <RowAction onClick={() => setEditing({ mode: 'edit', family: f })} icon={<Pencil className="size-4" aria-hidden />}>
+            Editar
+          </RowAction>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-4">
+      {families.length > 1 && (
+        <ListToolbar
+          prefs={prefs}
+          onChange={patch}
+          searchLabel="Buscar familia"
+          sortOptions={[
+            { value: 'name', label: 'Nombre' },
+            { value: 'count', label: 'Cantidad de integrantes' },
+            { value: 'color', label: 'Color' },
+          ]}
+          showView
+          summary={prefs.q ? `${visible.length} de ${families.length} familias` : undefined}
+          onReset={prefs.q ? () => patch({ q: '' }) : null}
+        />
+      )}
+
       {families.length === 0 ? (
         <EmptyState emoji="👨‍👩‍👧‍👦" title="Todavía no hay familias.">
           Crea una familia por cada rama (ej. GARCÍA, LÓPEZ). Cada una tendrá su color, y la aplicación de sus integrantes se verá de ese color.
         </EmptyState>
+      ) : visible.length === 0 ? (
+        <Notice>No hay familias con esa búsqueda.</Notice>
+      ) : prefs.view === 'table' && families.length > 1 ? (
+        <DataTable
+          label="Familias"
+          rows={visible}
+          columns={columns}
+          rowKey={(f) => f.id}
+          sort={{ field: prefs.sort, dir: prefs.dir }}
+          onSort={(field) => patch(toggleSort(prefs, field))}
+        />
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2">
-          {families.map((f) => {
-            const count = participants.filter((p) => p.familyId === f.id).length;
+          {visible.map((f) => {
+            const count = countOf(f);
             const color = FAMILY_COLORS[f.color];
             return (
               <li key={f.id} className="overflow-hidden rounded-xl border-2 border-night-900 bg-white shadow-block">
@@ -51,7 +138,7 @@ export function FamiliesManager({ eventId, families, participants }: { eventId: 
                   {f.dressCodeNote && <p className="text-sm text-ink-700">👕 {f.dressCodeNote}</p>}
                   <div className="flex flex-wrap gap-2 pt-1">
                     <Button onClick={() => setLinkFamilyId(f.id)} icon={<Link2 className="size-5" aria-hidden />}>
-                      {accessList.data?.some((a) => a.familyId === f.id) ? 'Enlace de la familia' : 'Crear enlace'}
+                      {hasLink(f) ? 'Enlace de la familia' : 'Crear enlace'}
                     </Button>
                     <Button variant="ghost" onClick={() => setEditing({ mode: 'edit', family: f })} icon={<Pencil className="size-5" aria-hidden />}>
                       Editar

@@ -5,13 +5,16 @@ import { actingParticipants, canEditContent } from '@/modules/events/domain/Even
 import type { Participant } from '@/modules/members/domain/Participant';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { useParticipants } from '@/modules/members/presentation/hooks';
+import { applySort, DEFAULT_LIST_PREFS, matchesSearch, type ListPrefs, type SortValue } from '@/shared/lib/listing';
+import { useSessionState } from '@/shared/lib/useSessionState';
 import { Button, Spinner } from '@/shared/ui/Button';
 import { Card, CardTitle, EmptyState, Notice, PageTitle, Pill, SectionTitle } from '@/shared/ui/Card';
 import { chipClasses, selectClasses } from '@/shared/ui/Tabs';
 import { errorMessage } from '@/shared/ui/errorMessages';
+import { FilterSelect, ListToolbar } from '@/shared/ui/ListToolbar';
 import { useToast } from '@/shared/ui/Toast';
 import { toTitleCase } from '@/shared/validation/names';
-import { type Game, gameCredits, rankGames } from '../domain/Game';
+import { CATEGORY_LABELS, type Game, type GameCategory, gameCredits, rankGames, type RankedGame } from '../domain/Game';
 import { GameCard } from './GameCard';
 import { GameFormModal } from './GameFormModal';
 import { useGameMutations, useGamePoll, useGames, useGameVotes } from './hooks';
@@ -20,6 +23,19 @@ import { ParticipantDraw } from './ParticipantDraw';
 import { Roulette } from './Roulette';
 
 type Editing = { game: Game | null } | null;
+
+interface GamePrefs extends ListPrefs {
+  /** '' = todas · categoría */
+  category: string;
+}
+
+const DEFAULT_PREFS: GamePrefs = { ...DEFAULT_LIST_PREFS, category: '' };
+
+const SORTERS: Record<string, (r: RankedGame) => SortValue> = {
+  name: (r) => r.game.name,
+  category: (r) => CATEGORY_LABELS[r.game.category].label,
+  duration: (r) => r.game.durationMinutes,
+};
 
 export function GamesPage() {
   const { event, context } = useEventScope();
@@ -39,6 +55,7 @@ export function GamesPage() {
   const [selected, setSelected] = useState<string[]>([]);
   const [merging, setMerging] = useState(false);
   const [maxVotes, setMaxVotes] = useState(3);
+  const [prefs, setPrefs] = useSessionState<GamePrefs>(`${event.id}:juegos`, DEFAULT_PREFS);
 
   const all = useMemo(() => games.data ?? [], [games.data]);
   const active = all.filter((g) => g.status === 'active');
@@ -56,6 +73,20 @@ export function GamesPage() {
   const myVotes = (votes.data ?? []).filter((v) => v.participantId === voter?.id);
   const remaining = Math.max(0, pollMax - myVotes.length);
   const byId = new Map(people.map((p) => [p.id, p]));
+  // La posición del ranking se calcula antes de filtrar, para que no cambie al buscar
+  const position = new Map(ranked.map((r, i) => [r.game.id, i + 1]));
+  const patch = (p: Partial<GamePrefs>) => setPrefs((prev) => ({ ...prev, ...p }));
+  const visibleGames = applySort(
+    ranked.filter(
+      ({ game }) =>
+        (!prefs.category || game.category === prefs.category) &&
+        matchesSearch(prefs.q, game.name, game.description, game.materials, CATEGORY_LABELS[game.category].label),
+    ),
+    SORTERS,
+    prefs.sort,
+    prefs.dir,
+  );
+  const hasFilters = Boolean(prefs.q || prefs.category);
   const canEditGame = (g: Game) => isEditor || acting.some((p) => p.id === g.proposedById);
 
   const run = async (action: () => Promise<unknown>, success: string) => {
@@ -192,7 +223,32 @@ export function GamesPage() {
             {showVotes ? 'Ranking de juegos' : 'Catálogo de juegos'}
             <Pill tone="night">{active.length}</Pill>
           </h2>
-          {ranked.map(({ game, votes: n, percent }, i) => {
+          {active.length > 1 && (
+            <ListToolbar
+              prefs={prefs}
+              onChange={patch}
+              searchLabel="Buscar juego"
+              sortOptions={[
+                { value: 'default', label: showVotes ? 'Más votados' : 'Nombre (catálogo)' },
+                { value: 'name', label: 'Nombre' },
+                { value: 'category', label: 'Categoría' },
+                { value: 'duration', label: 'Duración' },
+              ]}
+              summary={hasFilters ? `${visibleGames.length} de ${active.length} juegos` : undefined}
+              onReset={hasFilters ? () => patch({ q: '', category: '' }) : null}
+            >
+              <FilterSelect label="Categoría" value={prefs.category} onChange={(category) => patch({ category })}>
+                <option value="">Todas</option>
+                {(Object.keys(CATEGORY_LABELS) as GameCategory[]).map((c) => (
+                  <option key={c} value={c}>
+                    {CATEGORY_LABELS[c].label}
+                  </option>
+                ))}
+              </FilterSelect>
+            </ListToolbar>
+          )}
+          {visibleGames.length === 0 && <Notice>No hay juegos con esos filtros.</Notice>}
+          {visibleGames.map(({ game, votes: n, percent }) => {
             const hasVoted = myVotes.some((v) => v.gameId === game.id);
             const busy =
               (mutations.vote.isPending && mutations.vote.variables?.gameId === game.id) ||
@@ -201,7 +257,7 @@ export function GamesPage() {
               <GameCard
                 key={game.id}
                 game={game}
-                rank={i + 1}
+                rank={position.get(game.id) ?? 0}
                 votes={n}
                 percent={percent}
                 showVotes={showVotes}

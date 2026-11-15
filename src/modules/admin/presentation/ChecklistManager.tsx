@@ -8,14 +8,26 @@ import { useChecklistItems, useChecklistMutations, useChecklistProgress } from '
 import type { Family } from '@/modules/families/domain/Family';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { displayName, type Member } from '@/modules/members/domain/Participant';
+import { applySort, DEFAULT_LIST_PREFS, matchesSearch, toggleSort, type ListPrefs, type SortValue } from '@/shared/lib/listing';
+import { useSessionState } from '@/shared/lib/useSessionState';
 import { Button, Spinner } from '@/shared/ui/Button';
 import { EmptyState, Notice } from '@/shared/ui/Card';
+import { DataTable, RowAction, type Column } from '@/shared/ui/DataTable';
+import { FilterSelect, ListToolbar } from '@/shared/ui/ListToolbar';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { Modal } from '@/shared/ui/Modal';
 import { useToast } from '@/shared/ui/Toast';
 import { TextArea, TextField } from '@/shared/ui/TextField';
 
 type Editing = { mode: 'create' } | { mode: 'edit'; item: ChecklistItem } | null;
+
+interface ChecklistPrefs extends ListPrefs {
+  /** '' = cualquiera · alcance de la tarea */
+  scope: string;
+}
+
+const DEFAULT_PREFS: ChecklistPrefs = { ...DEFAULT_LIST_PREFS, scope: '' };
+const SCOPE_ORDER: Record<ChecklistScope, number> = { all: 0, family: 1, participant: 2 };
 
 interface Props {
   eventId: string;
@@ -28,12 +40,76 @@ export function ChecklistManager({ eventId, families, members }: Props) {
   const items = useChecklistItems(eventId);
   const progress = useChecklistProgress(eventId);
   const [editing, setEditing] = useState<Editing>(null);
+  const [prefs, setPrefs] = useSessionState<ChecklistPrefs>(`${eventId}:organizar:checklist`, DEFAULT_PREFS);
   const active = members.filter((m) => m.status === 'active');
 
   if (items.isLoading) return <Spinner label="Cargando…" />;
   if (items.error) return <Notice tone="error">{errorMessage(items.error)}</Notice>;
 
   const list = items.data ?? [];
+  const patch = (p: Partial<ChecklistPrefs>) => setPrefs((prev) => ({ ...prev, ...p }));
+  const progressOf = (item: ChecklistItem) => {
+    const target = active.filter((m) => appliesTo(item, m));
+    const done = target.filter((m) => progress.data?.some((p) => p.itemId === item.id && p.participantId === m.id)).length;
+    return { done, total: target.length };
+  };
+  const scopeText = (item: ChecklistItem) => {
+    if (item.scope === 'family') return families.find((f) => f.id === item.familyId)?.name;
+    if (item.scope === 'participant') {
+      const m = members.find((x) => x.id === item.participantId);
+      return m ? displayName(m) : undefined;
+    }
+    return 'todos';
+  };
+  const sorters: Record<string, (item: ChecklistItem) => SortValue> = {
+    title: (item) => item.title,
+    scope: (item) => `${SCOPE_ORDER[item.scope]} ${scopeText(item) ?? ''}`,
+    progress: (item) => {
+      const { done, total } = progressOf(item);
+      return total ? done / total : null;
+    },
+  };
+  const visible = applySort(
+    list.filter((item) => (!prefs.scope || item.scope === prefs.scope) && matchesSearch(prefs.q, item.title, item.description, scopeText(item))),
+    sorters,
+    prefs.sort,
+    prefs.dir,
+  );
+  const hasFilters = Boolean(prefs.q || prefs.scope);
+
+  const columns: Column<ChecklistItem>[] = [
+    {
+      key: 'title',
+      header: 'Tarea',
+      sortKey: 'title',
+      cell: (item) => (
+        <>
+          <span className="font-bold text-night-900">{item.title}</span>
+          {item.description && <span className="block text-sm text-ink-700">{item.description}</span>}
+        </>
+      ),
+    },
+    { key: 'scope', header: 'Para quién', sortKey: 'scope', className: 'text-sm', cell: (item) => <ScopeLabel item={item} families={families} members={members} /> },
+    {
+      key: 'progress',
+      header: 'Avance',
+      sortKey: 'progress',
+      className: 'whitespace-nowrap tabular-nums',
+      cell: (item) => {
+        const { done, total } = progressOf(item);
+        return `${done} de ${total}`;
+      },
+    },
+    {
+      key: 'actions',
+      header: 'Acciones',
+      cell: (item) => (
+        <RowAction onClick={() => setEditing({ mode: 'edit', item })} icon={<Pencil className="size-4" aria-hidden />}>
+          Editar
+        </RowAction>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-4">
@@ -46,10 +122,46 @@ export function ChecklistManager({ eventId, families, members }: Props) {
           Por ejemplo: «Confirma tu asistencia», «Trae un postre», «Compra el regalo de tu amigo secreto».
         </EmptyState>
       ) : (
+        <ListToolbar
+          prefs={prefs}
+          onChange={patch}
+          searchLabel="Buscar en el checklist"
+          sortOptions={[
+            { value: 'default', label: 'Orden de creación' },
+            { value: 'title', label: 'Nombre' },
+            { value: 'scope', label: 'Para quién' },
+            { value: 'progress', label: 'Avance' },
+          ]}
+          showView
+          summary={hasFilters ? `${visible.length} de ${list.length} tareas` : undefined}
+          onReset={hasFilters ? () => patch({ q: '', scope: '' }) : null}
+        >
+          <FilterSelect label="Para quién" value={prefs.scope} onChange={(scope) => patch({ scope })}>
+            <option value="">Cualquiera</option>
+            {(Object.keys(SCOPE_LABELS) as ChecklistScope[]).map((s) => (
+              <option key={s} value={s}>
+                {SCOPE_LABELS[s]}
+              </option>
+            ))}
+          </FilterSelect>
+        </ListToolbar>
+      )}
+
+      {list.length === 0 ? null : visible.length === 0 ? (
+        <Notice>No hay tareas con esos filtros.</Notice>
+      ) : prefs.view === 'table' ? (
+        <DataTable
+          label="Checklist de preparación"
+          rows={visible}
+          columns={columns}
+          rowKey={(item) => item.id}
+          sort={{ field: prefs.sort, dir: prefs.dir }}
+          onSort={(field) => patch(toggleSort(prefs, field))}
+        />
+      ) : (
         <ul className="space-y-2">
-          {list.map((item) => {
-            const target = active.filter((m) => appliesTo(item, m));
-            const done = target.filter((m) => progress.data?.some((p) => p.itemId === item.id && p.participantId === m.id)).length;
+          {visible.map((item) => {
+            const { done, total } = progressOf(item);
             return (
               <li key={item.id} className="space-y-2 rounded-2xl border-2 border-mist-300 bg-white p-4">
                 <p className="text-lg font-semibold">{item.title}</p>
@@ -57,7 +169,7 @@ export function ChecklistManager({ eventId, families, members }: Props) {
                 <div className="flex flex-wrap items-center gap-2 text-sm text-ink-700">
                   <ScopeLabel item={item} families={families} members={members} />
                   <span>
-                    · Hecho por {done} de {target.length}
+                    · Hecho por {done} de {total}
                   </span>
                 </div>
                 <Button variant="secondary" onClick={() => setEditing({ mode: 'edit', item })} icon={<Pencil className="size-5" aria-hidden />}>
