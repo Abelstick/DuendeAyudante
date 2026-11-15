@@ -13,7 +13,7 @@ import { playSound } from '@/shared/lib/sound';
 import { Garland, SnowBackdrop } from '@/shared/ui/Ambience';
 import { Snowfall, Tree, WinterScene } from '@/shared/ui/illustrations';
 import { SoundToggle } from '@/shared/ui/SoundToggle';
-import { prefetchCommonSections } from '../prefetch';
+import { prefetchEventSections } from '../prefetch';
 import { FullPageSpinner } from './FullPageSpinner';
 import { Spinner } from '@/shared/ui/Button';
 
@@ -58,8 +58,9 @@ export function EventLayout() {
   useFamilyTheme(myFamily?.color);
   const [collapsed, setCollapsed] = useState(readSidebarCollapsed);
 
-  // Con el teléfono libre, adelanta las secciones más visitadas
-  useEffect(() => prefetchCommonSections(), []);
+  // Con el teléfono libre, adelanta las secciones que se abren desde el inicio
+  const role = context.data?.role;
+  useEffect(() => (role ? prefetchEventSections(canManageEvent(role)) : undefined), [role]);
 
   const toggleSidebar = () => {
     setCollapsed((prev) => {

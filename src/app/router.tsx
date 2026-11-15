@@ -1,16 +1,24 @@
 import { lazy, Suspense, type ComponentType } from 'react';
 import { createBrowserRouter, Navigate, Outlet, ScrollRestoration } from 'react-router-dom';
+import { LoginPage } from '@/modules/accounts/presentation/LoginPage';
+import { ProfilePage } from '@/modules/accounts/presentation/ProfilePage';
 import { WelcomePage } from '@/modules/accounts/presentation/WelcomePage';
+import { CelebrationPage } from '@/modules/events/presentation/CelebrationPage';
 import { HomePage } from '@/modules/events/presentation/HomePage';
 import { FamilyLinkPage } from '@/modules/family-access/presentation/FamilyLinkPage';
+import { GamesPage } from '@/modules/games/presentation/GamesPage';
+import { GiftsPage } from '@/modules/wishlist/presentation/GiftsPage';
+import { PersonGiftsPage } from '@/modules/wishlist/presentation/PersonGiftsPage';
 import { RequireAuth } from './AuthContext';
 import { EventLayout } from './layout/EventLayout';
 import { FullPageSpinner } from './layout/FullPageSpinner';
 import { clearStaleChunkReload, RouteErrorPage } from './layout/RouteErrorPage';
+import { RARE_PAGES } from './prefetch';
 
 /**
- * Carga por partes: cada pantalla poco frecuente se descarga recién al abrirla,
- * así la primera visita (bienvenida, entrar, enlace de familia, inicio) pesa menos.
+ * Las pantallas de todos los días (entrar, inicio y las del menú de abajo) vienen en
+ * la carga inicial: abren al instante. Solo las poco frecuentes se descargan aparte
+ * (y se adelantan en segundo plano, ver prefetch.ts).
  */
 function page<M>(load: () => Promise<M>, pick: (m: M) => ComponentType) {
   return lazy(() =>
@@ -21,22 +29,16 @@ function page<M>(load: () => Promise<M>, pick: (m: M) => ComponentType) {
   );
 }
 
-const LoginPage = page(() => import('@/modules/accounts/presentation/LoginPage'), (m) => m.LoginPage);
-const SignUpPage = page(() => import('@/modules/accounts/presentation/SignUpPage'), (m) => m.SignUpPage);
-const RecoverPage = page(() => import('@/modules/accounts/presentation/RecoverPage'), (m) => m.RecoverPage);
-const NewPasswordPage = page(() => import('@/modules/accounts/presentation/NewPasswordPage'), (m) => m.NewPasswordPage);
-const ProfilePage = page(() => import('@/modules/accounts/presentation/ProfilePage'), (m) => m.ProfilePage);
-const CreateEventPage = page(() => import('@/modules/events/presentation/CreateEventPage'), (m) => m.CreateEventPage);
-const MyEventsPage = page(() => import('@/modules/events/presentation/MyEventsPage'), (m) => m.MyEventsPage);
-const CelebrationPage = page(() => import('@/modules/events/presentation/CelebrationPage'), (m) => m.CelebrationPage);
-const RecapPage = page(() => import('@/modules/events/presentation/RecapPage'), (m) => m.RecapPage);
-const TvPage = page(() => import('@/modules/events/presentation/TvPage'), (m) => m.TvPage);
-const OrganizePage = page(() => import('@/modules/admin/presentation/OrganizePage'), (m) => m.OrganizePage);
-const GamesPage = page(() => import('@/modules/games/presentation/GamesPage'), (m) => m.GamesPage);
-const AnnouncementsPage = page(() => import('@/modules/announcements/presentation/AnnouncementsPage'), (m) => m.AnnouncementsPage);
-const MessagesPage = page(() => import('@/modules/messages/presentation/MessagesPage'), (m) => m.MessagesPage);
-const GiftsPage = page(() => import('@/modules/wishlist/presentation/GiftsPage'), (m) => m.GiftsPage);
-const PersonGiftsPage = page(() => import('@/modules/wishlist/presentation/PersonGiftsPage'), (m) => m.PersonGiftsPage);
+const SignUpPage = page(RARE_PAGES.signUp, (m) => m.SignUpPage);
+const RecoverPage = page(RARE_PAGES.recover, (m) => m.RecoverPage);
+const NewPasswordPage = page(RARE_PAGES.newPassword, (m) => m.NewPasswordPage);
+const CreateEventPage = page(RARE_PAGES.createEvent, (m) => m.CreateEventPage);
+const MyEventsPage = page(RARE_PAGES.myEvents, (m) => m.MyEventsPage);
+const RecapPage = page(RARE_PAGES.recap, (m) => m.RecapPage);
+const TvPage = page(RARE_PAGES.tv, (m) => m.TvPage);
+const OrganizePage = page(RARE_PAGES.organize, (m) => m.OrganizePage);
+const AnnouncementsPage = page(RARE_PAGES.announcements, (m) => m.AnnouncementsPage);
+const MessagesPage = page(RARE_PAGES.messages, (m) => m.MessagesPage);
 
 /**
  * Raíz: al entrar a otra sección se empieza desde arriba; con «Atrás» se vuelve a
