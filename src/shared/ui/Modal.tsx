@@ -34,6 +34,9 @@ export function Modal({ open, title, onClose, children, footer, size = 'md' }: M
       ref={ref}
       aria-labelledby={titleId}
       onCancel={(e) => {
+        // El selector de fotos también dispara "cancel" al cerrarlo sin elegir nada, y ese evento
+        // sube hasta aquí: solo se cierra la ventana con su propio cancel (Esc o el botón atrás).
+        if (e.target !== e.currentTarget) return;
         e.preventDefault();
         onClose();
       }}
