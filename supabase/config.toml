@@ -1,0 +1,8 @@
+# Configuración mínima de la CLI de Supabase (no se usa Docker).
+project_id = "navidad-en-familia"
+
+[functions.create-member]
+verify_jwt = true
+
+[functions.reset-member-password]
+verify_jwt = true

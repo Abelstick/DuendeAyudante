@@ -1,0 +1,48 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { RouterProvider } from 'react-router-dom';
+import { AuthProvider } from '@/app/AuthContext';
+import { createContainer } from '@/app/container';
+import { ContainerProvider } from '@/app/ContainerContext';
+import { router } from '@/app/router';
+import { env } from '@/shared/config/env';
+import { ToastProvider } from '@/shared/ui/Toast';
+import { applyTextSize, getTextSize } from '@/shared/ui/textSize';
+import './index.css';
+
+applyTextSize(getTextSize());
+
+const root = createRoot(document.getElementById('root')!);
+
+if (!env.isConfigured) {
+  root.render(
+    <main style={{ maxWidth: 560, margin: '40px auto', padding: 16, fontSize: 18 }}>
+      <h1>🎄 Falta configurar la aplicación</h1>
+      <p>
+        Crea el archivo <code>.env.local</code> copiando <code>.env.example</code> y completa <code>VITE_SUPABASE_URL</code> y{' '}
+        <code>VITE_SUPABASE_PUBLISHABLE_KEY</code>. Luego reinicia <code>npm run dev</code>.
+      </p>
+    </main>,
+  );
+} else {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { staleTime: 30_000, retry: 1, refetchOnWindowFocus: true },
+    },
+  });
+
+  root.render(
+    <StrictMode>
+      <ContainerProvider container={createContainer()}>
+        <QueryClientProvider client={queryClient}>
+          <ToastProvider>
+            <AuthProvider>
+              <RouterProvider router={router} />
+            </AuthProvider>
+          </ToastProvider>
+        </QueryClientProvider>
+      </ContainerProvider>
+    </StrictMode>,
+  );
+}

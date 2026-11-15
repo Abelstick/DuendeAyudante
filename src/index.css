@@ -1,0 +1,79 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-pine-50: #eef6f1;
+  --color-pine-100: #d6eadd;
+  --color-pine-600: #2a6b47;
+  --color-pine-700: #1f5236;
+  --color-pine-800: #183f2a;
+  --color-pine-900: #112e1f;
+  --color-berry-50: #fdeeee;
+  --color-berry-600: #b3262e;
+  --color-berry-700: #8f1d24;
+  --color-gold-100: #fbf1cf;
+  --color-gold-400: #e0bb3e;
+  --color-gold-600: #a8841a;
+  --color-cream-50: #fffdf8;
+  --color-cream-100: #fbf6ec;
+  --color-cream-200: #f3ead6;
+  --color-ink-900: #1c1a17;
+  --color-ink-700: #4a453d;
+  --color-ink-500: #6f685d;
+
+  --font-sans: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Tamaño de letra base cómodo (18 px) y opción "Letra grande" (21 px). */
+html {
+  font-size: 112.5%;
+  -webkit-text-size-adjust: 100%;
+}
+html[data-text-size='large'] {
+  font-size: 131.25%;
+}
+
+body {
+  background: var(--color-cream-100);
+  color: var(--color-ink-900);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+}
+
+/* Foco siempre visible para quien navega con teclado */
+:focus-visible {
+  outline: 3px solid var(--color-gold-400);
+  outline-offset: 2px;
+}
+
+/* Nieve sutil decorativa en el encabezado */
+.snow-bg {
+  background-image:
+    radial-gradient(circle at 12% 30%, rgb(255 255 255 / 0.22) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 18%, rgb(255 255 255 / 0.18) 0 2px, transparent 3px),
+    radial-gradient(circle at 45% 70%, rgb(255 255 255 / 0.16) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 90% 75%, rgb(255 255 255 / 0.2) 0 2px, transparent 3px),
+    radial-gradient(circle at 25% 85%, rgb(255 255 255 / 0.14) 0 1.5px, transparent 2.5px);
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-pop-in {
+  animation: pop-in 0.25s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

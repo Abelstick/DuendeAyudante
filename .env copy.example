@@ -1,0 +1,11 @@
+# Copia este archivo como .env.local y completa los valores de tu proyecto Supabase
+# (Supabase → Project Settings → API). Estos valores son PÚBLICOS por diseño:
+# la seguridad depende de las políticas RLS, no de esconderlos.
+VITE_SUPABASE_URL=https://TU-PROYECTO.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxx
+
+# Dominio interno de los correos ficticios de los familiares. Debe coincidir con
+# el secreto MEMBER_EMAIL_DOMAIN de las Edge Functions. ".invalid" nunca recibe correo.
+VITE_MEMBER_EMAIL_DOMAIN=usuarios.navidad.invalid
+
+# NUNCA pongas aquí la clave service_role ni la contraseña de la base de datos.
