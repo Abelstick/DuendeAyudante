@@ -25,17 +25,12 @@ participa sin aprender a usar una aplicación complicada.
 | Recuerdos del año (resumen para compartir) | ✅ |
 | Mensajes navideños que se abren a la medianoche (pueden ser anónimos) | ✅ |
 | Ideas de regalo por edad y presupuesto | ✅ |
-| Publicar en Render | ⏳ |
-| Mascotas e ilustraciones por familia | ⏳ (la identidad de color por familia ya está) |
+| Mascotas e ilustraciones por familia | ✅ |
 
 ## Tecnología
 
 React + TypeScript + Vite + Tailwind · TanStack Query · React Hook Form + Zod · Supabase (PostgreSQL con RLS, Auth y
-Edge Functions) · Render Static Site.
-
-## Empezar
-
-Ver **[docs/puesta-en-marcha.md](docs/puesta-en-marcha.md)**.
+Edge Functions) 
 
 ```powershell
 npm install
