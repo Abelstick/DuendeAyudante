@@ -201,7 +201,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
                 ['no', 'No, sus familiares manejarán sus regalos'],
               ] as const
             ).map(([value, label]) => (
-              <label key={value} className="cursor-pointer">
+              <label key={value} className="relative cursor-pointer">
                 <input type="radio" value={value} className="peer sr-only" {...register('hasAccount')} />
                 <span className="flex min-h-14 items-center rounded-2xl border-2 border-mist-300 bg-white px-4 text-base font-semibold peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white">
                   {label}

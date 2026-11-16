@@ -356,9 +356,11 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
 
       <fieldset>
         <legend className="mb-2 text-base font-semibold text-ink-900">¿Cuánto lo quieres?</legend>
+        {/* `relative` en cada opción: el botón de radio oculto queda dentro de ella. Sin eso, al elegirla
+            el navegador desplaza la ventana para "mostrarlo" y deja una parte en blanco. */}
         <div className="grid grid-cols-3 gap-2">
           {(['1', '2', '3'] as const).map((p) => (
-            <label key={p} className="cursor-pointer">
+            <label key={p} className="relative cursor-pointer">
               <input type="radio" value={p} className="peer sr-only" {...register('priority')} />
               <span className="flex min-h-14 items-center justify-center rounded-2xl border-2 border-mist-300 px-2 text-center text-base font-semibold peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white peer-focus-visible:outline-3 peer-focus-visible:outline-gold-400">
                 {PRIORITY_LABELS[Number(p) as WishPriority]}
