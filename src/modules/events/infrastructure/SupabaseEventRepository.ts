@@ -12,13 +12,14 @@ interface EventRow {
   organizer_name: string;
   description: string | null;
   address: string | null;
+  address_host: string | null;
   celebration_at: string;
   timezone: string;
   currency: string;
   gift_exchanges: { id: string; budget_max: number | string }[] | null;
 }
 
-const EVENT_COLUMNS = 'id, name, join_code, organizer_name, description, address, celebration_at, timezone, currency, gift_exchanges(id, budget_max)';
+const EVENT_COLUMNS = 'id, name, join_code, organizer_name, description, address, address_host, celebration_at, timezone, currency, gift_exchanges(id, budget_max)';
 
 function mapEvent(row: EventRow): ChristmasEvent {
   const exchange = row.gift_exchanges?.[0];
@@ -29,6 +30,7 @@ function mapEvent(row: EventRow): ChristmasEvent {
     organizerName: row.organizer_name,
     description: row.description,
     address: row.address,
+    addressHost: row.address_host,
     celebrationAt: new Date(row.celebration_at),
     timezone: row.timezone,
     currency: row.currency.trim(),
@@ -108,8 +110,8 @@ export class SupabaseEventRepository implements IEventRepository {
     if (!data || data.length === 0) throw new AppError('FORBIDDEN');
   }
 
-  async updateAddress(eventId: string, address: string | null): Promise<void> {
-    const { data, error } = await this.supabase.from('events').update({ address }).eq('id', eventId).select('id');
+  async updateAddress(eventId: string, address: string | null, host: string | null): Promise<void> {
+    const { data, error } = await this.supabase.from('events').update({ address, address_host: host }).eq('id', eventId).select('id');
     if (error) throw fromPostgrestError(error);
     if (!data || data.length === 0) throw new AppError('FORBIDDEN');
   }

@@ -1016,6 +1016,16 @@ describe('dirección de la celebración', () => {
       as(ids.ownerA, (tx) => tx.query(`update public.events set address = repeat('a', 301) where id = $1`, [eventA])),
     ).rejects.toThrow(/check constraint/);
   });
+
+  it('también guarda de quién es la casa', async () => {
+    const upd = await as(ids.ownerA, (tx) => tx.query(`update public.events set address_host = 'la abuela Rosa' where id = $1`, [eventA]));
+    expect(upd.affectedRows).toBe(1);
+    const hack = await as(ids.rosa, (tx) => tx.query(`update public.events set address_host = 'X' where id = $1`, [eventA]));
+    expect(hack.affectedRows).toBe(0);
+    await expect(
+      as(ids.ownerA, (tx) => tx.query(`update public.events set address_host = repeat('a', 81) where id = $1`, [eventA])),
+    ).rejects.toThrow(/check constraint/);
+  });
 });
 
 describe('cuentas claras', () => {
@@ -1174,11 +1184,11 @@ describe('Navidad del próximo año', () => {
 
     next = (await duplicate(ids.ownerA, 'garcia 27')).rows[0]!.id;
 
-    const ev = await db.query<{ join_code: string; address: string | null; owner_user_id: string }>(
-      `select join_code, address, owner_user_id from public.events where id = $1`,
+    const ev = await db.query<{ join_code: string; address: string | null; address_host: string | null; owner_user_id: string }>(
+      `select join_code, address, address_host, owner_user_id from public.events where id = $1`,
       [next],
     );
-    expect(ev.rows[0]).toEqual({ join_code: 'GARCIA27', address: 'Av. Larco 123, Miraflores', owner_user_id: ids.ownerA });
+    expect(ev.rows[0]).toEqual({ join_code: 'GARCIA27', address: 'Av. Larco 123, Miraflores', address_host: 'la abuela Rosa', owner_user_id: ids.ownerA });
 
     const copied = await db.query<{ full_name: string; user_id: string | null; family: string | null }>(
       `select p.full_name, p.user_id, f.name as family

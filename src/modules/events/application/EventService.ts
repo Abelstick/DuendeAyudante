@@ -45,11 +45,20 @@ export class EventService {
     return this.events.updateDescription(eventId, text || null);
   }
 
-  /** Dirección en una sola línea, hasta 300 letras; vacía la borra. */
-  updateAddress(eventId: string, address: string): Promise<void> {
+  /**
+   * Dirección en una sola línea, hasta 300 letras; vacía la borra.
+   * `host` es de quién es la casa (hasta 80 letras); sin dirección no se guarda.
+   */
+  updateAddress(eventId: string, address: string, host = ''): Promise<void> {
     const text = address.trim().replace(/\s+/g, ' ');
     if (text.length > 300) throw new AppError('ADDRESS_TOO_LONG');
-    return this.events.updateAddress(eventId, text || null);
+    // Se muestra como «Casa de …»: si lo escribieron completo, no se repite
+    const hostText = host
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/^(en\s+)?(la\s+)?casa\s+de\s+/i, '');
+    if (hostText.length > 80) throw new AppError('ADDRESS_HOST_TOO_LONG');
+    return this.events.updateAddress(eventId, text || null, text ? hostText || null : null);
   }
 
   async duplicate(input: DuplicateEventInput): Promise<string> {

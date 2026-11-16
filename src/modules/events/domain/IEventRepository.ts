@@ -25,8 +25,8 @@ export interface IEventRepository {
   updateBudget(eventId: string, amount: number): Promise<void>;
   /** Cambia la descripción de la celebración (null la borra). */
   updateDescription(eventId: string, description: string | null): Promise<void>;
-  /** Cambia la dirección de la celebración (null la borra). */
-  updateAddress(eventId: string, address: string | null): Promise<void>;
+  /** Cambia la dirección de la celebración y de quién es la casa (null los borra). */
+  updateAddress(eventId: string, address: string | null, host: string | null): Promise<void>;
   /** Crea la Navidad del próximo año copiando lo elegido; devuelve su id. */
   duplicate(data: DuplicateEventData): Promise<string>;
 }

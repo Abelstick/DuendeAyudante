@@ -161,7 +161,10 @@ export function TvPage() {
           {ev.address && (
             <p className="mt-8 flex items-center justify-center gap-2 text-xl text-white/85 lg:text-2xl">
               <MapPin className="size-7 shrink-0 text-gold-300" aria-hidden />
-              {ev.address}
+              <span>
+                {ev.addressHost && <strong className="text-white">Casa de {ev.addressHost} · </strong>}
+                {ev.address}
+              </span>
             </p>
           )}
         </section>

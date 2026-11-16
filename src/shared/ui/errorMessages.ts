@@ -98,6 +98,7 @@ const MESSAGES: Record<string, string> = {
   OWNER_NEEDS_SUCCESSOR: 'Antes de borrar tu cuenta, elige quién queda a cargo de cada celebración que organizas (o bórrala).',
   SUCCESSOR_INVALID: 'La persona elegida ya no es administradora de esa celebración. Cierra esta ventana, vuelve a abrirla y elige de nuevo.',
 
+  ADDRESS_HOST_TOO_LONG: 'El nombre de la casa es muy largo (máximo 80 letras). Escribe solo de quién es, por ejemplo «la abuela Rosa».',
   ADDRESS_TOO_LONG: 'La dirección es muy larga (máximo 300 letras). Deja solo calle, número, distrito y una referencia corta.',
 
   EXPENSE_DESCRIPTION_INVALID: 'Escribe en qué se gastó (ej. Pavo, Bebidas).',

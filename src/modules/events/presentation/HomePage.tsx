@@ -37,6 +37,11 @@ const HOME_TOUR: TourStep[] = [
     text: 'Aquí ves cuántos días faltan para la celebración y la fecha del encuentro.',
   },
   {
+    target: 'inicio-direccion',
+    title: '¿Dónde es?',
+    text: 'Aquí está de quién es la casa y la dirección. Al abrir la tarjeta verás botones para llegar con Google Maps o Waze.',
+  },
+  {
     target: 'inicio-accesos',
     title: 'Accesos rápidos',
     text: 'Las tarjetas como esta se abren y se cierran tocando su título. Dentro de esta hay botones grandes para ir a regalos, juegos, tareas y horarios.',

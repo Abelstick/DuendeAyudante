@@ -11,6 +11,8 @@ export interface ChristmasEvent {
   description: string | null;
   /** Dónde es la celebración (texto libre: calle, número, distrito, referencia). */
   address: string | null;
+  /** De quién es la casa ("la abuela Rosa"); se muestra como «Casa de …». */
+  addressHost: string | null;
   celebrationAt: Date;
   timezone: string;
   currency: string;

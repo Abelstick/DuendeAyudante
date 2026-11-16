@@ -1,15 +1,21 @@
-import { Copy, MapPin, Navigation } from 'lucide-react';
+import { Copy, House, MapPin, Navigation } from 'lucide-react';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { googleMapsUrl, wazeUrl } from '@/shared/lib/maps';
 import { buttonClasses } from '@/shared/ui/Button';
+import { CollapsibleCard } from '@/shared/ui/CollapsibleCard';
 import { useToast } from '@/shared/ui/Toast';
 
-/** En Inicio: dónde es la celebración y cómo llegar. Si no hay dirección, no ocupa espacio. */
+/**
+ * En Inicio: dónde es la celebración, de quién es la casa y cómo llegar.
+ * Se abre y se cierra como las demás tarjetas; contraída sigue mostrando lo esencial.
+ * Si no hay dirección, no ocupa espacio.
+ */
 export function AddressCard() {
   const { event } = useEventScope();
   const toast = useToast();
   if (!event.address) return null;
   const address = event.address;
+  const host = event.addressHost;
 
   const copy = async () => {
     try {
@@ -21,18 +27,21 @@ export function AddressCard() {
   };
 
   return (
-    <section aria-labelledby="direccion-title" className="space-y-3 rounded-2xl border-2 border-night-900 bg-white p-4 shadow-block">
-      <div className="flex items-start gap-3">
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-night-900 bg-berry-500 text-white" aria-hidden>
-          <MapPin className="size-6" />
-        </span>
-        <div className="min-w-0">
-          <h2 id="direccion-title" className="text-lg font-extrabold text-ink-900">
-            ¿Dónde es?
-          </h2>
-          <p className="wrap-break-word select-all text-base text-ink-700">{address}</p>
-        </div>
-      </div>
+    <CollapsibleCard
+      id="inicio:direccion"
+      tourId="inicio-direccion"
+      icon={<MapPin className="size-6" />}
+      tone="berry"
+      title="¿Dónde es?"
+      action={<span className="line-clamp-2 text-sm font-semibold text-ink-700">{host ? `Casa de ${host}` : address}</span>}
+    >
+      {host && (
+        <p className="flex items-center gap-2 text-lg font-extrabold text-ink-900">
+          <House className="size-5 shrink-0 text-berry-600" aria-hidden />
+          <span className="min-w-0 wrap-break-word">Casa de {host}</span>
+        </p>
+      )}
+      <p className="wrap-break-word select-all text-base text-ink-700">{address}</p>
       <div className="grid gap-2 sm:grid-cols-3">
         <a href={googleMapsUrl(address)} target="_blank" rel="noopener noreferrer" className={buttonClasses('primary', 'md', 'justify-center')}>
           <MapPin className="size-5" aria-hidden />
@@ -47,6 +56,6 @@ export function AddressCard() {
           Copiar
         </button>
       </div>
-    </section>
+    </CollapsibleCard>
   );
 }

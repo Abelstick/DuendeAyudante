@@ -77,7 +77,7 @@ export function useUpdateAddress(eventId: string) {
   const { events } = useServices();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (address: string) => events.updateAddress(eventId, address),
+    mutationFn: ({ address, host }: { address: string; host: string }) => events.updateAddress(eventId, address, host),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
       void qc.invalidateQueries({ queryKey: eventKeys.mine });
