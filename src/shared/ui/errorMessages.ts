@@ -98,6 +98,11 @@ const MESSAGES: Record<string, string> = {
   OWNER_NEEDS_SUCCESSOR: 'Antes de borrar tu cuenta, elige quién queda a cargo de cada celebración que organizas (o bórrala).',
   SUCCESSOR_INVALID: 'La persona elegida ya no es administradora de esa celebración. Cierra esta ventana, vuelve a abrirla y elige de nuevo.',
 
+  QUESTION_INVALID: 'Escribe tu pregunta (máximo 300 letras).',
+  ANSWER_INVALID: 'Escribe tu respuesta (máximo 500 letras).',
+  QUESTION_OWN_ITEM: 'No puedes hacer preguntas sobre tus propios regalos.',
+  QUESTION_NEEDS_PROFILE: 'Para preguntar necesitas un perfil en esta celebración. Pide al organizador que te agregue.',
+  TOO_MANY_QUESTIONS: 'Este regalo ya tiene muchas preguntas. Revisa si la tuya ya está respondida.',
   ADDRESS_HOST_TOO_LONG: 'El nombre de la casa es muy largo (máximo 80 letras). Escribe solo de quién es, por ejemplo «la abuela Rosa».',
   ADDRESS_TOO_LONG: 'La dirección es muy larga (máximo 300 letras). Deja solo calle, número, distrito y una referencia corta.',
 

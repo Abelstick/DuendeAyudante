@@ -1,5 +1,5 @@
 import { ChevronDown, CloudUpload, ExternalLink, Images, Loader2, Pencil, Tag, Trash2 } from 'lucide-react';
-import { useId, useState } from 'react';
+import { useId, useState, type ReactNode } from 'react';
 import { AppError } from '@/shared/domain/errors';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { formatMoney } from '@/shared/lib/money';
@@ -20,6 +20,8 @@ interface Props {
   deleting?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
+  /** Contenido extra al pie de la tarjeta (p. ej. las preguntas sobre el regalo). */
+  children?: ReactNode;
 }
 
 const priorityStyles = {
@@ -31,7 +33,7 @@ const priorityStyles = {
 /** Cada prioridad tiene su caja de regalo (además de la etiqueta con texto). */
 const priorityGift: Record<1 | 2 | 3, GiftTone> = { 1: 'berry', 2: 'pine', 3: 'night' };
 
-export function WishlistItemCard({ item, budget, currency, canEdit, deleting, onEdit, onDelete }: Props) {
+export function WishlistItemCard({ item, budget, currency, canEdit, deleting, onEdit, onDelete, children }: Props) {
   const [confirming, setConfirming] = useState(false);
   const [viewing, setViewing] = useState<number | null>(null);
   const [photosOpen, setPhotosOpen] = useState(false);
@@ -180,6 +182,8 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
           ))}
         </ul>
       )}
+
+      {children}
 
       {canEdit &&
         (confirming ? (

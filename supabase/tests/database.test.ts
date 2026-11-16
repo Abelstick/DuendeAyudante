@@ -1028,6 +1028,57 @@ describe('dirección de la celebración', () => {
   });
 });
 
+describe('preguntas anónimas sobre regalos', () => {
+  type Row = { id: string; question: string; answer: string | null; is_mine: boolean; answer_unseen: boolean };
+  const list = (userId: string) => as(userId, (tx) => tx.query<Row>(`select * from public.list_wishlist_questions($1)`, [eventA]));
+  let item = '';
+  let question = '';
+
+  it('se pregunta por el regalo de otra persona, no por los propios', async () => {
+    item = (await as(ids.rosa, (tx) => tx.query<{ id: string }>(`select public.save_wishlist_item($1, $2, 'Zapatillas') as id`, [eventA, participant.rosa]))).rows[0]!.id;
+    question = (await as(ids.papa, (tx) => tx.query<{ id: string }>(`select public.ask_wishlist_question($1, '  ¿Qué talla?  ') as id`, [item]))).rows[0]!.id;
+
+    await expect(as(ids.rosa, (tx) => tx.query(`select public.ask_wishlist_question($1, '¿Y el color?')`, [item]))).rejects.toThrow(/QUESTION_OWN_ITEM/);
+    await expect(as(ids.papa, (tx) => tx.query(`select public.ask_wishlist_question($1, '   ')`, [item]))).rejects.toThrow(/QUESTION_INVALID/);
+    await expectDenied(as(ids.ownerB, (tx) => tx.query(`select public.ask_wishlist_question($1, '¿Qué talla?')`, [item])));
+    await expectDenied(as(ids.ownerB, (tx) => tx.query(`select * from public.list_wishlist_questions($1)`, [eventA])));
+  });
+
+  it('nadie puede saber quién preguntó, ni el organizador', async () => {
+    await expectDenied(as(ids.ownerA, (tx) => tx.query(`select * from public.wishlist_questions`)));
+    for (const viewer of [ids.rosa, ids.ownerA, ids.editor]) {
+      const rows = (await list(viewer)).rows;
+      expect(rows).toHaveLength(1);
+      expect(Object.keys(rows[0]!).sort()).toEqual(['answer', 'answer_unseen', 'answered_at', 'created_at', 'id', 'is_mine', 'item_id', 'question']);
+      expect(rows[0]).toMatchObject({ question: '¿Qué talla?', answer: null, is_mine: false });
+    }
+    expect((await list(ids.papa)).rows[0]).toMatchObject({ is_mine: true, answer_unseen: false });
+  });
+
+  it('responde la persona del regalo; quien preguntó recibe el aviso una sola vez', async () => {
+    await expectDenied(as(ids.editor, (tx) => tx.query(`select public.answer_wishlist_question($1, '40')`, [question])));
+    await as(ids.rosa, (tx) => tx.query(`select public.answer_wishlist_question($1, ' Talla 38 ')`, [question]));
+
+    expect((await list(ids.editor)).rows[0]).toMatchObject({ answer: 'Talla 38', is_mine: false, answer_unseen: false });
+    expect((await list(ids.papa)).rows[0]).toMatchObject({ answer: 'Talla 38', is_mine: true, answer_unseen: true });
+
+    // Que otra persona abra el regalo no apaga el aviso de quien preguntó
+    await as(ids.editor, (tx) => tx.query(`select public.mark_wishlist_answers_seen($1)`, [item]));
+    expect((await list(ids.papa)).rows[0]!.answer_unseen).toBe(true);
+    await as(ids.papa, (tx) => tx.query(`select public.mark_wishlist_answers_seen($1)`, [item]));
+    expect((await list(ids.papa)).rows[0]!.answer_unseen).toBe(false);
+  });
+
+  it('quien preguntó la quita solo si no tiene respuesta; la persona del regalo, siempre', async () => {
+    await expectDenied(as(ids.papa, (tx) => tx.query(`select public.delete_wishlist_question($1)`, [question])));
+    const other = (await as(ids.papa, (tx) => tx.query<{ id: string }>(`select public.ask_wishlist_question($1, '¿De qué color?') as id`, [item]))).rows[0]!.id;
+    await expectDenied(as(ids.editor, (tx) => tx.query(`select public.delete_wishlist_question($1)`, [other])));
+    await as(ids.papa, (tx) => tx.query(`select public.delete_wishlist_question($1)`, [other]));
+    await as(ids.rosa, (tx) => tx.query(`select public.delete_wishlist_question($1)`, [question]));
+    expect((await list(ids.rosa)).rows).toHaveLength(0);
+  });
+});
+
 describe('cuentas claras', () => {
   const saveExpense = (userId: string, args: unknown[]) =>
     as(userId, (tx) => tx.query<{ id: string }>(`select public.save_expense($1, $2, $3, $4, $5, $6::uuid[], $7, $8) as id`, args));

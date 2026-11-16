@@ -1,6 +1,8 @@
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { usePhotoUploadStatus } from '@/modules/family-drive/presentation/hooks';
+import { useEventScope } from '@/app/layout/EventLayout';
+import { actingParticipants } from '@/modules/events/domain/Event';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { Button } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/Card';
@@ -9,6 +11,7 @@ import { Modal } from '@/shared/ui/Modal';
 import { useToast } from '@/shared/ui/Toast';
 import type { WishlistItem } from '../domain/WishlistItem';
 import type { WishlistPhoto } from '../domain/WishlistPhoto';
+import { GiftQuestions } from './GiftQuestions';
 import { useWishlistMutations } from './hooks';
 import { useEnqueuePhotos, usePhotoQueue } from './photoQueue';
 import { WishlistItemCard } from './WishlistItemCard';
@@ -36,6 +39,9 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
   const enqueuePhotos = useEnqueuePhotos();
   const participants = useParticipants(eventId);
   const toast = useToast();
+  const { context } = useEventScope();
+  // Quien administra la lista de otra persona también puede preguntar; por los propios regalos (o de alguien a cargo), no
+  const canAsk = Boolean(context.me) && !actingParticipants(context).some((p) => p.id === participantId);
   const [adding, setAdding] = useState(startAdding);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
@@ -127,7 +133,9 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
           deleting={remove.isPending && remove.variables === item.id}
           onEdit={() => setEditingId(item.id)}
           onDelete={() => handleDelete(item)}
-        />
+        >
+          <GiftQuestions eventId={eventId} itemId={item.id} canAnswer canAsk={canAsk} />
+        </WishlistItemCard>
       ))}
 
       {adding && (

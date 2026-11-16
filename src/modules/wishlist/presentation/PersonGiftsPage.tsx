@@ -14,6 +14,7 @@ import { errorMessage } from '@/shared/ui/errorMessages';
 import { toTitleCase } from '@/shared/validation/names';
 import { useMySecretFriends } from '@/modules/secret-friend/presentation/hooks';
 import { EditableWishlist } from './EditableWishlist';
+import { GiftQuestions } from './GiftQuestions';
 import { useEventWishlist } from './hooks';
 import { WishlistItemCard } from './WishlistItemCard';
 
@@ -71,7 +72,10 @@ export function PersonGiftsPage() {
       ) : (
         <div className="stagger space-y-4">
           {items.map((item) => (
-            <WishlistItemCard key={item.id} item={item} budget={budget} currency={event.currency} canEdit={false} />
+            <WishlistItemCard key={item.id} item={item} budget={budget} currency={event.currency} canEdit={false}>
+              {/* Preguntas anónimas: un botón discreto dentro de cada regalo */}
+              <GiftQuestions eventId={event.id} itemId={item.id} canAnswer={false} canAsk={Boolean(context.me)} />
+            </WishlistItemCard>
           ))}
         </div>
       )}

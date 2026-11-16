@@ -25,6 +25,7 @@ import { WishlistService } from '../application/WishlistService';
 import type { WishlistItem } from '../domain/WishlistItem';
 import { DrivePhoto } from './DrivePhoto';
 import { EditableWishlist } from './EditableWishlist';
+import { GiftQuestionsNotice } from './GiftQuestionsNotice';
 import { useEventWishlist } from './hooks';
 
 /** Guía de Regalos: solo se abre si la persona toca «¿Cómo funcionan los regalos?». */
@@ -51,7 +52,7 @@ const GIFTS_TOUR: TourStep[] = [
   {
     target: 'regalos-pestanas',
     title: '2. Mira los regalos de todos',
-    text: 'Toca «Regalos de todos» y elige a una persona para ver qué le gustaría recibir. Con «Mis regalos» vuelves a tu lista.',
+    text: 'Toca «Regalos de todos» y elige a una persona para ver qué le gustaría recibir. Si te queda una duda (por ejemplo, la talla), dentro de cada regalo puedes hacer una pregunta anónima. Con «Mis regalos» vuelves a tu lista.',
   },
 ];
 
@@ -70,6 +71,9 @@ export function GiftsPage() {
 
       {/* Ayuda opcional: explica el flujo desde «Mis regalos» */}
       <TourButton label="¿Cómo funcionan los regalos? Te lo explicamos" steps={GIFTS_TOUR} onBeforeStart={() => setView('mine')} />
+
+      {/* Solo aparece si te preguntaron algo o respondieron una pregunta tuya */}
+      <GiftQuestionsNotice inGifts={view === 'mine'} />
 
       <div data-tour="regalos-pestanas">
         <SegmentedTabs

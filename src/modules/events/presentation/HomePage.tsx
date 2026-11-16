@@ -12,6 +12,7 @@ import { GamesTeaserCard } from '@/modules/games/presentation/GamesTeaserCard';
 import { useParticipants } from '@/modules/members/presentation/hooks';
 import { MyResponsibilitiesCard } from '@/modules/responsibilities/presentation/MyResponsibilitiesCard';
 import { NowNextCard } from '@/modules/schedule/presentation/NowNextCard';
+import { GiftQuestionsNotice } from '@/modules/wishlist/presentation/GiftQuestionsNotice';
 import { GiftsHomeCard } from '@/modules/wishlist/presentation/GiftsHomeCard';
 import { SecretFriendCard } from '@/modules/secret-friend/presentation/SecretFriendCard';
 import { formatMoney } from '@/shared/lib/money';
@@ -142,6 +143,9 @@ export function HomePage() {
       <CollapsibleCard id="inicio:accesos" tourId="inicio-accesos" icon={<LayoutGrid className="size-6" />} tone="gold" title="Accesos rápidos" action={<span className="text-sm font-semibold text-ink-700">Regalos, juegos, tareas y horarios</span>}>
         <QuickAccessGrid />
       </CollapsibleCard>
+
+      {/* Preguntas sobre regalos: solo aparece si hay algo que atender */}
+      <GiftQuestionsNotice />
 
       {/* Regalos a la mano: mi lista y las de los demás */}
       <GiftsHomeCard />

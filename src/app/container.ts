@@ -26,7 +26,9 @@ import { ResponsibilityService } from '@/modules/responsibilities/application/Re
 import { SupabaseResponsibilityRepository } from '@/modules/responsibilities/infrastructure/SupabaseResponsibilityRepository';
 import { SecretFriendService } from '@/modules/secret-friend/application/SecretFriendService';
 import { SupabaseSecretFriendRepository } from '@/modules/secret-friend/infrastructure/SupabaseSecretFriendRepository';
+import { GiftQuestionService } from '@/modules/wishlist/application/GiftQuestionService';
 import { WishlistService } from '@/modules/wishlist/application/WishlistService';
+import { SupabaseGiftQuestionRepository } from '@/modules/wishlist/infrastructure/SupabaseGiftQuestionRepository';
 import { SupabaseWishlistRepository } from '@/modules/wishlist/infrastructure/SupabaseWishlistRepository';
 import { ExpenseService } from '@/modules/expenses/application/ExpenseService';
 import { SupabaseExpenseRepository } from '@/modules/expenses/infrastructure/SupabaseExpenseRepository';
@@ -45,6 +47,7 @@ export interface Container {
   familyDrives: FamilyDriveService;
   members: MemberService;
   wishlist: WishlistService;
+  giftQuestions: GiftQuestionService;
   checklist: ChecklistService;
   responsibilities: ResponsibilityService;
   games: GameService;
@@ -65,6 +68,7 @@ export function createContainer(): Container {
     familyDrives: new FamilyDriveService(new SupabaseFamilyDriveRepository(supabase)),
     members: new MemberService(new SupabaseParticipantRepository(supabase), new EdgeFunctionMemberAccountService(supabase)),
     wishlist: new WishlistService(new SupabaseWishlistRepository(supabase)),
+    giftQuestions: new GiftQuestionService(new SupabaseGiftQuestionRepository(supabase)),
     checklist: new ChecklistService(new SupabaseChecklistRepository(supabase)),
     responsibilities: new ResponsibilityService(new SupabaseResponsibilityRepository(supabase)),
     games: new GameService(new SupabaseGameRepository(supabase)),
