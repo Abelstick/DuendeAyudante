@@ -1,11 +1,11 @@
-import { ClipboardPlus, KeyRound, MessageCircle, Pencil } from 'lucide-react';
+import { ClipboardPlus, KeyRound, MessageCircle, Pencil, UserRoundCheck } from 'lucide-react';
 import { useState } from 'react';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { ROLE_LABELS, type EventRole } from '@/modules/events/domain/Event';
 import type { Family } from '@/modules/families/domain/Family';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { displayName, type Member } from '@/modules/members/domain/Participant';
-import { useMemberMutations } from '@/modules/members/presentation/hooks';
+import { useDisabledMembers, useMemberMutations } from '@/modules/members/presentation/hooks';
 import { Button } from '@/shared/ui/Button';
 import { applySort, DEFAULT_LIST_PREFS, matchesSearch, toggleSort, type ListPrefs, type SortValue } from '@/shared/lib/listing';
 import { useSessionState } from '@/shared/lib/useSessionState';
@@ -56,7 +56,10 @@ function canResetPasswordOf(member: Member, myRole: EventRole, myParticipantId: 
 
 export function MembersList({ members, families, myRole, onAssignTask }: Props) {
   const { event, context } = useEventScope();
-  const { resetPassword, updateFamily } = useMemberMutations(event.id);
+  const { resetPassword, updateFamily, reactivate } = useMemberMutations(event.id);
+  // Quienes inhabilitaron su cuenta desde su perfil: aquí se les puede reactivar
+  const disabledIds = useDisabledMembers(event.id).data ?? [];
+  const isDisabled = (m: Member) => disabledIds.includes(m.id);
   const toast = useToast();
   const [panel, setPanel] = useState<Panel>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -106,6 +109,15 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
     }
   };
 
+  const doReactivate = async (member: Member) => {
+    try {
+      await reactivate.mutateAsync(member.id);
+      toast.success(`La cuenta de ${displayName(member)} está activa otra vez. Entra con su mismo usuario y contraseña.`);
+    } catch (err) {
+      toast.error(errorMessage(err));
+    }
+  };
+
   const open = panel ? byId.get(panel.memberId) : undefined;
 
   const familySelect = (m: Member, label?: string) => (
@@ -135,6 +147,7 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
           <>
             <span className="font-bold text-night-900">{displayName(m)}</span>
             {guardians.length > 0 && <span className="block text-sm text-ink-700">Lo manejan: {guardians.map((g) => displayName(g)).join(', ')}</span>}
+            {isDisabled(m) && <span className="block text-sm font-bold text-berry-700">Cuenta inhabilitada</span>}
           </>
         );
       },
@@ -159,6 +172,11 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
           <RowAction onClick={() => onAssignTask(m)} icon={<ClipboardPlus className="size-4" aria-hidden />}>
             Tarea
           </RowAction>
+          {isDisabled(m) && (
+            <RowAction onClick={() => doReactivate(m)} icon={<UserRoundCheck className="size-4" aria-hidden />}>
+              Reactivar
+            </RowAction>
+          )}
           {m.username && m.id !== context.me?.id && (
             <>
               <RowAction onClick={() => setPanel({ memberId: m.id, kind: 'access' })} icon={<MessageCircle className="size-4" aria-hidden />}>
@@ -239,6 +257,7 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
                   </p>
                 )}
                 {guardians.length > 0 && <p className="text-sm text-ink-700">Lo manejan: {guardians.map((g) => displayName(g)).join(', ')}</p>}
+                {isDisabled(m) && <p className="text-sm font-bold text-berry-700">Cuenta inhabilitada: esta persona no puede entrar hasta que la reactives.</p>}
               </div>
 
               {families.length > 0 && (
@@ -255,6 +274,11 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
                 <Button variant="secondary" onClick={() => onAssignTask(m)} icon={<ClipboardPlus className="size-5" aria-hidden />}>
                   Asignar tarea
                 </Button>
+                {isDisabled(m) && (
+                  <Button onClick={() => doReactivate(m)} loading={reactivate.isPending && reactivate.variables === m.id} icon={<UserRoundCheck className="size-5" aria-hidden />}>
+                    Reactivar cuenta
+                  </Button>
+                )}
                 {m.username && m.id !== context.me?.id && (
                   <>
                     <Button variant="ghost" onClick={() => setPanel({ memberId: m.id, kind: 'access' })} icon={<MessageCircle className="size-5" aria-hidden />}>

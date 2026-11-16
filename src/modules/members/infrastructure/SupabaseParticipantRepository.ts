@@ -75,6 +75,17 @@ export class SupabaseParticipantRepository implements IParticipantRepository {
     if (error) throw fromPostgrestError(error);
   }
 
+  async listDisabledIds(eventId: string): Promise<string[]> {
+    const { data, error } = await this.supabase.rpc('list_disabled_members', { p_event_id: eventId });
+    if (error) throw fromPostgrestError(error);
+    return (data ?? []) as string[];
+  }
+
+  async reactivateAccount(eventId: string, participantId: string): Promise<void> {
+    const { error } = await this.supabase.rpc('reactivate_member_account', { p_event_id: eventId, p_participant_id: participantId });
+    if (error) throw fromPostgrestError(error);
+  }
+
   async setGuardians(eventId: string, participantId: string, guardianIds: string[]): Promise<void> {
     const current = await this.supabase.from('guardianships').select('guardian_participant_id').eq('ward_participant_id', participantId);
     if (current.error) throw fromPostgrestError(current.error);

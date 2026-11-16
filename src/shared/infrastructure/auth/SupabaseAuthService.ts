@@ -1,5 +1,5 @@
 import type { SupabaseClient, User } from '@supabase/supabase-js';
-import type { AuthUser, IAuthService, OwnedEvent, OwnershipChoices, SignInCredentials } from '@/shared/application/ports/IAuthService';
+import type { AuthUser, IAuthService, SignInCredentials } from '@/shared/application/ports/IAuthService';
 import { fromPostgrestError } from '@/shared/infrastructure/supabase/errors';
 import { AppError } from '@/shared/domain/errors';
 import { normalizeJoinCode, normalizeUsername } from '@/shared/validation/names';
@@ -37,7 +37,10 @@ export class SupabaseAuthService implements IAuthService {
 
   async getCurrentUser(): Promise<AuthUser | null> {
     const { data } = await this.supabase.auth.getSession();
-    return data.session ? this.toAuthUser(data.session.user) : null;
+    if (!data.session) return null;
+    // Una cuenta inhabilitada no sigue dentro aunque tuviera la sesión abierta
+    if (await this.isDisabled()) return null;
+    return this.toAuthUser(data.session.user);
   }
 
   onChange(listener: (user: AuthUser | null) => void): () => void {
@@ -58,6 +61,7 @@ export class SupabaseAuthService implements IAuthService {
       if (error.status === 429) throw new AppError('TOO_MANY_ATTEMPTS');
       throw new AppError('NETWORK');
     }
+    if (await this.isDisabled()) throw new AppError('ACCOUNT_DISABLED');
     return this.toAuthUser(data.user);
   }
 
@@ -67,6 +71,7 @@ export class SupabaseAuthService implements IAuthService {
       if (error?.status === 429) throw new AppError('TOO_MANY_ATTEMPTS');
       throw new AppError(error?.status && error.status < 500 ? 'FAMILY_PASS_EXPIRED' : 'NETWORK');
     }
+    if (await this.isDisabled()) throw new AppError('ACCOUNT_DISABLED');
     return this.toAuthUser(data.user);
   }
 
@@ -115,20 +120,17 @@ export class SupabaseAuthService implements IAuthService {
     await this.supabase.auth.signOut();
   }
 
-  async listOwnedEvents(): Promise<OwnedEvent[]> {
-    const { data, error } = await this.supabase.rpc('my_owned_events');
+  async disableAccount(confirm: string): Promise<void> {
+    const { error } = await this.supabase.rpc('disable_my_account', { p_confirm: confirm });
     if (error) throw fromPostgrestError(error);
-    return ((data ?? []) as { event_id: string; event_name: string; successors: OwnedEvent['successors'] | null }[]).map((r) => ({
-      eventId: r.event_id,
-      eventName: r.event_name,
-      successors: r.successors ?? [],
-    }));
+    await this.supabase.auth.signOut();
   }
 
-  async deleteAccount(confirm: string, choices: OwnershipChoices): Promise<void> {
-    const { error } = await this.supabase.rpc('delete_my_account', { p_confirm: confirm, p_successors: choices });
-    if (error) throw fromPostgrestError(error);
-    // La cuenta ya no existe: se limpia la sesión solo en este dispositivo (el servidor ya no la reconoce)
-    await this.supabase.auth.signOut({ scope: 'local' });
+  /** Si la cuenta está inhabilitada, cierra la sesión y avisa. Sin conexión no se bloquea a nadie. */
+  private async isDisabled(): Promise<boolean> {
+    const { data, error } = await this.supabase.rpc('my_account_disabled');
+    if (error || data !== true) return false;
+    await this.supabase.auth.signOut();
+    return true;
   }
 }

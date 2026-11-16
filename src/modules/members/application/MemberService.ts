@@ -47,6 +47,14 @@ export class MemberService {
     });
   }
 
+  listDisabledIds(eventId: string) {
+    return this.participants.listDisabledIds(eventId);
+  }
+
+  reactivateAccount(eventId: string, participantId: string) {
+    return this.participants.reactivateAccount(eventId, participantId);
+  }
+
   /** Quiénes pueden manejar los regalos de esta persona desde su propia cuenta (hasta 5, nunca ella misma). */
   setGuardians(eventId: string, participantId: string, guardianIds: string[]) {
     const ids = [...new Set(guardianIds)].filter((id) => id !== participantId);

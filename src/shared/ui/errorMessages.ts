@@ -96,6 +96,9 @@ const MESSAGES: Record<string, string> = {
   FAMILY_PASS_EXPIRED: 'No pudimos terminar de entrar. Toca tu nombre otra vez.',
 
   DELETE_CONFIRMATION_REQUIRED: 'Para confirmar, escribe la palabra BORRAR.',
+  ACCOUNT_DISABLED: 'Esta cuenta está inhabilitada. Pídele a quien organiza tu celebración que la reactive.',
+  DISABLE_CONFIRMATION_REQUIRED: 'Para confirmar, escribe la palabra INHABILITAR.',
+  LAST_MANAGER: 'Eres la única persona que administra una de tus celebraciones. Antes de inhabilitar tu cuenta, nombra a otro administrador en Organizar: será quien pueda reactivarla.',
   OWNER_NEEDS_SUCCESSOR: 'Antes de borrar tu cuenta, elige quién queda a cargo de cada celebración que organizas (o bórrala).',
   SUCCESSOR_INVALID: 'La persona elegida ya no es administradora de esa celebración. Cierra esta ventana, vuelve a abrirla y elige de nuevo.',
 

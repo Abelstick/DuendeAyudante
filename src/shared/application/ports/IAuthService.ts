@@ -11,16 +11,12 @@ export interface SignInCredentials {
   password: string;
 }
 
-/** Celebración que organizo: antes de borrar mi cuenta hay que pasarla a un administrador (o borrarla). */
-export interface OwnedEvent {
-  eventId: string;
-  eventName: string;
-  /** Administradores que pueden quedar como organizador. */
-  successors: { userId: string; name: string }[];
-}
+/** Palabra que se escribe para confirmar que se inhabilita la cuenta (también la valida la base). */
+export const DISABLE_CONFIRMATION_WORD = 'INHABILITAR';
 
-/** Para cada celebración que organizo: el userId del nuevo organizador, o 'DELETE' para borrarla. */
-export type OwnershipChoices = Record<string, string>;
+export function isDisableConfirmed(text: string): boolean {
+  return text.trim().toUpperCase() === DISABLE_CONFIRMATION_WORD;
+}
 
 export interface IAuthService {
   getCurrentUser(): Promise<AuthUser | null>;
@@ -34,10 +30,10 @@ export interface IAuthService {
   /** Comprueba la contraseña de quien tiene la sesión abierta (para ver datos privados). Falla con WRONG_PASSWORD. */
   verifyPassword(password: string): Promise<void>;
   signOut(): Promise<void>;
-  listOwnedEvents(): Promise<OwnedEvent[]>;
   /**
-   * Borra la cuenta de quien tiene la sesión (su perfil queda en la celebración, sin usuario).
-   * `confirm` debe ser BORRAR. Al terminar, cierra la sesión en este dispositivo.
+   * Inhabilita la cuenta de quien tiene la sesión: ya no puede entrar, pero no se borra nada
+   * y quien administra su celebración puede reactivarla. `confirm` debe ser INHABILITAR.
+   * Al terminar, cierra la sesión.
    */
-  deleteAccount(confirm: string, choices: OwnershipChoices): Promise<void>;
+  disableAccount(confirm: string): Promise<void>;
 }

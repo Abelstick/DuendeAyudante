@@ -1028,6 +1028,44 @@ describe('dirección de la celebración', () => {
   });
 });
 
+describe('inhabilitar mi cuenta', () => {
+  const isMember = async (userId: string) => (await as(userId, (tx) => tx.query<{ ok: boolean }>(`select app.is_member($1) as ok`, [eventA]))).rows[0]!.ok;
+  const isDisabled = async (userId: string) => (await as(userId, (tx) => tx.query<{ off: boolean }>(`select public.my_account_disabled() as off`))).rows[0]!.off;
+
+  it('se confirma con la palabra y deja de ver la celebración, sin borrar nada', async () => {
+    await expect(as(ids.rosa, (tx) => tx.query(`select public.disable_my_account('si')`))).rejects.toThrow(/DISABLE_CONFIRMATION_REQUIRED/);
+    expect(await isMember(ids.rosa)).toBe(true);
+
+    await as(ids.rosa, (tx) => tx.query(`select public.disable_my_account(' inhabilitar ')`));
+    expect(await isDisabled(ids.rosa)).toBe(true);
+    expect(await isMember(ids.rosa)).toBe(false);
+    const acting = await as(ids.rosa, (tx) => tx.query(`select app.acting_participant_ids()`));
+    expect(acting.rows).toHaveLength(0);
+
+    // Su usuario y su perfil siguen ahí
+    const kept = await db.query<{ user_id: string | null; status: string }>(`select user_id, status from public.participants where id = $1`, [participant.rosa]);
+    expect(kept.rows[0]).toEqual({ user_id: ids.rosa, status: 'active' });
+  });
+
+  it('solo quien administra la ve inhabilitada y la reactiva', async () => {
+    await expectDenied(as(ids.editor, (tx) => tx.query(`select public.list_disabled_members($1)`, [eventA])));
+    await expectDenied(as(ids.editor, (tx) => tx.query(`select public.reactivate_member_account($1, $2)`, [eventA, participant.rosa])));
+    await expectDenied(as(ids.ownerB, (tx) => tx.query(`select public.reactivate_member_account($1, $2)`, [eventA, participant.rosa])));
+
+    const list = await as(ids.ownerA, (tx) => tx.query<{ id: string }>(`select public.list_disabled_members($1) as id`, [eventA]));
+    expect(list.rows.map((r) => r.id)).toEqual([participant.rosa]);
+
+    await as(ids.ownerA, (tx) => tx.query(`select public.reactivate_member_account($1, $2)`, [eventA, participant.rosa]));
+    expect(await isDisabled(ids.rosa)).toBe(false);
+    expect(await isMember(ids.rosa)).toBe(true);
+  });
+
+  it('quien administra sola una celebración no puede inhabilitarse', async () => {
+    await expect(as(ids.ownerB, (tx) => tx.query(`select public.disable_my_account('INHABILITAR')`))).rejects.toThrow(/LAST_MANAGER/);
+    expect(await isDisabled(ids.ownerB)).toBe(false);
+  });
+});
+
 describe('preguntas anónimas sobre regalos', () => {
   type Row = { id: string; question: string; answer: string | null; is_mine: boolean; answer_unseen: boolean };
   const list = (userId: string) => as(userId, (tx) => tx.query<Row>(`select * from public.list_wishlist_questions($1)`, [eventA]));

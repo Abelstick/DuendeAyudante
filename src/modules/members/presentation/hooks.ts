@@ -20,6 +20,12 @@ export function useMembers(eventId: string) {
   return useQuery({ queryKey: memberKeys.members(eventId), queryFn: () => members.listMembers(eventId) });
 }
 
+/** Integrantes con la cuenta inhabilitada (solo organizador/administradores). */
+export function useDisabledMembers(eventId: string) {
+  const { members } = useServices();
+  return useQuery({ queryKey: [...memberKeys.members(eventId), 'disabled'] as const, queryFn: () => members.listDisabledIds(eventId) });
+}
+
 export function useMemberMutations(eventId: string) {
   const { members } = useServices();
   const qc = useQueryClient();
@@ -42,6 +48,7 @@ export function useMemberMutations(eventId: string) {
       mutationFn: ({ participantId, details }: { participantId: string; details: ParticipantDetails }) => members.updateMember(participantId, details),
       onSuccess: refresh,
     }),
+    reactivate: useMutation({ mutationFn: (participantId: string) => members.reactivateAccount(eventId, participantId), onSuccess: refresh }),
     setGuardians: useMutation({
       mutationFn: ({ participantId, guardianIds }: { participantId: string; guardianIds: string[] }) => members.setGuardians(eventId, participantId, guardianIds),
       onSuccess: () => {
