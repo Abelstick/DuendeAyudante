@@ -36,7 +36,7 @@ export function ParticipantDraw({ participants, families }: Props) {
   };
 
   return (
-    <Card className="space-y-4">
+    <Card data-tour="juegos-sorteo" className="space-y-4">
       <CardTitle icon={<Users className="size-6" />} tone="gold">
         ¿A quién le toca?
       </CardTitle>

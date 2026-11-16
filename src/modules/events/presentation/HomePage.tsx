@@ -18,10 +18,49 @@ import { formatMoney } from '@/shared/lib/money';
 import { Avatar } from '@/shared/ui/Avatar';
 import { ButtonLink } from '@/shared/ui/Button';
 import { CollapsibleCard } from '@/shared/ui/CollapsibleCard';
+import { TourButton } from '@/shared/ui/TourButton';
+import type { TourStep } from '@/shared/tour/tour';
 import { toTitleCase } from '@/shared/validation/names';
 import { canManageEvent, ROLE_LABELS } from '../domain/Event';
 import { Countdown } from './Countdown';
 import { QuickAccessGrid } from './QuickAccessGrid';
+
+/** Guía del inicio: solo se abre si la persona toca «¿No sabes cómo empezar?». */
+const HOME_TOUR: TourStep[] = [
+  {
+    title: '¡Te damos la bienvenida! 🎄',
+    text: 'En menos de un minuto te mostramos lo principal. Toca «Siguiente» para avanzar, o la ✕ para salir cuando quieras.',
+  },
+  {
+    target: 'inicio-cuenta',
+    title: 'Cuánto falta',
+    text: 'Aquí ves cuántos días faltan para la celebración y la fecha del encuentro.',
+  },
+  {
+    target: 'inicio-accesos',
+    title: 'Accesos rápidos',
+    text: 'Las tarjetas como esta se abren y se cierran tocando su título. Dentro de esta hay botones grandes para ir a regalos, juegos, tareas y horarios.',
+  },
+  {
+    target: 'inicio-regalos',
+    title: 'Tu lista de regalos',
+    text: 'Lo primero que te conviene hacer: abre esta tarjeta y agrega lo que te gustaría recibir. También puedes ver qué quieren los demás.',
+  },
+  {
+    target: 'inicio-preparacion',
+    title: 'Tu preparación',
+    text: 'Una lista corta de lo que te falta hacer antes de la celebración. Se va marcando a medida que avanzas.',
+  },
+  {
+    target: 'menu',
+    title: 'El menú',
+    text: 'Con este menú vas a cada parte: Inicio, Regalos, Juegos, Celebración y tu Perfil. Siempre está a la vista.',
+  },
+  {
+    title: '¡Eso es todo!',
+    text: 'En Regalos y en Juegos también hay un botón de ayuda como este, que te explica cada pantalla paso a paso.',
+  },
+];
 
 /**
  * Inicio: de arriba hacia abajo responde "¿quién soy?", "¿cuánto falta?",
@@ -62,8 +101,13 @@ export function HomePage() {
         )}
       </header>
 
+      {/* Ayuda opcional: la guía solo empieza si la persona la pide */}
+      <TourButton label="¿No sabes cómo empezar? Toca aquí y te guiamos" steps={HOME_TOUR} />
+
       {/* 2 · Banner con la cuenta regresiva */}
-      <Countdown target={event.celebrationAt} timezone={event.timezone} title={event.name} description={event.description} budget={budget} currency={event.currency} />
+      <div data-tour="inicio-cuenta">
+        <Countdown target={event.celebrationAt} timezone={event.timezone} title={event.name} description={event.description} budget={budget} currency={event.currency} />
+      </div>
 
       {/* Ya empezó la celebración: los recuerdos del año */}
       {event.celebrationAt.getTime() <= Date.now() && (
@@ -90,7 +134,7 @@ export function HomePage() {
       <AnnouncementsHomeCard />
 
       {/* 4 · Accesos rápidos (Regalos, Juegos, Aportes y tareas, Cronograma), contraídos para que el inicio sea corto */}
-      <CollapsibleCard id="inicio:accesos" icon={<LayoutGrid className="size-6" />} tone="gold" title="Accesos rápidos" action={<span className="text-sm font-semibold text-ink-700">Regalos, juegos, tareas y horarios</span>}>
+      <CollapsibleCard id="inicio:accesos" tourId="inicio-accesos" icon={<LayoutGrid className="size-6" />} tone="gold" title="Accesos rápidos" action={<span className="text-sm font-semibold text-ink-700">Regalos, juegos, tareas y horarios</span>}>
         <QuickAccessGrid />
       </CollapsibleCard>
 

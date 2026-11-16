@@ -17,6 +17,8 @@ import { Notice, PageTitle, Pill } from '@/shared/ui/Card';
 import { DataTable, type Column } from '@/shared/ui/DataTable';
 import { FilterSelect, ListToolbar } from '@/shared/ui/ListToolbar';
 import { chipClasses, SegmentedTabs } from '@/shared/ui/Tabs';
+import { TourButton } from '@/shared/ui/TourButton';
+import type { TourStep } from '@/shared/tour/tour';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { toTitleCase } from '@/shared/validation/names';
 import { WishlistService } from '../application/WishlistService';
@@ -24,6 +26,34 @@ import type { WishlistItem } from '../domain/WishlistItem';
 import { DrivePhoto } from './DrivePhoto';
 import { EditableWishlist } from './EditableWishlist';
 import { useEventWishlist } from './hooks';
+
+/** Guía de Regalos: solo se abre si la persona toca «¿Cómo funcionan los regalos?». */
+const GIFTS_TOUR: TourStep[] = [
+  {
+    title: 'Así funcionan los regalos 🎁',
+    text: 'Son dos cosas: primero anotas lo que te gustaría recibir; después miras lo que quieren los demás para saber qué regalarles.',
+  },
+  {
+    target: 'regalos-quien',
+    title: '¿De quién es la lista?',
+    text: 'Si también llenas la lista de alguien más (por ejemplo, de tus hijos), elige aquí de quién son los regalos.',
+  },
+  {
+    target: 'regalos-agregar',
+    title: '1. Agrega tus regalos',
+    text: 'Toca este botón y escribe qué te gustaría recibir. Si quieres, añade detalles, una foto o el enlace de la tienda. Puedes agregar varios; aparecerán aquí debajo y los podrás cambiar o quitar.',
+  },
+  {
+    target: 'regalos-presupuesto',
+    title: 'El presupuesto',
+    text: 'Es el monto acordado para el intercambio. Procura pedir regalos que estén dentro de este monto.',
+  },
+  {
+    target: 'regalos-pestanas',
+    title: '2. Mira los regalos de todos',
+    text: 'Toca «Regalos de todos» y elige a una persona para ver qué le gustaría recibir. Con «Mis regalos» vuelves a tu lista.',
+  },
+];
 
 export function GiftsPage() {
   const { event } = useEventScope();
@@ -38,18 +68,23 @@ export function GiftsPage() {
     <div className="space-y-5">
       <PageTitle tone="berry" icon={<Gift className="size-8" aria-hidden />} title="Regalos" subtitle="Tu lista de deseos y la de tu familia" />
 
-      <SegmentedTabs
-        label="Qué regalos ver"
-        value={view}
-        onChange={setView}
-        options={[
-          { value: 'mine', label: 'Mis regalos', icon: <Gift className="size-5" aria-hidden /> },
-          { value: 'all', label: 'Regalos de todos', icon: <Users className="size-5" aria-hidden /> },
-        ]}
-      />
+      {/* Ayuda opcional: explica el flujo desde «Mis regalos» */}
+      <TourButton label="¿Cómo funcionan los regalos? Te lo explicamos" steps={GIFTS_TOUR} onBeforeStart={() => setView('mine')} />
+
+      <div data-tour="regalos-pestanas">
+        <SegmentedTabs
+          label="Qué regalos ver"
+          value={view}
+          onChange={setView}
+          options={[
+            { value: 'mine', label: 'Mis regalos', icon: <Gift className="size-5" aria-hidden /> },
+            { value: 'all', label: 'Regalos de todos', icon: <Users className="size-5" aria-hidden /> },
+          ]}
+        />
+      </div>
 
       {budget != null && (
-        <p className="flex items-center gap-3 rounded-xl border-2 border-night-900 bg-gold-100 px-4 py-3 text-base">
+        <p data-tour="regalos-presupuesto" className="flex items-center gap-3 rounded-xl border-2 border-night-900 bg-gold-100 px-4 py-3 text-base">
           <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border-2 border-night-900 bg-gold-400 text-night-900" aria-hidden>
             <Wallet className="size-5" />
           </span>
@@ -87,7 +122,7 @@ function MyGifts({ items, startAdding }: { items: WishlistItem[]; startAdding: b
   return (
     <div className="space-y-4">
       {people.length > 1 && (
-        <fieldset>
+        <fieldset data-tour="regalos-quien">
           <legend className="mb-2 text-lg font-extrabold">¿De quién son estos regalos?</legend>
           <div className="flex flex-wrap gap-2">
             {people.map((p) => (

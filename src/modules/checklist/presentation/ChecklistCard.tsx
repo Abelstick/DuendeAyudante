@@ -61,6 +61,7 @@ export function ChecklistCard() {
   return (
     <CollapsibleCard
       id="inicio:preparacion"
+      tourId="inicio-preparacion"
       icon={<ListChecks className="size-6" />}
       title="Tu preparación"
       action={checklist ? <Pill tone={checklist.done === checklist.total ? 'gold' : 'brand'}>{checklist.done} de {checklist.total}</Pill> : undefined}

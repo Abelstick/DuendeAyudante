@@ -126,6 +126,7 @@ export function EventLayout() {
         {/* Navegación lateral en escritorio: se puede plegar (sigue mostrando icono + texto) */}
         <nav
           aria-label="Menú principal"
+          data-tour="menu"
           className={`sky-bg snow-bg fixed inset-y-0 left-0 z-30 hidden flex-col gap-2 overflow-hidden border-r-2 border-night-900 text-white transition-[width] duration-200 md:flex ${
             collapsed ? 'w-24 p-2' : 'w-64 p-4'
           }`}
@@ -195,6 +196,7 @@ export function EventLayout() {
         {/* Barra inferior en móvil: icono + texto siempre visibles */}
         <nav
           aria-label="Menú principal"
+          data-tour="menu"
           className="hide-with-keyboard fixed inset-x-0 bottom-0 z-40 border-t-2 border-night-900 bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
         >
           <ul className="mx-auto grid max-w-2xl px-1" style={{ gridTemplateColumns: `repeat(${mobileItems.length}, minmax(0, 1fr))` }}>

@@ -13,6 +13,8 @@ import { chipClasses, selectClasses } from '@/shared/ui/Tabs';
 import { errorMessage } from '@/shared/ui/errorMessages';
 import { FilterSelect, ListToolbar } from '@/shared/ui/ListToolbar';
 import { useToast } from '@/shared/ui/Toast';
+import { TourButton } from '@/shared/ui/TourButton';
+import type { TourStep } from '@/shared/tour/tour';
 import { toTitleCase } from '@/shared/validation/names';
 import { CATEGORY_LABELS, type Game, type GameCategory, gameCredits, rankGames, type RankedGame } from '../domain/Game';
 import { GameCard } from './GameCard';
@@ -36,6 +38,45 @@ const SORTERS: Record<string, (r: RankedGame) => SortValue> = {
   category: (r) => CATEGORY_LABELS[r.game.category].label,
   duration: (r) => r.game.durationMinutes,
 };
+
+/** Guía de Juegos: solo se abre si la persona toca «¿Cómo funcionan los juegos?». */
+const GAMES_TOUR: TourStep[] = [
+  {
+    title: 'Así funcionan los juegos 🎲',
+    text: 'Son tres momentos: entre todos proponen juegos, luego votan por sus favoritos y, el día de la celebración, la ruleta elige a cuál jugar.',
+  },
+  {
+    target: 'juegos-agregar',
+    title: '1. Propón un juego',
+    text: 'Toca este botón para sugerir un juego o actividad: ponle un nombre y cuenta cómo se juega. Cualquiera puede proponer.',
+  },
+  {
+    target: 'juegos-lista',
+    title: 'La lista de juegos',
+    text: 'Aquí debajo aparecen todas las ideas. Puedes buscar un juego o ver los detalles de cada uno.',
+  },
+  {
+    target: 'juegos-votacion',
+    whenMissing: 'center',
+    title: '2. Vota por tus favoritos',
+    text: 'Cuando quien organiza abre la votación, aparece el botón «Votar» en cada juego. Tienes una cantidad limitada de votos y puedes quitar uno para cambiarlo.',
+  },
+  {
+    target: 'juegos-organizar',
+    title: 'Para quien organiza',
+    text: 'Desde aquí abres o cierras la votación, decides cuántos votos tiene cada persona y unes los juegos que se parecen.',
+  },
+  {
+    target: 'juegos-ruleta',
+    title: '3. ¡A jugar! La ruleta',
+    text: 'El día de la celebración, toca «¡Girar la ruleta!» y la suerte elige un juego de la lista.',
+  },
+  {
+    target: 'juegos-sorteo',
+    title: '¿A quién le toca?',
+    text: 'Este sorteo elige al azar a una o varias personas para participar en un juego o cumplir un reto.',
+  },
+];
 
 export function GamesPage() {
   const { event, context } = useEventScope();
@@ -108,6 +149,9 @@ export function GamesPage() {
     <div className="space-y-5 pb-20">
       <PageTitle tone="night" icon={<Dices className="size-8" aria-hidden />} title="Juegos y actividades" subtitle="Propón ideas, vota y ¡a jugar!" />
 
+      {/* Ayuda opcional: explica el flujo proponer → votar → jugar */}
+      {!selecting && <TourButton label="¿Cómo funcionan los juegos? Te lo explicamos" steps={GAMES_TOUR} />}
+
       <Roulette
         games={active}
         participants={people}
@@ -117,7 +161,7 @@ export function GamesPage() {
 
       {/* Estado de la votación */}
       {pollStatus === 'open' && voter && (
-        <Card className="space-y-3 border-2 border-brand!">
+        <Card data-tour="juegos-votacion" className="space-y-3 border-2 border-brand!">
           <CardTitle icon={<Vote className="size-6" />} action={<Pill tone={remaining > 0 ? 'brand' : 'success'}>{pollMax - remaining} de {pollMax}</Pill>}>
             ¡Votación abierta!
           </CardTitle>
@@ -155,7 +199,7 @@ export function GamesPage() {
 
       {/* Herramientas del organizador / editores */}
       {isEditor && (
-        <Card className="space-y-3 border-2 border-gold-400! bg-gold-50">
+        <Card data-tour="juegos-organizar" className="space-y-3 border-2 border-gold-400! bg-gold-50">
           <CardTitle icon={<Settings className="size-6" />} tone="gold">
             Organizar juegos
           </CardTitle>
@@ -208,7 +252,7 @@ export function GamesPage() {
       )}
 
       {!selecting && (
-        <Button size="lg" onClick={() => setEditing({ game: null })} icon={<Plus className="size-6" aria-hidden />}>
+        <Button size="lg" data-tour="juegos-agregar" onClick={() => setEditing({ game: null })} icon={<Plus className="size-6" aria-hidden />}>
           Agregar idea de juego o actividad
         </Button>
       )}
@@ -219,7 +263,7 @@ export function GamesPage() {
         </EmptyState>
       ) : (
         <div className="space-y-3">
-          <h2 className="flex items-center justify-between gap-2 text-xl font-extrabold text-ink-900">
+          <h2 data-tour="juegos-lista" className="flex items-center justify-between gap-2 text-xl font-extrabold text-ink-900">
             {showVotes ? 'Ranking de juegos' : 'Catálogo de juegos'}
             <Pill tone="night">{active.length}</Pill>
           </h2>

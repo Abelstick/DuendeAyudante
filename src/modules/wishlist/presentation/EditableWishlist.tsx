@@ -107,7 +107,7 @@ export function EditableWishlist({ eventId, participantId, items, budget, curren
 
   return (
     <div className="space-y-4">
-      <Button size="lg" onClick={() => setAdding(true)} icon={<Plus className="size-6" aria-hidden />}>
+      <Button size="lg" data-tour="regalos-agregar" onClick={() => setAdding(true)} icon={<Plus className="size-6" aria-hidden />}>
         Agregar regalo
       </Button>
 

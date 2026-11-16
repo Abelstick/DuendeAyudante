@@ -53,6 +53,7 @@ export function GiftsHomeCard() {
   return (
     <CollapsibleCard
       id="inicio:regalos"
+      tourId="inicio-regalos"
       icon={<Gift className="size-6" />}
       tone="berry"
       title="Regalos"

@@ -95,7 +95,7 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
   if (games.length === 0) return null;
 
   return (
-    <section aria-labelledby="roulette-title" className="sky-bg snow-bg relative space-y-4 overflow-hidden rounded-2xl border-2 border-night-900 p-5 text-white shadow-lift">
+    <section data-tour="juegos-ruleta" aria-labelledby="roulette-title" className="sky-bg snow-bg relative space-y-4 overflow-hidden rounded-2xl border-2 border-night-900 p-5 text-white shadow-lift">
       <div className="flex items-center gap-4">
         {/* Ruleta (decorativa: el resultado siempre aparece escrito) */}
         <div className="relative size-28 shrink-0" aria-hidden>

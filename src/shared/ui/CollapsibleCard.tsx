@@ -41,6 +41,8 @@ interface Props {
   /** Empieza contraída (por defecto sí: el inicio queda corto y cada quien abre lo que quiere). */
   defaultCollapsed?: boolean;
   className?: string;
+  /** Nombre con el que la guía paso a paso resalta esta tarjeta (`data-tour`). */
+  tourId?: string;
   children: ReactNode;
 }
 
@@ -48,12 +50,12 @@ interface Props {
  * Tarjeta con título que se puede contraer tocando el encabezado.
  * El contenido se pliega con una transición suave (sin animación si la persona la desactivó).
  */
-export function CollapsibleCard({ id, icon, tone = 'brand', title, action, defaultCollapsed = true, className = '', children }: Props) {
+export function CollapsibleCard({ id, icon, tone = 'brand', title, action, defaultCollapsed = true, className = '', tourId, children }: Props) {
   const [collapsed, toggle] = useCollapsed(id, defaultCollapsed);
   const contentId = useId();
 
   return (
-    <section className={`animate-pop-in rounded-xl border-2 border-night-900 bg-white shadow-block ${className}`}>
+    <section data-tour={tourId} className={`animate-pop-in rounded-xl border-2 border-night-900 bg-white shadow-block ${className}`}>
       <h2>
         <button
           type="button"
