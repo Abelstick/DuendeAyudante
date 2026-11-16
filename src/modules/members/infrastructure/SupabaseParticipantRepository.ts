@@ -74,4 +74,23 @@ export class SupabaseParticipantRepository implements IParticipantRepository {
       .eq('id', participantId);
     if (error) throw fromPostgrestError(error);
   }
+
+  async setGuardians(eventId: string, participantId: string, guardianIds: string[]): Promise<void> {
+    const current = await this.supabase.from('guardianships').select('guardian_participant_id').eq('ward_participant_id', participantId);
+    if (current.error) throw fromPostgrestError(current.error);
+    const before = (current.data ?? []).map((r) => r.guardian_participant_id as string);
+    const removed = before.filter((id) => !guardianIds.includes(id));
+    const added = guardianIds.filter((id) => !before.includes(id));
+
+    if (removed.length > 0) {
+      const { error } = await this.supabase.from('guardianships').delete().eq('ward_participant_id', participantId).in('guardian_participant_id', removed);
+      if (error) throw fromPostgrestError(error);
+    }
+    if (added.length > 0) {
+      const { error } = await this.supabase
+        .from('guardianships')
+        .insert(added.map((id) => ({ event_id: eventId, guardian_participant_id: id, ward_participant_id: participantId })));
+      if (error) throw fromPostgrestError(error);
+    }
+  }
 }

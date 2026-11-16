@@ -28,6 +28,7 @@ const MESSAGES: Record<string, string> = {
   ONLY_OWNER_CAN_CREATE_ADMINS: 'Solo el organizador puede nombrar administradores.',
   ACCOUNT_NOT_CREATED: 'No pudimos crear el usuario. Inténtalo de nuevo en un momento.',
   MEMBER_WITHOUT_ACCOUNT: 'Esta persona no tiene usuario propio.',
+  TOO_MANY_GUARDIANS: 'Elige como máximo 5 familiares que puedan ayudar a esta persona.',
   GUARDIAN_NOT_FOUND: 'No encontramos al familiar responsable elegido. Vuelve a elegirlo.',
   FAMILY_NOT_FOUND: 'Esa familia ya no existe. Elige otra.',
 

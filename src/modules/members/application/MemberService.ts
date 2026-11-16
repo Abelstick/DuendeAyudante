@@ -47,6 +47,13 @@ export class MemberService {
     });
   }
 
+  /** Quiénes pueden manejar los regalos de esta persona desde su propia cuenta (hasta 5, nunca ella misma). */
+  setGuardians(eventId: string, participantId: string, guardianIds: string[]) {
+    const ids = [...new Set(guardianIds)].filter((id) => id !== participantId);
+    if (ids.length > 5) throw new AppError('TOO_MANY_GUARDIANS');
+    return this.participants.setGuardians(eventId, participantId, ids);
+  }
+
   async addMember(data: NewMemberData) {
     if (!isValidPersonName(data.firstName)) throw new AppError('FIRST_NAME_INVALID');
     if (!isValidPersonName(data.paternalSurname)) throw new AppError('PATERNAL_SURNAME_INVALID');

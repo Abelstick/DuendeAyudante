@@ -275,7 +275,7 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
       )}
 
       {editingId && byId.get(editingId) && (
-        <EditMemberModal key={editingId} member={byId.get(editingId)!} families={families} onClose={() => setEditingId(null)} />
+        <EditMemberModal key={editingId} member={byId.get(editingId)!} members={members} families={families} onClose={() => setEditingId(null)} />
       )}
 
       {/* Acceso y contraseñas: en una ventana, para no alargar la lista */}

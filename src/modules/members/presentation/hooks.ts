@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useServices } from '@/app/ContainerContext';
+import { eventKeys } from '@/modules/events/presentation/hooks';
 import type { NewMemberData } from '../domain/IMemberAccountService';
 import type { ParticipantDetails } from '../domain/IParticipantRepository';
 
@@ -40,6 +41,14 @@ export function useMemberMutations(eventId: string) {
     update: useMutation({
       mutationFn: ({ participantId, details }: { participantId: string; details: ParticipantDetails }) => members.updateMember(participantId, details),
       onSuccess: refresh,
+    }),
+    setGuardians: useMutation({
+      mutationFn: ({ participantId, guardianIds }: { participantId: string; guardianIds: string[] }) => members.setGuardians(eventId, participantId, guardianIds),
+      onSuccess: () => {
+        refresh();
+        // Si quien administra se eligió a sí mismo, sus "personas a cargo" cambian al instante
+        void qc.invalidateQueries({ queryKey: eventKeys.context(eventId) });
+      },
     }),
   };
 }

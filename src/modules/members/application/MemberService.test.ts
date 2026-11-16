@@ -3,7 +3,7 @@ import { MemberService } from './MemberService';
 
 function setup() {
   const accounts = { createMember: vi.fn().mockResolvedValue({ participantId: 'p', fullName: 'ROSA GARCÍA', username: 'rosa' }), resetPassword: vi.fn() };
-  const participants = { listActive: vi.fn(), listMembers: vi.fn(), updateFamily: vi.fn(), updateDetails: vi.fn() };
+  const participants = { listActive: vi.fn(), listMembers: vi.fn(), updateFamily: vi.fn(), updateDetails: vi.fn(), setGuardians: vi.fn() };
   return { accounts, participants, service: new MemberService(participants, accounts) };
 }
 

@@ -28,14 +28,23 @@ type FormValues = z.infer<typeof schema>;
 
 interface Props {
   member: Member;
+  /** Todos los integrantes: de aquí se eligen quienes pueden ayudarle con sus regalos. */
+  members: Member[];
   families: Family[];
   onClose: () => void;
 }
 
-/** Ventana para corregir los datos de un familiar: nombre, apellidos, dato para diferenciar y familia. */
-export function EditMemberModal({ member, families, onClose }: Props) {
+/**
+ * Ventana para corregir los datos de un familiar: nombre, apellidos, dato para diferenciar,
+ * familia y quién puede ayudarle con sus regalos desde su propia cuenta.
+ */
+export function EditMemberModal({ member, members, families, onClose }: Props) {
   const { event } = useEventScope();
-  const { update } = useMemberMutations(event.id);
+  const { update, setGuardians } = useMemberMutations(event.id);
+  const [guardianIds, setGuardianIds] = useState<string[]>(member.guardianIds);
+  // Puede ayudar cualquiera con usuario propio (y quien ya estaba elegido, aunque ya no cumpla)
+  const possibleGuardians = members.filter((m) => m.id !== member.id && ((m.hasAccount && m.status === 'active') || member.guardianIds.includes(m.id)));
+  const guardiansChanged = guardianIds.length !== member.guardianIds.length || guardianIds.some((id) => !member.guardianIds.includes(id));
   const toast = useToast();
   const [formError, setFormError] = useState<string | null>(null);
   const {
@@ -58,16 +67,19 @@ export function EditMemberModal({ member, families, onClose }: Props) {
   const onSubmit = async (v: FormValues) => {
     setFormError(null);
     try {
-      await update.mutateAsync({
-        participantId: member.id,
-        details: {
-          firstName: v.firstName,
-          paternalSurname: v.paternalSurname,
-          maternalSurname: v.maternalSurname || null,
-          distinguishingNote: v.distinguishingNote || null,
-          familyId: v.familyId || null,
-        },
-      });
+      if (isDirty) {
+        await update.mutateAsync({
+          participantId: member.id,
+          details: {
+            firstName: v.firstName,
+            paternalSurname: v.paternalSurname,
+            maternalSurname: v.maternalSurname || null,
+            distinguishingNote: v.distinguishingNote || null,
+            familyId: v.familyId || null,
+          },
+        });
+      }
+      if (guardiansChanged) await setGuardians.mutateAsync({ participantId: member.id, guardianIds });
       toast.success('Datos actualizados.');
       onClose();
     } catch (err) {
@@ -112,6 +124,30 @@ export function EditMemberModal({ member, families, onClose }: Props) {
           </label>
         )}
 
+        {possibleGuardians.length > 0 && (
+          <fieldset>
+            <legend className="mb-1 text-base font-bold text-ink-900">
+              ¿Quién puede ayudarle con sus regalos? <span className="font-normal text-ink-500">(opcional)</span>
+            </legend>
+            <p className="mb-2 text-sm text-ink-700">
+              Las personas que marques podrán agregar y cambiar sus regalos desde su propia cuenta, sin cerrar sesión. Por ejemplo, su mamá, su papá o un hijo.
+            </p>
+            <div className="max-h-64 space-y-2 overflow-y-auto">
+              {possibleGuardians.map((m) => (
+                <label key={m.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-white px-3">
+                  <input
+                    type="checkbox"
+                    className="size-5 accent-brand"
+                    checked={guardianIds.includes(m.id)}
+                    onChange={(e) => setGuardianIds((ids) => (e.target.checked ? [...ids, m.id] : ids.filter((id) => id !== m.id)))}
+                  />
+                  <span className="text-base">{displayName(m)}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        )}
+
         {member.username && (
           <p className="text-sm text-ink-700">
             Su usuario (<strong className="text-ink-900">{member.username}</strong>) y su contraseña no cambian.
@@ -121,7 +157,7 @@ export function EditMemberModal({ member, families, onClose }: Props) {
         {formError && <Notice tone="error">{formError}</Notice>}
 
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button type="submit" loading={update.isPending} disabled={!isDirty} icon={<Save className="size-5" aria-hidden />}>
+          <Button type="submit" loading={update.isPending || setGuardians.isPending} disabled={!isDirty && !guardiansChanged} icon={<Save className="size-5" aria-hidden />}>
             Guardar cambios
           </Button>
           <Button variant="secondary" onClick={onClose}>
