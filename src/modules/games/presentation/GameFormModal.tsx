@@ -100,7 +100,7 @@ export function GameFormModal({ eventId, initial, allGames, participants, propos
                   aria-pressed={proposedBy === p.id}
                   onClick={() => setProposedBy(p.id)}
                   className={`min-h-12 rounded-full border-2 px-4 text-base font-semibold ${
-                    proposedBy === p.id ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-white'
+                    proposedBy === p.id ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-surface'
                   }`}
                 >
                   {p.id === meId ? 'Mía' : `De ${toTitleCase(p.firstName)}`}

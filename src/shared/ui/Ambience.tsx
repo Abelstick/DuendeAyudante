@@ -44,8 +44,8 @@ export function SnowBackdrop() {
       ))}
       {/* Nieve acumulada al pie de la pantalla (en computadora; en el celular ahí va el menú) */}
       <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 hidden h-28 w-full md:block" focusable="false">
-        <path d="M0 70 C150 20 300 30 450 60 C600 90 750 30 900 44 C1020 56 1110 80 1200 60 V120 H0 Z" fill="#fff" opacity="0.7" />
-        <path d="M0 96 C200 60 380 100 600 90 C820 80 1000 60 1200 92 V120 H0 Z" fill="#fff" />
+        <path d="M0 70 C150 20 300 30 450 60 C600 90 750 30 900 44 C1020 56 1110 80 1200 60 V120 H0 Z" fill="var(--color-snow)" opacity="0.7" />
+        <path d="M0 96 C200 60 380 100 600 90 C820 80 1000 60 1200 92 V120 H0 Z" fill="var(--color-snow)" />
       </svg>
     </div>
   );
@@ -69,7 +69,7 @@ export function Garland({ count = 9, className = '' }: { count?: number; classNa
   return (
     <div className={`pointer-events-none relative h-7 ${className}`} aria-hidden>
       <svg viewBox="0 0 100 20" preserveAspectRatio="none" className="absolute inset-0 size-full" focusable="false">
-        <path d={d} fill="none" stroke="#0f1e38" strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
+        <path d={d} fill="none" stroke="var(--color-line)" strokeWidth="1.6" vectorEffect="non-scaling-stroke" />
       </svg>
       {Array.from({ length: count }, (_, i) => {
         const color = BULBS[i % BULBS.length]!;

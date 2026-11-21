@@ -63,7 +63,7 @@ export function WishPhotosField({ step, status, existing, removingId, onRemoveEx
       {total > 0 && (
         <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4" aria-label="Fotos del regalo">
           {existing.map((photo, i) => (
-            <li key={photo.id} className="relative aspect-square overflow-hidden rounded-xl border-2 border-night-900 bg-mist-200">
+            <li key={photo.id} className="relative aspect-square overflow-hidden rounded-xl border-2 border-line bg-mist-200">
               <DrivePhoto driveFileId={photo.driveFileId} alt={`Foto ${i + 1}`} width={300} className="size-full" />
               {i === 0 && <span className="absolute left-1 top-1 rounded-md bg-night-900/80 px-1.5 text-xs font-bold text-white">Portada</span>}
               <button
@@ -71,7 +71,7 @@ export function WishPhotosField({ step, status, existing, removingId, onRemoveEx
                 disabled={removingId === photo.id}
                 onClick={() => onRemoveExisting(photo)}
                 aria-label={`Quitar foto ${i + 1}`}
-                className="absolute right-1 top-1 flex size-9 items-center justify-center rounded-full border-2 border-night-900 bg-white text-berry-700 shadow-card disabled:opacity-60"
+                className="absolute right-1 top-1 flex size-9 items-center justify-center rounded-full border-2 border-line bg-surface text-berry-700 shadow-card disabled:opacity-60"
               >
                 {removingId === photo.id ? <Loader2 className="size-5 animate-spin" aria-hidden /> : <X className="size-5" aria-hidden />}
               </button>
@@ -83,14 +83,14 @@ export function WishPhotosField({ step, status, existing, removingId, onRemoveEx
             </li>
           ))}
           {pending.map((file, i) => (
-            <li key={`new-${i}-${file.name}`} className="relative aspect-square overflow-hidden rounded-xl border-2 border-night-900 bg-mist-200">
+            <li key={`new-${i}-${file.name}`} className="relative aspect-square overflow-hidden rounded-xl border-2 border-line bg-mist-200">
               <img src={previews[i]} alt={`Foto nueva ${i + 1}`} className="size-full object-cover" />
               <span className="absolute bottom-1 left-1 rounded-md bg-gold-400 px-1.5 text-xs font-bold text-night-900">Nueva</span>
               <button
                 type="button"
                 onClick={() => onPendingChange(pending.filter((_, j) => j !== i))}
                 aria-label={`Quitar foto nueva ${i + 1}`}
-                className="absolute right-1 top-1 flex size-9 items-center justify-center rounded-full border-2 border-night-900 bg-white text-berry-700 shadow-card"
+                className="absolute right-1 top-1 flex size-9 items-center justify-center rounded-full border-2 border-line bg-surface text-berry-700 shadow-card"
               >
                 <X className="size-5" aria-hidden />
               </button>
@@ -100,7 +100,7 @@ export function WishPhotosField({ step, status, existing, removingId, onRemoveEx
       )}
 
       {status !== 'ready' ? (
-        <p className="rounded-xl border-2 border-dashed border-night-900/30 bg-sky-100 px-4 py-3 text-sm font-semibold text-night-800">📷 {BLOCKED[status]}</p>
+        <p className="rounded-xl border-2 border-dashed border-line/30 bg-sky-100 px-4 py-3 text-sm font-semibold text-night-ink">📷 {BLOCKED[status]}</p>
       ) : room <= 0 ? (
         <p className="text-sm text-ink-700">Llegaste al máximo de {MAX_PHOTOS_PER_ITEM} fotos.</p>
       ) : (

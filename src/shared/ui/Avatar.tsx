@@ -20,7 +20,7 @@ export function Avatar({ name, colors, size = 'md' }: Props) {
   return (
     <span
       aria-hidden
-      className={`flex shrink-0 items-center justify-center rounded-full font-black ring-2 ring-white ${sizes[size]} ${colors ? '' : 'bg-brand-soft text-brand'}`}
+      className={`flex shrink-0 items-center justify-center rounded-full font-black ring-2 ring-surface ${sizes[size]} ${colors ? '' : 'bg-brand-soft text-brand-ink'}`}
       style={colors ? { backgroundColor: colors.bg, color: colors.fg } : undefined}
     >
       {initialsOf(name)}

@@ -113,8 +113,8 @@ export function OrganizePage() {
       <Card data-tour="organizar-datos" className="space-y-3 border-2 border-gold-400! bg-gold-50">
         <JoinCodeEditor />
         <ul className="grid gap-2 sm:grid-cols-2">
-          <li className="flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-base">
-            <CalendarDays className="size-5 shrink-0 text-night-700" aria-hidden />
+          <li className="flex items-center gap-2 rounded-2xl bg-surface px-4 py-3 text-base">
+            <CalendarDays className="size-5 shrink-0 text-night-ink" aria-hidden />
             <span className="first-letter:uppercase">{formatEventDate(event.celebrationAt, event.timezone)}</span>
           </li>
           {event.giftExchange && (
@@ -137,7 +137,7 @@ export function OrganizePage() {
             key={label}
             aria-current={i + 1 === step ? 'step' : undefined}
             className={`flex items-center gap-3 rounded-2xl border-2 px-4 py-3 text-base font-bold ${
-              i + 1 < step ? 'border-pine-600/30 bg-pine-100 text-pine-700' : i + 1 === step ? 'border-gold-400 bg-gold-100 text-ink-900' : 'border-mist-200 bg-white text-ink-700'
+              i + 1 < step ? 'border-pine-600/30 bg-pine-100 text-pine-700' : i + 1 === step ? 'border-gold-400 bg-gold-100 text-ink-900' : 'border-mist-200 bg-surface text-ink-700'
             }`}
           >
             <span

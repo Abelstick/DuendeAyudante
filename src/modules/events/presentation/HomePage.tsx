@@ -6,7 +6,7 @@ import { useEventScope } from '@/app/layout/EventLayout';
 import { AnnouncementsHomeCard } from '@/modules/announcements/presentation/AnnouncementsHomeCard';
 import { PinnedAnnouncementBanner } from '@/modules/announcements/presentation/PinnedAnnouncementBanner';
 import { ChecklistCard } from '@/modules/checklist/presentation/ChecklistCard';
-import { FAMILY_COLORS } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS } from '@/modules/families/presentation/familyTheme';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { GamesTeaserCard } from '@/modules/games/presentation/GamesTeaserCard';
@@ -94,7 +94,7 @@ export function HomePage() {
           <Avatar name={me?.fullName ?? event.organizerName} colors={familyColor && { bg: familyColor.soft, fg: familyColor.text }} size="lg" />
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-2xl font-black leading-tight text-ink-900">¡Hola{me ? `, ${toTitleCase(me.firstName)}` : ''}! 👋</h1>
-            <span className="flex items-center gap-0.5 text-base font-bold text-brand">
+            <span className="flex items-center gap-0.5 text-base font-bold text-brand-ink">
               Ver mi perfil
               <ChevronRight className="size-5 shrink-0" aria-hidden />
             </span>
@@ -123,16 +123,16 @@ export function HomePage() {
       {event.celebrationAt.getTime() <= Date.now() && (
         <Link
           to={`${base}/recuerdos`}
-          className="tap-card flex items-center gap-3 rounded-2xl border-2 border-night-900 bg-gold-50 p-4 shadow-block active:shadow-none"
+          className="tap-card flex items-center gap-3 rounded-2xl border-2 border-line bg-gold-50 p-4 shadow-block active:shadow-none"
         >
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-night-900 bg-gold-400 text-night-900" aria-hidden>
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-line bg-gold-400 text-night-900" aria-hidden>
             <Sparkles className="size-6" />
           </span>
           <span className="min-w-0 flex-1">
             <span className="block text-lg font-extrabold text-ink-900">Recuerdos de esta Navidad</span>
             <span className="block text-sm font-semibold text-ink-700">Cuántos fuimos, el juego favorito y más, para compartir</span>
           </span>
-          <ChevronRight className="size-6 shrink-0 text-brand" aria-hidden />
+          <ChevronRight className="size-6 shrink-0 text-brand-ink" aria-hidden />
         </Link>
       )}
 

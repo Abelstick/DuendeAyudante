@@ -13,7 +13,7 @@ const bubbleTones: Record<Tone, string> = {
 /** Icono dentro de una ficha de color con contorno: ancla visual de títulos y tarjetas. */
 export function IconBubble({ children, tone = 'brand', size = 'md' }: { children: ReactNode; tone?: Tone; size?: 'md' | 'lg' }) {
   return (
-    <span className={`flex shrink-0 items-center justify-center rounded-xl border-2 border-night-900 shadow-[0_3px_0_0_var(--color-night-900)] ${bubbleTones[tone]} ${size === 'lg' ? 'size-14' : 'size-11'}`} aria-hidden>
+    <span className={`flex shrink-0 items-center justify-center rounded-xl border-2 border-line shadow-[0_3px_0_0_var(--color-line)] ${bubbleTones[tone]} ${size === 'lg' ? 'size-14' : 'size-11'}`} aria-hidden>
       {children}
     </span>
   );
@@ -21,7 +21,7 @@ export function IconBubble({ children, tone = 'brand', size = 'md' }: { children
 
 export function Card({ className = '', children, ...rest }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={`animate-pop-in rounded-xl border-2 border-night-900 bg-white p-5 shadow-block ${className}`} {...rest}>
+    <div className={`animate-pop-in rounded-xl border-2 border-line bg-surface p-5 shadow-block ${className}`} {...rest}>
       {children}
     </div>
   );
@@ -36,7 +36,7 @@ export function CardTitle({ icon, tone = 'brand', children, action }: { icon?: R
     <div className="flex items-center gap-3">
       {icon && <IconBubble tone={tone}>{icon}</IconBubble>}
       <div className="min-w-0 flex-1">
-        <h2 className="text-xl leading-tight font-extrabold text-night-900 hyphens-auto wrap-break-word sm:text-[1.4rem]">{children}</h2>
+        <h2 className="text-xl leading-tight font-extrabold text-heading hyphens-auto wrap-break-word sm:text-[1.4rem]">{children}</h2>
         {action && <div className="mt-1 flex flex-wrap gap-1">{action}</div>}
       </div>
     </div>
@@ -52,7 +52,7 @@ export function PageTitle({ icon, title, subtitle, tone = 'brand' }: { icon?: Re
         </IconBubble>
       )}
       <div className="min-w-0">
-        <h1 className="text-[1.75rem] leading-none font-extrabold text-night-900 hyphens-auto wrap-break-word sm:text-4xl">{title}</h1>
+        <h1 className="text-[1.75rem] leading-none font-extrabold text-heading hyphens-auto wrap-break-word sm:text-4xl">{title}</h1>
         {subtitle && <p className="mt-1 text-base text-ink-700">{subtitle}</p>}
       </div>
     </header>
@@ -60,16 +60,16 @@ export function PageTitle({ icon, title, subtitle, tone = 'brand' }: { icon?: Re
 }
 
 export function SectionTitle({ children }: { children: ReactNode }) {
-  return <h2 className="mb-3 text-[1.4rem] font-extrabold text-night-900">{children}</h2>;
+  return <h2 className="mb-3 text-[1.4rem] font-extrabold text-heading">{children}</h2>;
 }
 
 export function EmptyState({ emoji, title, children }: { emoji: string; title: string; children?: ReactNode }) {
   return (
-    <div className="rounded-2xl border-2 border-dashed border-night-900/40 bg-white p-6 text-center">
-      <div className="mx-auto flex size-20 items-center justify-center rounded-2xl border-2 border-night-900 bg-sky-100 text-5xl shadow-block motion-safe:animate-float" aria-hidden>
+    <div className="rounded-2xl border-2 border-dashed border-line/40 bg-surface p-6 text-center">
+      <div className="mx-auto flex size-20 items-center justify-center rounded-2xl border-2 border-line bg-sky-100 text-5xl shadow-block motion-safe:animate-float" aria-hidden>
         {emoji}
       </div>
-      <p className="font-display mt-4 text-xl font-extrabold text-night-900">{title}</p>
+      <p className="font-display mt-4 text-xl font-extrabold text-heading">{title}</p>
       {children && <div className="mt-2 text-ink-700">{children}</div>}
     </div>
   );
@@ -77,9 +77,9 @@ export function EmptyState({ emoji, title, children }: { emoji: string; title: s
 
 export function Notice({ tone = 'info', children }: { tone?: 'info' | 'warning' | 'success' | 'error'; children: ReactNode }) {
   const tones = {
-    info: 'bg-sky-100 text-night-800 border-night-900',
-    warning: 'bg-gold-100 text-night-900 border-night-900',
-    success: 'bg-pine-100 text-pine-800 border-night-900',
+    info: 'bg-sky-100 text-night-ink border-line',
+    warning: 'bg-gold-100 text-heading border-line',
+    success: 'bg-pine-100 text-pine-800 border-line',
     error: 'bg-berry-50 text-berry-700 border-berry-600',
   } as const;
   return (
@@ -93,11 +93,11 @@ export function Notice({ tone = 'info', children }: { tone?: 'info' | 'warning' 
 export function Pill({ tone = 'neutral', children }: { tone?: Tone | 'neutral' | 'success'; children: ReactNode }) {
   const tones = {
     neutral: 'bg-mist-200 text-ink-700',
-    brand: 'bg-brand-soft text-brand',
+    brand: 'bg-brand-soft text-brand-ink',
     berry: 'bg-berry-50 text-berry-700',
     gold: 'bg-gold-100 text-gold-700',
-    night: 'bg-night-50 text-night-700',
+    night: 'bg-night-50 text-night-ink',
     success: 'bg-pine-100 text-pine-700',
   } as const;
-  return <span className={`inline-flex items-center gap-1 rounded-lg border-2 border-night-900/15 px-2.5 py-0.5 text-sm font-extrabold ${tones[tone]}`}>{children}</span>;
+  return <span className={`inline-flex items-center gap-1 rounded-lg border-2 border-line/15 px-2.5 py-0.5 text-sm font-extrabold ${tones[tone]}`}>{children}</span>;
 }

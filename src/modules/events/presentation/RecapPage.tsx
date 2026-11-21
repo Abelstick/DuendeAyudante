@@ -18,7 +18,7 @@ import { buildRecap, recapShareText } from '../domain/Recap';
 
 function Stat({ emoji, value, label }: { emoji: string; value: ReactNode; label: string }) {
   return (
-    <li className="animate-pop-in rounded-2xl border-2 border-night-900 bg-white p-4 text-center shadow-block">
+    <li className="animate-pop-in rounded-2xl border-2 border-line bg-surface p-4 text-center shadow-block">
       <span className="block text-3xl" aria-hidden>
         {emoji}
       </span>
@@ -69,7 +69,7 @@ export function RecapPage() {
         Volver al inicio
       </ButtonLink>
 
-      <header className="sky-bg snow-bg relative overflow-hidden rounded-xl border-2 border-night-900 px-5 py-6 text-white shadow-lift">
+      <header className="sky-bg snow-bg relative overflow-hidden rounded-xl border-2 border-line px-5 py-6 text-white shadow-lift">
         <Snowfall fall={300} />
         <div className="relative flex items-center gap-4">
           <Tree className="h-20 w-auto shrink-0" />
@@ -93,7 +93,7 @@ export function RecapPage() {
       </ul>
 
       {recap.topGame && (
-        <section className="rounded-2xl border-2 border-night-900 bg-gold-50 p-4 shadow-block">
+        <section className="rounded-2xl border-2 border-line bg-gold-50 p-4 shadow-block">
           <p className="eyebrow text-gold-700">🏆 El juego favorito</p>
           <p className="text-2xl font-extrabold text-ink-900">{recap.topGame.name}</p>
           <p className="text-base text-ink-700">
@@ -104,7 +104,7 @@ export function RecapPage() {
       )}
 
       {recap.helpers.length > 0 && (
-        <section className="rounded-2xl border-2 border-night-900 bg-pine-50 p-4 shadow-block">
+        <section className="rounded-2xl border-2 border-line bg-pine-50 p-4 shadow-block">
           <p className="eyebrow text-pine-700">💪 Gracias especiales</p>
           <ul className="mt-1 space-y-1">
             {recap.helpers.map((h, i) => (
@@ -116,7 +116,7 @@ export function RecapPage() {
         </section>
       )}
 
-      <section className="flex items-center gap-3 rounded-2xl border-2 border-night-900 bg-white p-4 shadow-block">
+      <section className="flex items-center gap-3 rounded-2xl border-2 border-line bg-surface p-4 shadow-block">
         <Sparkles className="size-8 shrink-0 text-gold-700" aria-hidden />
         <p className="text-base text-ink-900">
           Organizó <strong>{recap.organizer}</strong>. ¡Gracias por una Navidad tan bonita! ❤️

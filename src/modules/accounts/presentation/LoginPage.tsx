@@ -158,7 +158,7 @@ export function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="flex min-h-13 min-w-24 items-center justify-center gap-1 rounded-xl border-2 border-mist-300 bg-white px-3 text-base font-semibold text-brand"
+                className="flex min-h-13 min-w-24 items-center justify-center gap-1 rounded-xl border-2 border-mist-300 bg-surface px-3 text-base font-semibold text-brand-ink"
                 aria-pressed={showPassword}
               >
                 {showPassword ? <EyeOff className="size-5" aria-hidden /> : <Eye className="size-5" aria-hidden />}
@@ -176,7 +176,7 @@ export function LoginPage() {
         </form>
 
         <div className="mt-6 space-y-2 border-t border-mist-200 pt-4">
-          <button type="button" className="block min-h-12 text-base font-semibold text-brand underline" onClick={() => setShowHelp((v) => !v)}>
+          <button type="button" className="block min-h-12 text-base font-semibold text-brand-ink underline" onClick={() => setShowHelp((v) => !v)}>
             ¿Olvidaste tu contraseña?
           </button>
           {showHelp && (
@@ -184,7 +184,7 @@ export function LoginPage() {
               <p>Pídele una nueva a la persona que organiza tu Navidad. Te la enviará por WhatsApp.</p>
               <p>
                 Si eres organizador y entras con tu correo,{' '}
-                <Link to="/recuperar" className="font-semibold text-brand underline">
+                <Link to="/recuperar" className="font-semibold text-brand-ink underline">
                   recupera tu contraseña aquí
                 </Link>
                 .
@@ -193,7 +193,7 @@ export function LoginPage() {
           )}
           <button
             type="button"
-            className="block min-h-12 text-base font-semibold text-brand underline"
+            className="block min-h-12 text-base font-semibold text-brand-ink underline"
             onClick={() => switchMode(mode === 'family' ? 'organizer' : 'family')}
           >
             {mode === 'family' ? 'Soy organizador: entrar con mi correo' : 'Soy familiar: entrar con código y usuario'}

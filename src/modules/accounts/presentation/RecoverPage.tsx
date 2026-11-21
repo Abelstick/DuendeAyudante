@@ -49,7 +49,7 @@ export function RecoverPage() {
             </Button>
           </form>
         )}
-        <Link to="/entrar" className="inline-block min-h-12 text-base font-semibold text-brand underline">
+        <Link to="/entrar" className="inline-block min-h-12 text-base font-semibold text-brand-ink underline">
           Volver a Entrar
         </Link>
       </Card>

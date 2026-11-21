@@ -5,7 +5,7 @@ import { useResponsibilities } from '@/modules/responsibilities/presentation/hoo
 import { CATEGORY_LABELS, STATUS_LABELS } from '@/modules/responsibilities/domain/Responsibility';
 import { Spinner } from '@/shared/ui/Button';
 import { EmptyState } from '@/shared/ui/Card';
-import { FAMILY_COLORS, FAMILY_THEMES } from '../domain/Family';
+import { FAMILY_COLORS } from './familyTheme';
 import { useFamilies } from './hooks';
 
 /** Tarjetas de cada familia: color, vestimenta, integrantes y lo que aporta. */
@@ -32,8 +32,8 @@ export function FamiliesOverview() {
         );
         const isMine = context.me?.familyId === f.id;
         return (
-          <article key={f.id} className={`overflow-hidden rounded-2xl border-2 border-night-900 bg-white ${isMine ? 'shadow-[0_5px_0_0_var(--color-gold-400)]' : 'shadow-block'}`}>
-            <header className="snow-bg border-b-2 border-night-900 px-4 py-3 text-white" style={{ backgroundColor: FAMILY_THEMES[f.color].strong }}>
+          <article key={f.id} className={`overflow-hidden rounded-2xl border-2 border-line bg-surface ${isMine ? 'shadow-[0_5px_0_0_var(--color-gold-400)]' : 'shadow-block'}`}>
+            <header className="snow-bg border-b-2 border-line px-4 py-3 text-white" style={{ backgroundColor: FAMILY_COLORS[f.color].strong }}>
               <h3 className="text-xl font-black">Familia {f.name}</h3>
               <p className="flex flex-wrap items-center gap-2 text-sm font-semibold">
                 Color: {color.label}

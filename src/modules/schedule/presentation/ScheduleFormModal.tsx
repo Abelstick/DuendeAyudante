@@ -128,7 +128,7 @@ export function ScheduleFormModal({ eventId, timezone, celebrationAt, initial, p
           <span>
             Responsable <span className="font-normal text-ink-500">(opcional)</span>
           </span>
-          <select {...register('responsibleId')} className="min-h-13 w-full rounded-xl border-2 border-mist-300 bg-white px-3 text-lg font-normal text-ink-900">
+          <select {...register('responsibleId')} className="min-h-13 w-full rounded-xl border-2 border-mist-300 bg-surface px-3 text-lg font-normal text-ink-900">
             <option value="">Nadie en particular</option>
             {participants.map((p) => (
               <option key={p.id} value={p.id}>
@@ -149,7 +149,7 @@ export function ScheduleFormModal({ eventId, timezone, celebrationAt, initial, p
                   aria-pressed={status === s}
                   onClick={() => setStatus(s)}
                   className={`min-h-12 rounded-xl border-2 px-3 text-base font-semibold ${
-                    status === s ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-white'
+                    status === s ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-surface'
                   }`}
                 >
                   <span aria-hidden>{SCHEDULE_STATUS_LABELS[s].emoji}</span> {SCHEDULE_STATUS_LABELS[s].label}

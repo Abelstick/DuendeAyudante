@@ -94,7 +94,7 @@ export function AnnouncementFormModal({ eventId, initial, onClose }: { eventId: 
                 aria-pressed={priority === value}
                 onClick={() => setPriority(value)}
                 className={`min-h-13 rounded-xl border-2 px-3 text-base font-semibold ${
-                  priority === value ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-white'
+                  priority === value ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-surface'
                 }`}
               >
                 {label}
@@ -103,7 +103,7 @@ export function AnnouncementFormModal({ eventId, initial, onClose }: { eventId: 
           </div>
         </fieldset>
 
-        <label className="flex min-h-13 cursor-pointer items-start gap-3 rounded-xl border-2 border-mist-200 bg-white p-3 has-checked:border-gold-400 has-checked:bg-gold-50">
+        <label className="flex min-h-13 cursor-pointer items-start gap-3 rounded-xl border-2 border-mist-200 bg-surface p-3 has-checked:border-gold-400 has-checked:bg-gold-50">
           <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} className="mt-1 size-5 shrink-0 accent-gold-600" />
           <span>
             <span className="block text-base font-semibold">📌 Fijar arriba en Inicio</span>

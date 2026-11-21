@@ -1,12 +1,12 @@
-import { Bell, ChevronRight, KeyRound, LogOut, Type, UserRound, UserRoundX } from 'lucide-react';
-import { useState } from 'react';
+import { Bell, ChevronRight, KeyRound, LogOut, MonitorSmartphone, Moon, Sun, SunMoon, Type, UserRound, UserRoundX, Volume2, VolumeX } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/AuthContext';
 import { useServices } from '@/app/ContainerContext';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { ROLE_LABELS } from '@/modules/events/domain/Event';
 import { useMyEvents } from '@/modules/events/presentation/hooks';
-import { FAMILY_COLORS } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS } from '@/modules/families/presentation/familyTheme';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { displayName } from '@/modules/members/domain/Participant';
@@ -15,6 +15,7 @@ import { Button } from '@/shared/ui/Button';
 import { Card, CardTitle, PageTitle, Pill } from '@/shared/ui/Card';
 import { Modal } from '@/shared/ui/Modal';
 import { useSoundEnabled } from '@/shared/ui/SoundToggle';
+import { applyColorScheme, getColorScheme, type ColorSchemePreference } from '@/shared/ui/colorScheme';
 import { applyTextSize, getTextSize, type TextSize } from '@/shared/ui/textSize';
 import { ChangePasswordForm } from './ChangePasswordForm';
 import { DisableAccountModal } from './DisableAccountModal';
@@ -27,6 +28,7 @@ export function ProfilePage() {
   const families = useFamilies(event.id);
   const myEvents = useMyEvents();
   const [textSize, setTextSize] = useState<TextSize>(getTextSize);
+  const [colorScheme, setColorScheme] = useState<ColorSchemePreference>(getColorScheme);
   const [changing, setChanging] = useState(false);
   const [disablingAccount, setDisablingAccount] = useState(false);
   const [soundOn, setSoundOn] = useSoundEnabled();
@@ -37,6 +39,11 @@ export function ProfilePage() {
   const chooseSize = (size: TextSize) => {
     setTextSize(size);
     applyTextSize(size);
+  };
+
+  const chooseColorScheme = (preference: ColorSchemePreference) => {
+    setColorScheme(preference);
+    applyColorScheme(preference);
   };
 
   const signOut = async () => {
@@ -79,6 +86,26 @@ export function ProfilePage() {
       </Card>
 
       <Card className="space-y-3">
+        <CardTitle icon={<SunMoon className="size-6" />} tone="night">
+          Modo de color
+        </CardTitle>
+        <p className="text-base text-ink-700">El modo oscuro descansa la vista de noche. «Según el dispositivo» cambia solo, igual que tu celular o computadora.</p>
+        <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Modo de color">
+          {(
+            [
+              ['light', 'Claro', Sun],
+              ['dark', 'Oscuro', Moon],
+              ['system', 'Según el dispositivo', MonitorSmartphone],
+            ] as const
+          ).map(([value, label, Icon]) => (
+            <ChoiceTile key={value} selected={colorScheme === value} onSelect={() => chooseColorScheme(value)} label={label}>
+              <Icon className="size-6" aria-hidden />
+            </ChoiceTile>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="space-y-3">
         <CardTitle icon={<Type className="size-6" />} tone="night">
           Tamaño de la letra
         </CardTitle>
@@ -91,25 +118,12 @@ export function ProfilePage() {
               ['large', 'Grande', 'text-xl'],
             ] as const
           ).map(([value, label, size]) => (
-            <button
-              key={value}
-              type="button"
-              role="radio"
-              aria-checked={textSize === value}
-              onClick={() => chooseSize(value)}
-              className={`flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-2xl border-2 px-1 font-extrabold transition-colors ${
-                textSize === value ? 'border-brand bg-brand text-white' : 'border-mist-300 bg-white text-ink-900 hover:border-brand'
-              }`}
-            >
+            <ChoiceTile key={value} selected={textSize === value} onSelect={() => chooseSize(value)} label={label}>
               {/* Muestra de cómo se ve cada tamaño */}
               <span className={`${size} leading-none`} aria-hidden>
                 Aa
               </span>
-              <span className="text-sm">
-                {textSize === value ? '✓ ' : ''}
-                {label}
-              </span>
-            </button>
+            </ChoiceTile>
           ))}
         </div>
       </Card>
@@ -119,26 +133,16 @@ export function ProfilePage() {
           Sonidos
         </CardTitle>
         <p className="text-base text-ink-700">Campanitas al completar una tarea, guardar un regalo o girar la ruleta.</p>
-        <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Sonidos">
+        <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Sonidos">
           {(
             [
-              [true, 'Con sonido'],
-              [false, 'Sin sonido'],
+              [true, 'Con sonido', Volume2],
+              [false, 'Sin sonido', VolumeX],
             ] as const
-          ).map(([value, label]) => (
-            <button
-              key={label}
-              type="button"
-              role="radio"
-              aria-checked={soundOn === value}
-              onClick={() => setSoundOn(value)}
-              className={`btn-3d font-display min-h-14 rounded-xl border-2 border-night-900 text-base font-bold ${
-                soundOn === value ? 'bg-brand text-white' : 'bg-white text-night-900 hover:bg-brand-soft'
-              }`}
-            >
-              {soundOn === value ? '✓ ' : ''}
-              {label}
-            </button>
+          ).map(([value, label, Icon]) => (
+            <ChoiceTile key={label} selected={soundOn === value} onSelect={() => setSoundOn(value)} label={label}>
+              <Icon className="size-6" aria-hidden />
+            </ChoiceTile>
           ))}
         </div>
       </Card>
@@ -161,7 +165,7 @@ export function ProfilePage() {
       {(myEvents.data?.length ?? 0) > 1 && (
         <Link
           to="/mis-navidades"
-          className="tap-card flex min-h-14 items-center justify-between gap-3 rounded-2xl border-2 border-mist-300 bg-white px-5 text-lg font-bold text-brand shadow-card"
+          className="tap-card flex min-h-14 items-center justify-between gap-3 rounded-2xl border-2 border-mist-300 bg-surface px-5 text-lg font-bold text-brand-ink shadow-card"
         >
           Ver mis otras Navidades
           <ChevronRight className="size-6" aria-hidden />
@@ -183,5 +187,29 @@ export function ProfilePage() {
       </section>
       {disablingAccount && <DisableAccountModal onClose={() => setDisablingAccount(false)} />}
     </div>
+  );
+}
+
+/**
+ * Opción de una preferencia (modo de color, letra, sonido): ficha con relieve, muestra arriba y
+ * nombre abajo. La elegida toma el color de la familia y lleva ✓ (no depende solo del color).
+ */
+function ChoiceTile({ selected, onSelect, label, children }: { selected: boolean; onSelect: () => void; label: string; children: ReactNode }) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      onClick={onSelect}
+      className={`btn-3d font-display flex min-h-18 flex-col items-center justify-center gap-1 rounded-xl border-2 border-line px-1 py-2 text-center font-bold ${
+        selected ? 'bg-brand text-white' : 'bg-surface text-heading hover:bg-brand-soft'
+      }`}
+    >
+      {children}
+      <span className="text-sm leading-tight">
+        {selected ? '✓ ' : ''}
+        {label}
+      </span>
+    </button>
   );
 }

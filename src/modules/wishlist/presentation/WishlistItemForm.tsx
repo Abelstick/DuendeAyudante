@@ -261,7 +261,7 @@ export function WishlistItemForm({ initial, budget, currency, forName, submittin
           <ul className="flex flex-wrap gap-2" aria-label="Marcas elegidas">
             {brands.map((brand) => (
               <li key={brand}>
-                <span className="inline-flex min-h-11 items-center gap-1 rounded-full border-2 border-night-900 bg-gold-50 py-1 pl-3 pr-1 text-base font-bold text-night-900">
+                <span className="inline-flex min-h-11 items-center gap-1 rounded-full border-2 border-line bg-gold-50 py-1 pl-3 pr-1 text-base font-bold text-heading">
                   <Tag className="size-4 shrink-0" aria-hidden />
                   {brand}
                   <button

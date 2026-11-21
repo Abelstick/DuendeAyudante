@@ -50,7 +50,7 @@ export function TourButton({ label, steps, onBeforeStart, className = '' }: Prop
       type="button"
       onClick={start}
       aria-busy={loading || undefined}
-      className={`flex min-h-12 w-full items-center gap-2.5 rounded-xl border-2 border-dashed border-night-900/50 bg-white/80 px-4 py-2 text-left text-base font-bold text-night-800 transition-colors hover:border-night-900 hover:bg-sky-100 ${className}`}
+      className={`flex min-h-12 w-full items-center gap-2.5 rounded-xl border-2 border-dashed border-line/50 bg-surface/80 px-4 py-2 text-left text-base font-bold text-night-ink transition-colors hover:border-line hover:bg-sky-100 ${className}`}
     >
       <CircleQuestionMark className="size-6 shrink-0 text-sky-600" aria-hidden />
       <span className="min-w-0 flex-1">{loading ? 'Abriendo la guía…' : label}</span>

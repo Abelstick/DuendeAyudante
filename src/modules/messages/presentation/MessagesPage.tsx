@@ -67,7 +67,7 @@ export function MessagesPage() {
             Cuando alguien te escriba, aquí aparecerá un regalito esperando.
           </EmptyState>
         ) : !unlocked ? (
-          <div className="flex flex-col items-center gap-3 rounded-2xl border-2 border-night-900 bg-white p-5 text-center shadow-block">
+          <div className="flex flex-col items-center gap-3 rounded-2xl border-2 border-line bg-surface p-5 text-center shadow-block">
             <GiftBox className="w-24 motion-safe:animate-float" />
             <p className="text-xl font-extrabold text-ink-900">
               ¡{inbox.length === 1 ? 'Hay 1 mensaje esperando' : `Hay ${inbox.length} mensajes esperando`}! 🎁
@@ -88,18 +88,18 @@ export function MessagesPage() {
               setOpened(true);
               playSound('reveal');
             }}
-            className="tap-card flex w-full flex-col items-center gap-3 rounded-2xl border-2 border-night-900 bg-gold-50 p-5 text-center shadow-block"
+            className="tap-card flex w-full flex-col items-center gap-3 rounded-2xl border-2 border-line bg-gold-50 p-5 text-center shadow-block"
           >
             <GiftBox className="w-24 motion-safe:animate-float" />
             <span className="text-xl font-extrabold text-ink-900">¡Ya puedes abrir tus mensajes! 🎄</span>
-            <span className="font-display rounded-xl border-2 border-night-900 bg-berry-600 px-4 py-2 text-lg font-semibold text-white">Toca para abrir</span>
+            <span className="font-display rounded-xl border-2 border-line bg-berry-600 px-4 py-2 text-lg font-semibold text-white">Toca para abrir</span>
           </button>
         ) : (
           <>
             <ConfettiBurst />
             <ul className="stagger space-y-3">
               {inbox.map((m) => (
-                <li key={m.id} className="animate-pop-in space-y-2 rounded-2xl border-2 border-night-900 bg-white p-4 shadow-block">
+                <li key={m.id} className="animate-pop-in space-y-2 rounded-2xl border-2 border-line bg-surface p-4 shadow-block">
                   {showFor && <Pill tone="berry">Para {nameOf(m.toId)}</Pill>}
                   <p className="whitespace-pre-line text-lg text-ink-900">{m.body}</p>
                   <p className="text-right text-base font-bold text-ink-700">— {m.fromName ? toTitleCase(m.fromName) : 'Alguien que te quiere 🤫'}</p>
@@ -119,7 +119,7 @@ export function MessagesPage() {
             {(sent.data ?? []).map((m) => {
               const to = people.find((p) => p.id === m.toId);
               return (
-                <li key={m.id} className="space-y-1 rounded-2xl border-2 border-mist-300 bg-white p-3">
+                <li key={m.id} className="space-y-1 rounded-2xl border-2 border-mist-300 bg-surface p-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-bold text-ink-900">Para {to ? displayName(to) : 'alguien que ya no está'}</p>
                     {m.anonymous && <Pill>Sin firma 🤫</Pill>}

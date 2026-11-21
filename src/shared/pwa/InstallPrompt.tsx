@@ -64,12 +64,12 @@ export function InstallPrompt() {
           <section
             role="dialog"
             aria-labelledby="install-title"
-            className="animate-pop-in pointer-events-auto w-full max-w-md rounded-2xl border-2 border-night-900 bg-white p-4 text-ink-900 shadow-block"
+            className="animate-pop-in pointer-events-auto w-full max-w-md rounded-2xl border-2 border-line bg-surface p-4 text-ink-900 shadow-block"
           >
             <div className="flex items-start gap-3">
-              <img src="/icons/icon-192.png" alt="" className="size-14 shrink-0 rounded-xl border-2 border-night-900" />
+              <img src="/icons/icon-192.png" alt="" className="size-14 shrink-0 rounded-xl border-2 border-line" />
               <div className="min-w-0 flex-1">
-                <h2 id="install-title" className="font-display text-lg font-bold text-night-900">
+                <h2 id="install-title" className="font-display text-lg font-bold text-heading">
                   ¿Instalar la app en tu celular?
                 </h2>
                 <p className="text-base text-ink-700">Ábrela con un toque desde tu pantalla de inicio, como cualquier otra app.</p>

@@ -105,7 +105,7 @@ export function MergeGamesModal({ eventId, games, participants, onClose, onDone 
                 <label
                   key={o.id}
                   className={`flex min-h-13 cursor-pointer items-center gap-3 rounded-xl border-2 px-3 ${
-                    target === o.id ? 'border-brand bg-brand-soft' : 'border-mist-200 bg-white'
+                    target === o.id ? 'border-brand bg-brand-soft' : 'border-mist-200 bg-surface'
                   }`}
                 >
                   <input type="radio" name="merge-target" className="size-5 accent-brand" checked={target === o.id} onChange={() => setTarget(o.id)} />
@@ -118,7 +118,7 @@ export function MergeGamesModal({ eventId, games, participants, onClose, onDone 
 
         {target === 'new' && (
           <form id={formId} onSubmit={handleSubmit((v) => submit(formToFields(v)))} className="space-y-5 rounded-2xl bg-mist-50 p-4" noValidate>
-            <p className="text-base font-semibold text-brand">Revisa y ajusta el juego combinado:</p>
+            <p className="text-base font-semibold text-brand-ink">Revisa y ajusta el juego combinado:</p>
             <GameFieldInputs register={register} errors={errors} participants={participants} autoFocus={false} />
           </form>
         )}

@@ -125,7 +125,7 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
       aria-label={label}
       value={m.familyId ?? ''}
       onChange={(e) => changeFamily(m, e.target.value)}
-      className="min-h-12 w-full rounded-xl border-2 border-night-900 bg-white px-3 text-base text-ink-900"
+      className="min-h-12 w-full rounded-xl border-2 border-line bg-surface px-3 text-base text-ink-900"
     >
       <option value="">Sin familia</option>
       {families.map((f) => (
@@ -145,7 +145,7 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
         const guardians = m.guardianIds.map((id) => byId.get(id)).filter((g): g is Member => Boolean(g));
         return (
           <>
-            <span className="font-bold text-night-900">{displayName(m)}</span>
+            <span className="font-bold text-heading">{displayName(m)}</span>
             {guardians.length > 0 && <span className="block text-sm text-ink-700">Lo manejan: {guardians.map((g) => displayName(g)).join(', ')}</span>}
             {isDisabled(m) && <span className="block text-sm font-bold text-berry-700">Cuenta inhabilitada</span>}
           </>
@@ -244,9 +244,9 @@ export function MembersList({ members, families, myRole, onAssignTask }: Props) 
         {visible.map((m) => {
           const guardians = m.guardianIds.map((id) => byId.get(id)).filter((g): g is Member => Boolean(g));
           return (
-            <li key={m.id} className="space-y-3 rounded-xl border-2 border-night-900 bg-white p-4 shadow-block">
+            <li key={m.id} className="space-y-3 rounded-xl border-2 border-line bg-surface p-4 shadow-block">
               <div className="space-y-1">
-                <p className="font-display text-lg font-bold leading-tight text-night-900">{displayName(m)}</p>
+                <p className="font-display text-lg font-bold leading-tight text-heading">{displayName(m)}</p>
                 <div className="flex flex-wrap items-center gap-2">
                   <FamilyBadge family={familyOf(m)} />
                   <span className="rounded-lg bg-mist-200 px-2.5 py-0.5 text-sm font-bold text-ink-700">{m.role ? ROLE_LABELS[m.role] : 'Sin usuario'}</span>

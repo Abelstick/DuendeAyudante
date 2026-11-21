@@ -99,14 +99,14 @@ export function FamilyDrivesManager({ eventId, families }: Props) {
       <p className="text-base text-ink-700">
         Para que cada uno pueda poner fotos en sus ideas de regalo, conecta una cuenta de Google. Las fotos se guardan en una carpeta nueva de ese Google Drive.
       </p>
-      <ul className="space-y-1 rounded-xl bg-sky-100 px-4 py-3 text-sm text-night-800">
+      <ul className="space-y-1 rounded-xl bg-sky-100 px-4 py-3 text-sm text-night-ink">
         <li>🔒 La app solo puede ver los archivos que ella misma crea, nunca el resto del Drive.</li>
         <li>👀 Las fotos se ven en la app y quedan como «cualquiera con el enlace puede ver».</li>
         <li>📦 Ocupan espacio de esa cuenta de Google (cada foto pesa menos de 1 MB).</li>
       </ul>
 
       {/* Una sola cuenta para todos */}
-      <section className="space-y-3 rounded-xl border-2 border-night-900 bg-gold-50 p-4 shadow-block" aria-labelledby="drive-general-title">
+      <section className="space-y-3 rounded-xl border-2 border-line bg-gold-50 p-4 shadow-block" aria-labelledby="drive-general-title">
         <h3 id="drive-general-title" className="flex items-center gap-2 text-lg font-extrabold text-ink-900">
           <Users className="size-5 shrink-0" aria-hidden /> Una sola cuenta para todas las familias
         </h3>
@@ -134,7 +134,7 @@ export function FamilyDrivesManager({ eventId, families }: Props) {
             {families.map((f) => {
               const own = familyDrives.data?.find((d) => d.familyId === f.id) ?? null;
               return (
-                <li key={f.id} className="space-y-3 rounded-xl border-2 border-night-900 bg-white p-4 shadow-block">
+                <li key={f.id} className="space-y-3 rounded-xl border-2 border-line bg-surface p-4 shadow-block">
                   <FamilyBadge family={f} />
                   {slot(
                     { familyId: f.id },
@@ -185,7 +185,7 @@ function DriveSlot({ connection, emptyText, disconnectText, connecting, confirmi
   } else {
     status = (
       <p className="flex items-start gap-2 text-base text-ink-900">
-        <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-pine-600" aria-hidden />
+        <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-pine-700" aria-hidden />
         <span className="min-w-0 wrap-break-word">
           Conectado a <strong>{connection.googleEmail}</strong>
         </span>

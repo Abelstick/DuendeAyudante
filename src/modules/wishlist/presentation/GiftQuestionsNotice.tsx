@@ -9,7 +9,7 @@ import { countPending, itemsWithNewAnswers } from '../domain/GiftQuestion';
 import { useEventWishlist } from './hooks';
 import { useGiftQuestions } from './questionHooks';
 
-const rowClasses = 'flex min-h-14 items-center gap-3 rounded-xl border-2 border-night-900 bg-gold-50 px-4 py-2 text-base font-bold text-ink-900 shadow-block';
+const rowClasses = 'flex min-h-14 items-center gap-3 rounded-xl border-2 border-line bg-gold-50 px-4 py-2 text-base font-bold text-ink-900 shadow-block';
 
 /**
  * Avisos de las preguntas sobre regalos: "te preguntaron algo" y "respondieron tu pregunta".
@@ -35,7 +35,7 @@ export function GiftQuestionsNotice({ inGifts = false }: { inGifts?: boolean }) 
 
   const base = `/e/${event.id}/regalos`;
   const icon = (node: ReactNode) => (
-    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border-2 border-night-900 bg-gold-400 text-night-900" aria-hidden>
+    <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border-2 border-line bg-gold-400 text-night-900" aria-hidden>
       {node}
     </span>
   );
@@ -59,7 +59,7 @@ export function GiftQuestionsNotice({ inGifts = false }: { inGifts?: boolean }) 
               {pendingText}
               <span className="block text-sm font-semibold text-ink-700">Toca para responder</span>
             </span>
-            <ChevronRight className="size-6 shrink-0 text-brand" aria-hidden />
+            <ChevronRight className="size-6 shrink-0 text-brand-ink" aria-hidden />
           </Link>
         ))}
       {answeredBy.map((participantId) => {
@@ -71,7 +71,7 @@ export function GiftQuestionsNotice({ inGifts = false }: { inGifts?: boolean }) 
               {person ? `${toTitleCase(person.firstName)} respondió tu pregunta` : 'Respondieron tu pregunta'}
               <span className="block text-sm font-semibold text-ink-700">Toca para ver la respuesta</span>
             </span>
-            <ChevronRight className="size-6 shrink-0 text-brand" aria-hidden />
+            <ChevronRight className="size-6 shrink-0 text-brand-ink" aria-hidden />
           </Link>
         );
       })}

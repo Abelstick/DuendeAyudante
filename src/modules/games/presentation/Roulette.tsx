@@ -95,7 +95,7 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
   if (games.length === 0) return null;
 
   return (
-    <section data-tour="juegos-ruleta" aria-labelledby="roulette-title" className="sky-bg snow-bg relative space-y-4 overflow-hidden rounded-2xl border-2 border-night-900 p-5 text-white shadow-lift">
+    <section data-tour="juegos-ruleta" aria-labelledby="roulette-title" className="sky-bg snow-bg relative space-y-4 overflow-hidden rounded-2xl border-2 border-line p-5 text-white shadow-lift">
       <div className="flex items-center gap-4">
         {/* Ruleta (decorativa: el resultado siempre aparece escrito) */}
         <div className="relative size-28 shrink-0" aria-hidden>
@@ -108,7 +108,7 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
               transition: spinning ? `transform ${SPIN_MS}ms cubic-bezier(0.15, 0.8, 0.2, 1)` : 'none',
             }}
           />
-          <span className="absolute left-1/2 top-1/2 flex size-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl border-2 border-night-900 bg-white text-night-900">
+          <span className="absolute left-1/2 top-1/2 flex size-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl border-2 border-line bg-surface text-heading">
             <Dices className="size-6" />
           </span>
         </div>
@@ -123,9 +123,9 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
       </div>
 
       {display && (
-        <div className={`rounded-xl border-2 bg-white p-4 text-center text-ink-900 ${spinning ? 'border-white' : 'animate-pop-in border-gold-400'}`} aria-live={spinning ? 'off' : 'polite'}>
+        <div className={`rounded-xl border-2 bg-surface p-4 text-center text-ink-900 ${spinning ? 'border-white' : 'animate-pop-in border-gold-400'}`} aria-live={spinning ? 'off' : 'polite'}>
           <p className="text-sm font-bold uppercase tracking-wide text-ink-500">{spinning ? 'Eligiendo…' : '¡Les toca jugar!'}</p>
-          <p className={`font-display text-2xl font-semibold leading-tight ${spinning ? 'text-ink-500' : 'text-night-900'}`}>
+          <p className={`font-display text-2xl font-semibold leading-tight ${spinning ? 'text-ink-500' : 'text-heading'}`}>
             {!spinning && <span aria-hidden>🎉 </span>}
             {display.name}
           </p>
@@ -138,7 +138,7 @@ export function Roulette({ games, participants, canMarkPlayed, onMarkPlayed }: P
       )}
 
       {result && !spinning && (
-        <div className="animate-pop-in space-y-3 rounded-xl bg-white p-4 text-ink-900">
+        <div className="animate-pop-in space-y-3 rounded-xl bg-surface p-4 text-ink-900">
           {result.description && <p className="whitespace-pre-line text-base">{result.description}</p>}
           <GameDetails game={result} participants={participants} />
         </div>

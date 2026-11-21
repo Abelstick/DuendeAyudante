@@ -8,7 +8,7 @@ import { CATEGORY_LABELS, KIND_LABELS, STATUS_LABELS, type Responsibility, type 
 
 const statusStyles: Record<ResponsibilityStatus, string> = {
   pending: 'bg-gold-100 text-gold-700',
-  in_progress: 'bg-night-50 text-night-700',
+  in_progress: 'bg-night-50 text-night-ink',
   done: 'bg-pine-600 text-white',
 };
 
@@ -40,8 +40,8 @@ export function ResponsibilityCard({ item, families, participants, canChangeStat
   const fams = item.familyIds.map((id) => families.find((f) => f.id === id)).filter((f): f is Family => Boolean(f));
 
   return (
-    <article className={`animate-pop-in relative space-y-3 overflow-hidden rounded-2xl border-2 border-night-900 p-4 pl-6 shadow-block ${item.status === 'done' ? 'bg-pine-50' : 'bg-white'}`}>
-      <span className={`absolute inset-y-0 left-0 w-2.5 border-r-2 border-night-900 ${statusStripe[item.status]}`} aria-hidden />
+    <article className={`animate-pop-in relative space-y-3 overflow-hidden rounded-2xl border-2 border-line p-4 pl-6 shadow-block ${item.status === 'done' ? 'bg-pine-50' : 'bg-surface'}`}>
+      <span className={`absolute inset-y-0 left-0 w-2.5 border-r-2 border-line ${statusStripe[item.status]}`} aria-hidden />
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="text-sm font-bold text-ink-500">

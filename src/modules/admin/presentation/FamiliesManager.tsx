@@ -3,7 +3,8 @@ import { Link2, Pencil, Plus, Save, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { FAMILY_COLOR_KEYS, FAMILY_COLORS, FAMILY_THEMES, type Family, type FamilyColor } from '@/modules/families/domain/Family';
+import { FAMILY_COLOR_KEYS, type Family, type FamilyColor } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS } from '@/modules/families/presentation/familyTheme';
 import { useFamilyMutations } from '@/modules/families/presentation/hooks';
 import { useFamilyAccessList } from '@/modules/family-access/presentation/hooks';
 import type { Member } from '@/modules/members/domain/Participant';
@@ -125,8 +126,8 @@ export function FamiliesManager({ eventId, families, participants }: { eventId: 
             const count = countOf(f);
             const color = FAMILY_COLORS[f.color];
             return (
-              <li key={f.id} className="overflow-hidden rounded-xl border-2 border-night-900 bg-white shadow-block">
-                <div className="h-3" style={{ backgroundColor: FAMILY_THEMES[f.color].strong }} aria-hidden />
+              <li key={f.id} className="overflow-hidden rounded-xl border-2 border-line bg-surface shadow-block">
+                <div className="h-3" style={{ backgroundColor: FAMILY_COLORS[f.color].strong }} aria-hidden />
                 <div className="space-y-2 p-4">
                   <p className="text-lg font-bold" style={{ color: color.text }}>
                     Familia {f.name}
@@ -299,14 +300,14 @@ function FamilyFormModal({ eventId, editing, families, memberCount, onClose }: F
 
         {/* Vista previa de cómo verán la aplicación los integrantes */}
         <div className="overflow-hidden rounded-2xl border border-mist-200" aria-hidden>
-          <div className="snow-bg px-4 py-3 text-base font-bold text-white" style={{ backgroundColor: FAMILY_THEMES[color].strong }}>
+          <div className="snow-bg px-4 py-3 text-base font-bold text-white" style={{ backgroundColor: FAMILY_COLORS[color].strong }}>
             🎄 Así verán la aplicación sus integrantes
           </div>
-          <div className="flex items-center justify-between gap-2 px-4 py-3" style={{ backgroundColor: FAMILY_THEMES[color].page }}>
+          <div className="flex items-center justify-between gap-2 px-4 py-3" style={{ backgroundColor: FAMILY_COLORS[color].soft }}>
             <span className="font-semibold" style={{ color: FAMILY_COLORS[color].text }}>
               Familia {previewName}
             </span>
-            <span className="rounded-xl px-3 py-1.5 text-sm font-semibold text-white" style={{ backgroundColor: FAMILY_THEMES[color].strong }}>
+            <span className="rounded-xl px-3 py-1.5 text-sm font-semibold text-white" style={{ backgroundColor: FAMILY_COLORS[color].strong }}>
               Agregar regalo
             </span>
           </div>

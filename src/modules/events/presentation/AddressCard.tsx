@@ -37,7 +37,7 @@ export function AddressCard() {
     >
       {host && (
         <p className="flex items-center gap-2 text-lg font-extrabold text-ink-900">
-          <House className="size-5 shrink-0 text-berry-600" aria-hidden />
+          <House className="size-5 shrink-0 text-berry-700" aria-hidden />
           <span className="min-w-0 wrap-break-word">Casa de {host}</span>
         </p>
       )}

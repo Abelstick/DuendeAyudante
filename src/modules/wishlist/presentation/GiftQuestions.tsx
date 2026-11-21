@@ -65,13 +65,13 @@ export function GiftQuestions({ eventId, itemId, canAnswer, canAsk }: Props) {
   };
 
   return (
-    <div className="rounded-xl border-2 border-night-900/15 bg-mist-100">
+    <div className="rounded-xl border-2 border-line/15 bg-mist-100">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="flex min-h-12 w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-base font-bold text-night-900 hover:bg-mist-200"
+        className="flex min-h-12 w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-base font-bold text-heading hover:bg-mist-200"
       >
         <MessageCircleQuestion className="size-5 shrink-0" aria-hidden />
         <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
@@ -93,7 +93,7 @@ export function GiftQuestions({ eventId, itemId, canAnswer, canAsk }: Props) {
           )}
 
           {canAsk && (
-            <div className="space-y-2 rounded-lg bg-white p-3">
+            <div className="space-y-2 rounded-lg bg-surface p-3">
               <TextArea
                 label="Tu pregunta"
                 rows={2}
@@ -148,7 +148,7 @@ function QuestionRow({ eventId, question: q, canAnswer }: { eventId: string; que
   };
 
   return (
-    <li className="space-y-2 rounded-lg bg-white p-3">
+    <li className="space-y-2 rounded-lg bg-surface p-3">
       <p className="text-base font-bold text-ink-900 wrap-break-word">
         <span aria-hidden>❓ </span>
         <span className="sr-only">Pregunta: </span>

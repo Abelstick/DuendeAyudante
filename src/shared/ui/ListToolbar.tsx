@@ -36,7 +36,7 @@ export function ListToolbar({ prefs, onChange, searchLabel, sortOptions, showVie
   const [open, setOpen] = useState(false);
   const hasPanel = Boolean(children || sortOptions);
   return (
-    <section aria-label="Buscar, filtrar y ordenar" className="space-y-3 rounded-2xl border-2 border-night-900 bg-white p-3 shadow-block sm:p-4">
+    <section aria-label="Buscar, filtrar y ordenar" className="space-y-3 rounded-2xl border-2 border-line bg-surface p-3 shadow-block sm:p-4">
       <div className="flex flex-wrap items-end gap-2">
         {searchLabel && (
           <div className="relative min-w-48 flex-1">
@@ -49,7 +49,7 @@ export function ListToolbar({ prefs, onChange, searchLabel, sortOptions, showVie
               placeholder={searchLabel}
               value={prefs.q}
               onChange={(e) => onChange({ q: e.target.value })}
-              className="min-h-12 w-full rounded-xl border-2 border-night-900 bg-white pl-10 pr-11 text-base text-ink-900 placeholder:text-ink-500 focus:outline-none focus:ring-4 focus:ring-aqua-400 [&::-webkit-search-cancel-button]:hidden"
+              className="min-h-12 w-full rounded-xl border-2 border-line bg-surface pl-10 pr-11 text-base text-ink-900 placeholder:text-ink-500 focus:outline-none focus:ring-4 focus:ring-aqua-400 [&::-webkit-search-cancel-button]:hidden"
             />
             {prefs.q && (
               <button
@@ -69,7 +69,7 @@ export function ListToolbar({ prefs, onChange, searchLabel, sortOptions, showVie
             aria-expanded={open}
             aria-controls={panelId}
             onClick={() => setOpen((v) => !v)}
-            className={`flex min-h-12 shrink-0 items-center gap-1.5 rounded-xl border-2 border-night-900 px-3 text-base font-bold focus:outline-none focus:ring-4 focus:ring-aqua-400 ${open ? 'bg-brand-soft text-brand' : 'bg-white text-night-900 hover:bg-brand-soft'}`}
+            className={`flex min-h-12 shrink-0 items-center gap-1.5 rounded-xl border-2 border-line px-3 text-base font-bold focus:outline-none focus:ring-4 focus:ring-aqua-400 ${open ? 'bg-brand-soft text-brand-ink' : 'bg-surface text-heading hover:bg-brand-soft'}`}
           >
             <SlidersHorizontal className="size-5" aria-hidden />
             {open ? 'Ocultar filtros' : 'Filtros'}
@@ -108,7 +108,7 @@ export function ListToolbar({ prefs, onChange, searchLabel, sortOptions, showVie
                   type="button"
                   onClick={() => onChange({ dir: asc ? 'desc' : 'asc' })}
                   title={asc ? 'Orden ascendente. Toca para cambiar a descendente.' : 'Orden descendente. Toca para cambiar a ascendente.'}
-                  className="flex min-h-12 shrink-0 items-center gap-1 rounded-xl border-2 border-night-900 bg-white px-3 text-base font-bold text-night-900 hover:bg-brand-soft focus:outline-none focus:ring-4 focus:ring-aqua-400"
+                  className="flex min-h-12 shrink-0 items-center gap-1 rounded-xl border-2 border-line bg-surface px-3 text-base font-bold text-heading hover:bg-brand-soft focus:outline-none focus:ring-4 focus:ring-aqua-400"
                 >
                   {asc ? <ArrowUp className="size-5" aria-hidden /> : <ArrowDown className="size-5" aria-hidden />}
                   <span>{asc ? 'Asc.' : 'Desc.'}</span>
@@ -128,7 +128,7 @@ export function ListToolbar({ prefs, onChange, searchLabel, sortOptions, showVie
             </p>
           )}
           {onReset && (
-            <button type="button" onClick={onReset} className="min-h-10 rounded-lg px-2 text-base font-bold text-brand underline decoration-2 underline-offset-4 hover:bg-brand-soft">
+            <button type="button" onClick={onReset} className="min-h-10 rounded-lg px-2 text-base font-bold text-brand-ink underline decoration-2 underline-offset-4 hover:bg-brand-soft">
               Quitar filtros
             </button>
           )}
@@ -156,7 +156,7 @@ function ViewToggle({ value, onChange }: { value: ListView; onChange: (view: Lis
     { value: 'table', label: 'Tabla', icon: <Table2 className="size-5" aria-hidden /> },
   ] as const;
   return (
-    <div role="group" aria-label="Cómo ver la lista" className="flex shrink-0 gap-1 rounded-xl border-2 border-night-900 bg-night-800 p-1">
+    <div role="group" aria-label="Cómo ver la lista" className="flex shrink-0 gap-1 rounded-xl border-2 border-line bg-night-800 p-1">
       {options.map((o) => (
         <button
           key={o.value}

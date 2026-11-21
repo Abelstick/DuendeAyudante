@@ -85,7 +85,7 @@ export function ExpensesSection() {
         </EmptyState>
       ) : (
         <>
-          <div className="rounded-2xl border-2 border-night-900 bg-gold-50 p-4 shadow-block">
+          <div className="rounded-2xl border-2 border-line bg-gold-50 p-4 shadow-block">
             <p className="text-sm font-bold uppercase tracking-wide text-gold-700">Total gastado</p>
             <p className="text-3xl font-black tabular-nums text-ink-900">{money(spent)}</p>
           </div>
@@ -99,7 +99,7 @@ export function ExpensesSection() {
             ) : (
               <ul className="space-y-2">
                 {transfers.map((t) => (
-                  <li key={`${t.fromId}-${t.toId}`} className="space-y-2 rounded-2xl border-2 border-mist-300 bg-white p-3">
+                  <li key={`${t.fromId}-${t.toId}`} className="space-y-2 rounded-2xl border-2 border-mist-300 bg-surface p-3">
                     <p className="flex flex-wrap items-center gap-x-2 text-base">
                       <strong>{nameOf(t.fromId)}</strong>
                       <ArrowRight className="size-5 shrink-0 text-ink-500" aria-label="le paga a" />
@@ -127,7 +127,7 @@ export function ExpensesSection() {
 
           <section className="space-y-3">
             <CardTitle icon={<Receipt className="size-6" />}>Cuánto puso cada uno</CardTitle>
-            <ul className="divide-y-2 divide-mist-200 rounded-2xl border-2 border-mist-300 bg-white">
+            <ul className="divide-y-2 divide-mist-200 rounded-2xl border-2 border-mist-300 bg-surface">
               {balances.map((b) => (
                 <li key={b.participantId} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
                   <span className="min-w-0">
@@ -154,7 +154,7 @@ export function ExpensesSection() {
               {list.map((e) => {
                 const editable = canWriteExpense(e, { isEditor, actingIds });
                 return (
-                  <li key={e.id} className={`space-y-1 rounded-2xl border-2 p-3 ${e.kind === 'payment' ? 'border-pine-600/30 bg-pine-50' : 'border-mist-300 bg-white'}`}>
+                  <li key={e.id} className={`space-y-1 rounded-2xl border-2 p-3 ${e.kind === 'payment' ? 'border-pine-600/30 bg-pine-50' : 'border-mist-300 bg-surface'}`}>
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <p className="font-bold text-ink-900">{e.kind === 'payment' ? '🤝 Pago' : `🧾 ${e.description}`}</p>
                       <p className="text-lg font-black tabular-nums">{money(e.amount)}</p>

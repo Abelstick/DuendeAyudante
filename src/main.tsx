@@ -14,9 +14,13 @@ import { setupPwa } from '@/shared/pwa/install';
 import { installKeyboardTracking } from '@/shared/lib/virtualKeyboard';
 import { ToastProvider } from '@/shared/ui/Toast';
 import { applyTextSize, getTextSize } from '@/shared/ui/textSize';
+import { applyColorScheme, getColorScheme } from '@/shared/ui/colorScheme';
+import { installFamilyPalette } from '@/modules/families/presentation/familyTheme';
 import './index.css';
 
 applyTextSize(getTextSize());
+applyColorScheme(getColorScheme());
+installFamilyPalette();
 setupPwa();
 installKeyboardTracking();
 

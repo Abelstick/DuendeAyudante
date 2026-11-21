@@ -176,7 +176,7 @@ export function BulkMembersModal({ families, members, onClose }: Props) {
     }
   };
 
-  const cell = 'min-h-11 w-full rounded-lg border-2 border-night-900 bg-white px-2.5 text-base text-ink-900 focus:outline-none focus:ring-4 focus:ring-aqua-400 disabled:border-mist-300 disabled:bg-mist-100 disabled:text-ink-700';
+  const cell = 'min-h-11 w-full rounded-lg border-2 border-line bg-surface px-2.5 text-base text-ink-900 focus:outline-none focus:ring-4 focus:ring-aqua-400 disabled:border-mist-300 disabled:bg-mist-100 disabled:text-ink-700';
 
   return (
     <Modal
@@ -235,7 +235,7 @@ export function BulkMembersModal({ families, members, onClose }: Props) {
           </Notice>
         )}
 
-        <div className="relative overflow-x-auto rounded-xl border-2 border-night-900">
+        <div className="relative overflow-x-auto rounded-xl border-2 border-line">
           <table className="w-full min-w-[60rem] border-collapse text-left">
             <thead className="bg-night-800 text-white">
               <tr className="eyebrow">
@@ -272,7 +272,7 @@ export function BulkMembersModal({ families, members, onClose }: Props) {
                 const locked = r.status === 'ok' || r.status === 'saving';
                 const n = i + 1;
                 return (
-                  <tr key={r.key} className={`border-t-2 border-mist-200 align-top ${r.status === 'ok' ? 'bg-pine-50' : r.status === 'error' ? 'bg-berry-50' : 'bg-white'}`}>
+                  <tr key={r.key} className={`border-t-2 border-mist-200 align-top ${r.status === 'ok' ? 'bg-pine-50' : r.status === 'error' ? 'bg-berry-50' : 'bg-surface'}`}>
                     <td className="px-2 py-3 text-center font-bold text-ink-500">{n}</td>
                     <td className="p-1.5">
                       <input
@@ -346,7 +346,7 @@ export function BulkMembersModal({ families, members, onClose }: Props) {
                         {!locked && (
                           <button
                             type="button"
-                            className="flex size-11 shrink-0 items-center justify-center rounded-lg border-2 border-night-900 bg-white text-night-900 hover:bg-brand-soft"
+                            className="flex size-11 shrink-0 items-center justify-center rounded-lg border-2 border-line bg-surface text-heading hover:bg-brand-soft"
                             aria-label={`Generar otra contraseña, fila ${n}`}
                             title="Generar otra contraseña"
                             onClick={() => patch(r.key, { password: generateFriendlyPassword() })}

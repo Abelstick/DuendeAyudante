@@ -112,7 +112,7 @@ export function EventLayout() {
           {isManager && (
             <Link
               to={`${base}/organizar`}
-              className="btn-3d font-display flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border-2 border-night-900 bg-gold-400 px-3 text-base font-semibold text-night-900 [--btn-edge:#000] hover:bg-gold-300"
+              className="btn-3d font-display flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl border-2 border-line bg-gold-400 px-3 text-base font-semibold text-night-900 [--btn-edge:#000] hover:bg-gold-300"
             >
               <Settings className="size-5" aria-hidden />
               Organizar
@@ -127,7 +127,7 @@ export function EventLayout() {
         <nav
           aria-label="Menú principal"
           data-tour="menu"
-          className={`sky-bg snow-bg fixed inset-y-0 left-0 z-30 hidden flex-col gap-2 overflow-hidden border-r-2 border-night-900 text-white transition-[width] duration-200 md:flex ${
+          className={`sky-bg snow-bg fixed inset-y-0 left-0 z-30 hidden flex-col gap-2 overflow-hidden border-r-2 border-line text-white transition-[width] duration-200 md:flex ${
             collapsed ? 'w-24 p-2' : 'w-64 p-4'
           }`}
         >
@@ -153,7 +153,7 @@ export function EventLayout() {
               className={({ isActive }) =>
                 `font-display relative flex rounded-[10px] border-2 font-bold transition-colors ${
                   collapsed ? 'min-h-16 flex-col items-center justify-center gap-1 px-1 text-xs' : 'min-h-13 items-center gap-3 px-4 text-lg'
-                } ${isActive ? 'border-night-900 bg-gold-400 text-night-900 shadow-[0_4px_0_0_#000]' : 'border-transparent text-white hover:bg-white/15'}`
+                } ${isActive ? 'border-line bg-gold-400 text-night-900 shadow-[0_4px_0_0_#000]' : 'border-transparent text-white hover:bg-white/15'}`
               }
             >
               <Icon className={collapsed ? 'size-7' : 'size-6'} aria-hidden />
@@ -197,7 +197,7 @@ export function EventLayout() {
         <nav
           aria-label="Menú principal"
           data-tour="menu"
-          className="hide-with-keyboard fixed inset-x-0 bottom-0 z-40 border-t-2 border-night-900 bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
+          className="hide-with-keyboard fixed inset-x-0 bottom-0 z-40 border-t-2 border-line bg-surface pb-[env(safe-area-inset-bottom)] md:hidden"
         >
           <ul className="mx-auto grid max-w-2xl px-1" style={{ gridTemplateColumns: `repeat(${mobileItems.length}, minmax(0, 1fr))` }}>
             {mobileItems.map(({ to, label, icon: Icon, end }) => (
@@ -208,7 +208,7 @@ export function EventLayout() {
                   onClick={() => playSound('tap')}
                   className={({ isActive }) =>
                     `group font-display flex min-h-[4.5rem] flex-col items-center justify-center gap-1 px-0.5 text-center text-xs leading-tight ${
-                      isActive ? 'font-extrabold text-night-900' : 'font-semibold text-ink-700'
+                      isActive ? 'font-extrabold text-heading' : 'font-semibold text-ink-700'
                     }`
                   }
                 >
@@ -216,7 +216,7 @@ export function EventLayout() {
                     <>
                       <span
                         className={`flex h-9 w-14 items-center justify-center rounded-xl border-2 group-active:translate-y-0.5 ${
-                          isActive ? 'animate-hop border-night-900 bg-brand text-white shadow-[0_3px_0_0_var(--color-night-900)]' : 'border-transparent'
+                          isActive ? 'animate-hop border-line bg-brand text-white shadow-[0_3px_0_0_var(--color-line)]' : 'border-transparent'
                         }`}
                       >
                         <Icon className="size-6" strokeWidth={isActive ? 2.5 : 2} aria-hidden />

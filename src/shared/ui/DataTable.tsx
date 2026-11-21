@@ -33,7 +33,7 @@ interface Props<T> {
 export function DataTable<T>({ label, rows, columns, rowKey, sort, onSort, rowClassName }: Props<T>) {
   return (
     <div
-      className="relative overflow-x-auto rounded-xl border-2 border-night-900 bg-white shadow-block md:relative md:left-1/2 md:w-max md:min-w-full md:max-w-[min(80rem,calc(100vw_-_var(--nf-side,0px)_-_3rem))] md:-translate-x-1/2"
+      className="relative overflow-x-auto rounded-xl border-2 border-line bg-surface shadow-block md:relative md:left-1/2 md:w-max md:min-w-full md:max-w-[min(80rem,calc(100vw_-_var(--nf-side,0px)_-_3rem))] md:-translate-x-1/2"
       role="region"
       aria-label={label}
       tabIndex={0}
@@ -73,7 +73,7 @@ export function DataTable<T>({ label, rows, columns, rowKey, sort, onSort, rowCl
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={rowKey(row)} className={`border-t-2 border-mist-200 align-middle odd:bg-white even:bg-mist-100/60 ${rowClassName?.(row) ?? ''}`}>
+            <tr key={rowKey(row)} className={`border-t-2 border-mist-200 align-middle odd:bg-surface even:bg-mist-100/60 ${rowClassName?.(row) ?? ''}`}>
               {columns.map((c) => (
                 <td key={c.key} className={`px-3 py-2 ${c.className ?? ''}`}>
                   {c.cell(row)}
@@ -94,7 +94,7 @@ export function RowAction({ icon, children, onClick, disabled }: { icon?: ReactN
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-lg border-2 border-night-900 bg-white px-2.5 text-sm font-bold text-night-900 hover:bg-brand-soft disabled:cursor-not-allowed disabled:opacity-55 [&>svg]:shrink-0"
+      className="inline-flex min-h-10 items-center gap-1.5 whitespace-nowrap rounded-lg border-2 border-line bg-surface px-2.5 text-sm font-bold text-heading hover:bg-brand-soft disabled:cursor-not-allowed disabled:opacity-55 [&>svg]:shrink-0"
     >
       {icon}
       {children}

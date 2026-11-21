@@ -1,4 +1,5 @@
-import { FAMILY_COLORS, type Family } from '../domain/Family';
+import { type Family } from '../domain/Family';
+import { FAMILY_COLORS } from './familyTheme';
 
 /** Etiqueta de familia: color + nombre + nombre del color (no depende solo del color). */
 export function FamilyBadge({ family, showColorName = false }: { family: Family | undefined; showColorName?: boolean }) {

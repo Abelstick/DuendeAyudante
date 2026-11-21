@@ -13,9 +13,19 @@
      · brand → color de la familia (verde pino por defecto): acción principal y selección.
      · berry → rojo navideño: regalos, "ahora", acciones de riesgo.
      · gold  → premios, momentos especiales, avisos importantes.
-     · night → tinta/contornos, navegación y cielo nocturno.
+     · night → navegación y cielo nocturno (siempre oscuro, en ambos modos).
      · sky   → información y anillo de selección.
      · mist  → fondos y bordes neutros.  · ink → textos.
+   Jerarquía del texto (de más a menos peso)
+     heading (títulos) → ink-900 (datos, etiquetas) → ink-700 (texto) → ink-500 (ayudas).
+   Tokens semánticos (cambian solos con el modo claro/oscuro)
+     · surface   → fondo de tarjetas, campos y ventanas (blanco en modo claro).
+     · heading   → títulos.          · line → contornos y sombras duras de los bloques.
+     · night-ink → texto azulado sobre fondos informativos.
+     · brand-ink → texto con el color de la familia (enlaces, "Ver mi perfil").
+   Regla del modo oscuro: los tonos suaves (-50/-100) y los de texto (-700/-800) se
+   invierten; los tonos sólidos de fondo (pine-600, berry-500/600/800, gold-300/400,
+   night-600…900, sky-500/600) NO cambian, así el texto blanco u oscuro encima sigue igual.
    Radios: 10–12 px (campos, botones, tarjetas). Bordes: 2 px.
    Espaciado: múltiplos de 4 px; 16 px de margen lateral; 20 px entre tarjetas.
    ========================================================================== */
@@ -30,9 +40,10 @@
 
   --color-berry-50: #fdeeee;
   --color-berry-100: #f9d6d6;
-  --color-berry-500: #de4343;
+  --color-berry-500: #d13636; /* texto blanco encima ≥ 4.5:1 */
   --color-berry-600: #c62828;
   --color-berry-700: #a31f1f;
+  --color-berry-800: #8a1919;
 
   --color-gold-50: #fef9ea;
   --color-gold-100: #fcf0cd;
@@ -61,14 +72,21 @@
 
   --color-ink-900: #202938;
   --color-ink-700: #4b5565;
-  --color-ink-500: #667085;
+  --color-ink-500: #596377; /* ≥ 4.5:1 también sobre mist-200 y el fondo de página */
+
+  /* Semánticos: su valor oscuro está en html[data-theme='dark'] */
+  --color-surface: #ffffff;
+  --color-heading: #0f1e38;
+  --color-line: #0f1e38;
+  --color-night-ink: #223a63;
+  --color-snow: #ffffff;
 
   --font-sans: 'Nunito', 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-display: 'Bricolage Grotesque', 'Nunito', 'Segoe UI', system-ui, sans-serif;
   /* Sombras duras: el objeto parece un bloque con grosor */
   --shadow-card: 0 4px 0 0 var(--color-mist-300);
-  --shadow-block: 0 4px 0 0 var(--color-night-900);
-  --shadow-lift: 0 6px 0 0 var(--color-night-900);
+  --shadow-block: 0 4px 0 0 var(--color-line);
+  --shadow-lift: 0 6px 0 0 var(--color-line);
 
   --animate-pop-in: pop-in 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
   --animate-rise: rise 0.35s ease-out both;
@@ -79,22 +97,73 @@
   --animate-hop: hop 0.45s ease-out;
 }
 
-/* Identidad de color de la familia: EventLayout cambia estas variables
-   según la familia de la persona (rojo, verde, blanco…). */
+/* Identidad de color de la familia: familyTheme.ts cambia estas variables según la
+   familia de la persona (rojo, verde, blanco…); brand-soft y brand-ink cambian solos
+   con el modo claro/oscuro. Estos valores son el respaldo antes de que cargue la app. */
 :root {
   --brand: #176b45;
   --brand-strong: #125538;
   --brand-soft: #ddf2e5;
-  --brand-page: #f1f4fa;
-  --brand-accent: #f2b824;
+  --brand-ink: #176b45;
 }
 
 @theme inline {
   --color-brand: var(--brand);
   --color-brand-strong: var(--brand-strong);
   --color-brand-soft: var(--brand-soft);
-  --color-brand-page: var(--brand-page);
-  --color-brand-accent: var(--brand-accent);
+  --color-brand-ink: var(--brand-ink);
+}
+
+/* --------------------------------------------------------------------------
+   MODO OSCURO · "noche de nieve"
+   La preferencia (claro / oscuro / según el dispositivo) la resuelven
+   shared/ui/colorScheme.ts y public/theme-init.js en el atributo data-theme.
+   Superficies azul noche escalonadas (página → tarjeta → recuadro) y contornos
+   más claros que la tarjeta, para que los bloques sigan viéndose "con grosor".
+   -------------------------------------------------------------------------- */
+html[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-surface: #1a263c;
+  --color-heading: #f4f7fc;
+  --color-line: #506592;
+  --color-night-ink: #b8caee;
+  --color-snow: #22324f;
+
+  --color-mist-50: #152034;
+  --color-mist-100: #1f2c44;
+  --color-mist-200: #2a3a57;
+  --color-mist-300: #34466a;
+
+  --color-ink-900: #eef2f9;
+  --color-ink-700: #c5cede;
+  --color-ink-500: #9aa7bd;
+
+  --color-night-50: #1f2e4d;
+  --color-night-100: #283a5e;
+
+  --color-pine-50: #142a1f;
+  --color-pine-100: #1a3628;
+  --color-pine-700: #8fdcb0;
+  --color-pine-800: #a8e6c2;
+
+  --color-berry-50: #3a1c22;
+  --color-berry-100: #4a222a;
+  --color-berry-700: #ffa3a3;
+
+  --color-gold-50: #2f2714;
+  --color-gold-100: #3d3217;
+  --color-gold-600: #e5b53a;
+  --color-gold-700: #f5cd66;
+
+  --color-sky-100: #17304a;
+
+  /* Nieve del paisaje (illustrations.tsx) iluminada por la luna, que se funde con la página */
+  --scene-snow: #9fb2d1;
+  --scene-snow-shade: #22324f;
+}
+html[data-theme='light'] {
+  color-scheme: light;
 }
 
 /* Tamaño de letra base cómodo (18 px), "Compacta" (16 px, para quien ya agrandó la letra
@@ -115,9 +184,11 @@ html[data-text-size='large'] {
 body {
   /* Fondo invernal: azul hielo con copitos quietos; encima cae la nieve (ver Ambience.tsx) */
   --page: #d5eaf9;
+  --page-dot: rgb(255 255 255 / 0.95);
+  --page-dot-soft: rgb(255 255 255 / 0.7);
   background-color: var(--page);
   background-image:
-    radial-gradient(rgb(255 255 255 / 0.95) 2px, transparent 2.2px), radial-gradient(rgb(255 255 255 / 0.7) 1.2px, transparent 1.4px);
+    radial-gradient(var(--page-dot) 2px, transparent 2.2px), radial-gradient(var(--page-dot-soft) 1.2px, transparent 1.4px);
   background-size:
     46px 46px,
     46px 46px;
@@ -130,6 +201,12 @@ body {
   line-height: 1.5;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+}
+/* De noche: cielo azul profundo con copitos tenues */
+html[data-theme='dark'] body {
+  --page: #0d1729;
+  --page-dot: rgb(255 255 255 / 0.13);
+  --page-dot-soft: rgb(255 255 255 / 0.08);
 }
 
 h1,
@@ -221,7 +298,7 @@ summary,
   height: 14px;
   margin-left: -5px;
   border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
-  border: 1.5px solid var(--color-night-900);
+  border: 1.5px solid var(--color-line);
   box-shadow: 0 0 10px 2px currentColor;
   animation: bulb 1.8s ease-in-out infinite;
 }
@@ -244,7 +321,7 @@ summary,
 
 /* Botón con relieve: se hunde al presionarlo (feedback táctil visible) */
 .btn-3d {
-  box-shadow: 0 4px 0 0 var(--btn-edge, var(--color-night-900));
+  box-shadow: 0 4px 0 0 var(--btn-edge, var(--color-line));
   transition:
     transform 0.07s ease-out,
     box-shadow 0.07s ease-out,
@@ -253,7 +330,7 @@ summary,
 }
 .btn-3d:active:not(:disabled) {
   transform: translateY(4px);
-  box-shadow: 0 0 0 0 var(--btn-edge, var(--color-night-900));
+  box-shadow: 0 0 0 0 var(--btn-edge, var(--color-line));
 }
 
 /* Tarjeta tocable: salta un poquito al pasar y se hunde al presionar */
@@ -336,6 +413,9 @@ summary,
 /* Ventanas: fondo y entrada */
 dialog::backdrop {
   background: rgb(15 30 56 / 0.6);
+}
+html[data-theme='dark'] dialog::backdrop {
+  background: rgb(3 7 15 / 0.72);
 }
 dialog[open] > div {
   animation: sheet-up 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
@@ -541,10 +621,10 @@ dialog[open] > div {
 .driver-popover.duende-tour {
   max-width: min(22rem, calc(100vw - 1.5rem));
   padding: 1rem;
-  border: 2px solid var(--color-night-900);
+  border: 2px solid var(--color-line);
   border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 5px 0 0 var(--color-night-900);
+  background: var(--color-surface);
+  box-shadow: 0 5px 0 0 var(--color-line);
   color: var(--color-ink-900);
   font-family: var(--font-sans);
 }
@@ -554,7 +634,7 @@ dialog[open] > div {
   font-size: 1.25rem;
   font-weight: 800;
   line-height: 1.2;
-  color: var(--color-night-900);
+  color: var(--color-heading);
 }
 .driver-popover.duende-tour .driver-popover-description {
   margin-top: 0.4rem;
@@ -574,7 +654,7 @@ dialog[open] > div {
 }
 .driver-popover.duende-tour .driver-popover-close-btn:hover {
   background: var(--color-mist-200);
-  color: var(--color-night-900);
+  color: var(--color-heading);
 }
 .driver-popover.duende-tour .driver-popover-footer {
   flex-wrap: wrap;
@@ -593,11 +673,11 @@ dialog[open] > div {
   min-height: 2.75rem;
   margin: 0;
   padding: 0.35rem 0.9rem;
-  border: 2px solid var(--color-night-900);
+  border: 2px solid var(--color-line);
   border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 3px 0 0 var(--color-night-900);
-  color: var(--color-night-900);
+  background: var(--color-surface);
+  box-shadow: 0 3px 0 0 var(--color-line);
+  color: var(--color-heading);
   font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 700;

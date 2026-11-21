@@ -109,7 +109,7 @@ export function MessageFormModal({ eventId, initial, senders, participants, unlo
           {!body.trim() && (
             <div className="flex flex-wrap gap-2" aria-label="Ideas para empezar">
               {MESSAGE_STARTERS.map((s) => (
-                <button key={s} type="button" onClick={() => setBody(s)} className="min-h-11 rounded-full border-2 border-mist-300 bg-white px-3 text-left text-sm font-semibold text-ink-700 hover:border-brand">
+                <button key={s} type="button" onClick={() => setBody(s)} className="min-h-11 rounded-full border-2 border-mist-300 bg-surface px-3 text-left text-sm font-semibold text-ink-700 hover:border-brand">
                   {s}
                 </button>
               ))}
@@ -120,7 +120,7 @@ export function MessageFormModal({ eventId, initial, senders, participants, unlo
           </p>
         </div>
 
-        <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border-2 border-mist-300 bg-white p-3">
+        <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border-2 border-mist-300 bg-surface p-3">
           <input type="checkbox" className="mt-1 size-5 accent-brand" checked={anonymous} onChange={(e) => setAnonymous(e.target.checked)} />
           <span>
             <span className="block text-base font-semibold">Enviarlo sin firma 🤫</span>

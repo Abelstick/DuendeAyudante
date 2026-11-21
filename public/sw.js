@@ -5,9 +5,9 @@
  * - Supabase y otros dominios: no se tocan (siempre en vivo).
  * Cambia VERSION para forzar a todos a descargar la nueva caché.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = `navidad-${VERSION}`;
-const SHELL = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
+const SHELL = ['/', '/theme-init.js', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));

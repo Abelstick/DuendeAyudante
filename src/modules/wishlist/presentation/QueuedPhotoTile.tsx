@@ -26,7 +26,7 @@ export function QueuedPhotoTile({ job, className = '' }: { job: QueuedPhoto; cla
   const retrying = job.status === 'queued' && job.attempts > 0;
 
   return (
-    <div className={`relative overflow-hidden rounded-xl border-2 border-night-900 bg-mist-200 ${className}`}>
+    <div className={`relative overflow-hidden rounded-xl border-2 border-line bg-mist-200 ${className}`}>
       {url && <img src={url} alt="" className="size-full object-cover" />}
 
       {job.status === 'uploading' && (
@@ -43,7 +43,7 @@ export function QueuedPhotoTile({ job, className = '' }: { job: QueuedPhoto; cla
       )}
 
       {job.status === 'failed' && (
-        <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-berry-700/70 p-1 text-white" role="alert">
+        <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-berry-800/70 p-1 text-white" role="alert">
           <AlertTriangle className="size-5" aria-hidden />
           <span className="text-center text-xs font-bold leading-tight" title={errorMessage(new AppError(job.error ?? 'UNEXPECTED'))}>
             No se pudo subir
@@ -53,7 +53,7 @@ export function QueuedPhotoTile({ job, className = '' }: { job: QueuedPhoto; cla
               type="button"
               onClick={() => void queue.retry(job.id)}
               aria-label="Volver a intentar subir la foto"
-              className="flex size-9 items-center justify-center rounded-full border-2 border-night-900 bg-white text-night-900"
+              className="flex size-9 items-center justify-center rounded-full border-2 border-line bg-surface text-heading"
             >
               <RotateCw className="size-4" aria-hidden />
             </button>
@@ -61,7 +61,7 @@ export function QueuedPhotoTile({ job, className = '' }: { job: QueuedPhoto; cla
               type="button"
               onClick={() => void queue.discard(job.id)}
               aria-label="Quitar la foto"
-              className="flex size-9 items-center justify-center rounded-full border-2 border-night-900 bg-white text-berry-700"
+              className="flex size-9 items-center justify-center rounded-full border-2 border-line bg-surface text-berry-700"
             >
               <X className="size-4" aria-hidden />
             </button>

@@ -55,7 +55,7 @@ export function JoinCodeEditor() {
     return (
       <div className="space-y-2">
         <p className="text-lg">
-          🏠 Código de tu Navidad: <strong className="select-all tracking-wider text-brand">{event.joinCode}</strong>
+          🏠 Código de tu Navidad: <strong className="select-all tracking-wider text-brand-ink">{event.joinCode}</strong>
         </p>
         <p className="text-sm text-ink-700">Tus familiares lo usan para entrar. Ya va incluido en cada mensaje de WhatsApp.</p>
         <Button
@@ -73,7 +73,7 @@ export function JoinCodeEditor() {
   }
 
   return (
-    <div className="animate-pop-in space-y-3 rounded-2xl border-2 border-gold-400 bg-white p-4">
+    <div className="animate-pop-in space-y-3 rounded-2xl border-2 border-gold-400 bg-surface p-4">
       <TextField
         label="Nuevo código"
         hint="Una palabra sencilla, sin espacios (ej. GARCIA, NAVIDAD2026)."
@@ -89,7 +89,7 @@ export function JoinCodeEditor() {
         className="uppercase tracking-wider"
       />
       {status === 'checking' && <p className="text-base text-ink-700">Revisando si está libre…</p>}
-      {status === 'free' && <p className="text-base font-semibold text-brand">✅ ¡Ese código está libre!</p>}
+      {status === 'free' && <p className="text-base font-semibold text-brand-ink">✅ ¡Ese código está libre!</p>}
       {status === 'taken' && <p className="text-base font-semibold text-berry-700">⚠️ Ese código ya lo usa otra Navidad. Prueba con otro.</p>}
       <Notice>
         Las personas que ya entraron no tienen que hacer nada. Los mensajes que ya enviaste siguen funcionando con el código anterior.

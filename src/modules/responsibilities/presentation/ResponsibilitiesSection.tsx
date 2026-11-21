@@ -98,7 +98,7 @@ export function ResponsibilitiesSection() {
   const chip = chipClasses;
   const countStyles: Record<ResponsibilityStatus, string> = {
     pending: 'bg-gold-100 text-gold-700',
-    in_progress: 'bg-night-50 text-night-700',
+    in_progress: 'bg-night-50 text-night-ink',
     done: 'bg-pine-100 text-pine-700',
   };
 
@@ -109,7 +109,7 @@ export function ResponsibilitiesSection() {
       sortKey: 'title',
       cell: (r) => (
         <>
-          <span className="font-bold text-night-900">{r.title}</span>
+          <span className="font-bold text-heading">{r.title}</span>
           {r.description && <span className="block text-sm text-ink-700">{r.description}</span>}
         </>
       ),

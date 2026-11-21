@@ -33,9 +33,9 @@ export function AddressEditor() {
 
   if (!editing) {
     return (
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl bg-white px-4 py-3 text-base">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl bg-surface px-4 py-3 text-base">
         <span className="flex min-w-0 flex-1 items-start gap-2">
-          <MapPin className="mt-0.5 size-5 shrink-0 text-night-700" aria-hidden />
+          <MapPin className="mt-0.5 size-5 shrink-0 text-night-ink" aria-hidden />
           <span className="min-w-0 wrap-break-word">
             {event.address ? (
               <>
@@ -70,7 +70,7 @@ export function AddressEditor() {
   const unchanged = value.trim() === (event.address ?? '') && host.trim() === (event.addressHost ?? '');
 
   return (
-    <div className="animate-pop-in space-y-3 rounded-2xl border-2 border-gold-400 bg-white p-4">
+    <div className="animate-pop-in space-y-3 rounded-2xl border-2 border-gold-400 bg-surface p-4">
       <TextField
         label="¿De quién es la casa?"
         optional

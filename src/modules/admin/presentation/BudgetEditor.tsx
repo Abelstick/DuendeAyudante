@@ -42,9 +42,9 @@ export function BudgetEditor({ budget, onEditingChange }: { budget: number; onEd
 
   if (!editing) {
     return (
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 h-full rounded-2xl bg-white px-4 py-3 text-base">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 h-full rounded-2xl bg-surface px-4 py-3 text-base">
         <span className="flex min-w-0 flex-1 items-center gap-2">
-          <Wallet className="size-5 shrink-0 text-night-700" aria-hidden />
+          <Wallet className="size-5 shrink-0 text-night-ink" aria-hidden />
           <span>
             Monto acordado: <strong>{formatMoney(budget, event.currency)}</strong>
           </span>
@@ -65,7 +65,7 @@ export function BudgetEditor({ budget, onEditingChange }: { budget: number; onEd
   }
 
   return (
-    <div className="animate-pop-in space-y-3 rounded-2xl border-2 border-gold-400 bg-white p-4">
+    <div className="animate-pop-in space-y-3 rounded-2xl border-2 border-gold-400 bg-surface p-4">
       <TextField
         label={`Monto acordado del intercambio (${event.currency === 'PEN' ? 'S/' : event.currency})`}
         hint="Monto máximo para cada regalo del amigo secreto."

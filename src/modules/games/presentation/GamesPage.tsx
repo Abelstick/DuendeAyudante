@@ -339,7 +339,7 @@ export function GamesPage() {
           <SectionTitle>✅ Ya jugamos</SectionTitle>
           <ul className="space-y-2">
             {played.map((g) => (
-              <li key={g.id} className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border-2 border-mist-300 bg-white px-4 py-3">
+              <li key={g.id} className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border-2 border-mist-300 bg-surface px-4 py-3">
                 <span className="text-base font-bold text-ink-700">{g.name}</span>
                 {isEditor && (
                   <Button

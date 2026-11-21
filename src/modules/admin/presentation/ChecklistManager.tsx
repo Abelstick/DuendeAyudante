@@ -84,7 +84,7 @@ export function ChecklistManager({ eventId, families, members }: Props) {
       sortKey: 'title',
       cell: (item) => (
         <>
-          <span className="font-bold text-night-900">{item.title}</span>
+          <span className="font-bold text-heading">{item.title}</span>
           {item.description && <span className="block text-sm text-ink-700">{item.description}</span>}
         </>
       ),
@@ -164,7 +164,7 @@ export function ChecklistManager({ eventId, families, members }: Props) {
           {visible.map((item) => {
             const { done, total } = progressOf(item);
             return (
-              <li key={item.id} className="space-y-2 rounded-2xl border-2 border-mist-300 bg-white p-4">
+              <li key={item.id} className="space-y-2 rounded-2xl border-2 border-mist-300 bg-surface p-4">
                 <p className="text-lg font-semibold">{item.title}</p>
                 {item.description && <p className="text-sm text-ink-700">{item.description}</p>}
                 <div className="flex flex-wrap items-center gap-2 text-sm text-ink-700">
@@ -272,7 +272,7 @@ function ChecklistItemModal({ eventId, editing, families, members, onClose }: Mo
     }
   };
 
-  const selectClass = 'min-h-13 w-full rounded-xl border-2 border-mist-300 bg-white px-3 text-lg text-ink-900';
+  const selectClass = 'min-h-13 w-full rounded-xl border-2 border-mist-300 bg-surface px-3 text-lg text-ink-900';
 
   return (
     <Modal
@@ -312,7 +312,7 @@ function ChecklistItemModal({ eventId, editing, families, members, onClose }: Mo
                   aria-pressed={scope === s}
                   onClick={() => setScope(s)}
                   className={`min-h-13 rounded-xl border-2 px-3 text-base font-semibold ${
-                    scope === s ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-white'
+                    scope === s ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-surface'
                   }`}
                 >
                   {scope === s ? '✓ ' : ''}

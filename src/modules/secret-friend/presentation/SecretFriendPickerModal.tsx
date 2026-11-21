@@ -81,7 +81,7 @@ export function SecretFriendPickerModal({ eventId, giver, forName, currentReceiv
                 aria-checked={selected}
                 onClick={() => setReceiverId(p.id)}
                 className={`flex min-h-14 w-full flex-wrap items-center justify-between gap-2 rounded-xl border-2 px-4 py-2 text-left ${
-                  selected ? 'border-brand bg-brand-soft' : 'border-mist-200 bg-white'
+                  selected ? 'border-brand bg-brand-soft' : 'border-mist-200 bg-surface'
                 }`}
               >
                 <span className="text-base font-semibold">

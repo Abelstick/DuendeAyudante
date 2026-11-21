@@ -5,7 +5,7 @@ import { useAuth } from '@/app/AuthContext';
 import { useServices } from '@/app/ContainerContext';
 import { FullPageSpinner } from '@/app/layout/FullPageSpinner';
 import { PublicLayout } from '@/app/layout/PublicLayout';
-import { FAMILY_COLORS } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS } from '@/modules/families/presentation/familyTheme';
 import { isAppError } from '@/shared/domain/errors';
 import { Avatar } from '@/shared/ui/Avatar';
 import { Button, ButtonLink, Spinner } from '@/shared/ui/Button';
@@ -43,7 +43,7 @@ export function FamilyLinkPage() {
     return (
       <PublicLayout>
         <Card className="space-y-4">
-          <h1 className="text-2xl font-extrabold text-night-900">{notFound ? 'Este enlace no es válido' : 'No pudimos abrir el enlace'}</h1>
+          <h1 className="text-2xl font-extrabold text-heading">{notFound ? 'Este enlace no es válido' : 'No pudimos abrir el enlace'}</h1>
           <Notice tone="error">{errorMessage(info.error)}</Notice>
           <ButtonLink to="/entrar" variant="secondary" size="lg" icon={<LogIn className="size-6" aria-hidden />}>
             Entrar con usuario y contraseña
@@ -99,7 +99,7 @@ export function FamilyLinkPage() {
         {members === null ? (
           // Paso 1 · la palabra secreta
           <form onSubmit={checkWord} className="space-y-5" noValidate>
-            <h1 className="text-[1.7rem] font-extrabold leading-tight text-night-900">Escribe la palabra secreta</h1>
+            <h1 className="text-[1.7rem] font-extrabold leading-tight text-heading">Escribe la palabra secreta</h1>
             <TextField
               label="Palabra secreta"
               hint="Está en el mensaje de WhatsApp que te enviaron. No importa si la escribes en minúsculas."
@@ -120,7 +120,7 @@ export function FamilyLinkPage() {
         ) : (
           // Paso 2 · ¿quién eres?
           <div className="space-y-4">
-            <h1 className="text-[1.7rem] font-extrabold leading-tight text-night-900">¿Quién eres?</h1>
+            <h1 className="text-[1.7rem] font-extrabold leading-tight text-heading">¿Quién eres?</h1>
             <p className="text-lg text-ink-700">Toca tu nombre para entrar.</p>
 
             {members.length > 6 && (
@@ -148,11 +148,11 @@ export function FamilyLinkPage() {
                       type="button"
                       onClick={() => enter(m)}
                       disabled={enteringId !== null}
-                      className="btn-3d flex min-h-16 w-full items-center gap-3 rounded-xl border-2 border-night-900 bg-white px-4 py-2 text-left hover:bg-brand-soft disabled:opacity-60"
+                      className="btn-3d flex min-h-16 w-full items-center gap-3 rounded-xl border-2 border-line bg-surface px-4 py-2 text-left hover:bg-brand-soft disabled:opacity-60"
                     >
                       <Avatar name={m.name} colors={{ bg: color.soft, fg: color.text }} />
-                      <span className="font-display min-w-0 flex-1 text-xl font-bold leading-tight text-night-900">{m.name}</span>
-                      {enteringId === m.participantId ? <Spinner /> : <ChevronRight className="size-6 shrink-0 text-night-900" aria-hidden />}
+                      <span className="font-display min-w-0 flex-1 text-xl font-bold leading-tight text-heading">{m.name}</span>
+                      {enteringId === m.participantId ? <Spinner /> : <ChevronRight className="size-6 shrink-0 text-heading" aria-hidden />}
                     </button>
                   </li>
                 ))}
@@ -176,7 +176,7 @@ export function FamilyLinkPage() {
 
       <p className="mt-6 text-center text-base text-ink-700">
         ¿No encuentras tu nombre o eres quien organiza?{' '}
-        <Link to="/entrar" className="font-bold text-brand underline underline-offset-4">
+        <Link to="/entrar" className="font-bold text-brand-ink underline underline-offset-4">
           Entra con tu usuario y contraseña
         </Link>
         .

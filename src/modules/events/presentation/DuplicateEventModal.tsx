@@ -96,7 +96,7 @@ export function DuplicateEventModal({ event, onClose }: Props) {
           {OPTIONS.map((o) => {
             const disabled = o.key === 'copyResponsibilities' && !copy.copyMembers;
             return (
-              <label key={o.key} className={`flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border-2 border-mist-300 bg-white p-3 ${disabled ? 'opacity-60' : ''}`}>
+              <label key={o.key} className={`flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border-2 border-mist-300 bg-surface p-3 ${disabled ? 'opacity-60' : ''}`}>
                 <input
                   type="checkbox"
                   className="mt-1 size-5 accent-brand"

@@ -1,6 +1,7 @@
 import { Plus, Save, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { FAMILY_COLORS, type Family } from '@/modules/families/domain/Family';
+import { type Family } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS } from '@/modules/families/presentation/familyTheme';
 import { displayName, type Participant } from '@/modules/members/domain/Participant';
 import type { Responsibility } from '@/modules/responsibilities/domain/Responsibility';
 import { formatMoney, parseMoney } from '@/shared/lib/money';
@@ -161,7 +162,7 @@ export function ExpenseFormModal({ eventId, currency, initial, kind: initialKind
               <button
                 type="button"
                 onClick={() => setShareIds(shareIds.length === participants.length ? [] : participants.map((p) => p.id))}
-                className="min-h-12 rounded-full border-2 border-night-900 bg-white px-4 text-base font-semibold"
+                className="min-h-12 rounded-full border-2 border-line bg-surface px-4 text-base font-semibold"
               >
                 {shareIds.length === participants.length ? 'Quitar a todos' : 'Todos'}
               </button>
@@ -183,7 +184,7 @@ export function ExpenseFormModal({ eventId, currency, initial, kind: initialKind
             </div>
             <div className="max-h-64 space-y-2 overflow-y-auto rounded-xl">
               {participants.map((p) => (
-                <label key={p.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-white px-3">
+                <label key={p.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-surface px-3">
                   <input type="checkbox" className="size-5 accent-brand" checked={shareIds.includes(p.id)} onChange={() => setShareIds((ids) => toggle(ids, p.id))} />
                   <span className="text-base">{displayName(p)}</span>
                 </label>

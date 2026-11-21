@@ -1,6 +1,7 @@
 import { Minus, Plus, Shuffle, Users } from 'lucide-react';
 import { useState } from 'react';
-import { FAMILY_COLORS, type Family } from '@/modules/families/domain/Family';
+import { type Family } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS } from '@/modules/families/presentation/familyTheme';
 import { displayName, type Participant } from '@/modules/members/domain/Participant';
 import { playSound } from '@/shared/lib/sound';
 import { Avatar } from '@/shared/ui/Avatar';
@@ -27,7 +28,7 @@ export function ParticipantDraw({ participants, families }: Props) {
 
   const max = Math.min(10, participants.length);
   const amount = Math.min(count, max);
-  const stepClass = 'flex size-12 items-center justify-center rounded-full border-2 border-mist-300 bg-white text-brand hover:border-brand disabled:opacity-40';
+  const stepClass = 'flex size-12 items-center justify-center rounded-full border-2 border-mist-300 bg-surface text-brand-ink hover:border-brand disabled:opacity-40';
 
   const draw = () => {
     setChosen(pickRandomPeople(participants, amount, secureRandom));

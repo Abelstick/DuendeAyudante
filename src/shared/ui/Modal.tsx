@@ -44,27 +44,27 @@ export function Modal({ open, title, onClose, children, footer, size = 'md' }: M
         // Tocar fuera de la ventana (el fondo) la cierra
         if (e.target === ref.current) onClose();
       }}
-      className={`m-0 mt-auto mb-(--kb-inset) max-h-[calc(92dvh-var(--kb-inset))] w-full max-w-none overflow-hidden rounded-t-2xl border-2 border-b-0 border-night-900 bg-white p-0 text-ink-900 sm:m-auto sm:rounded-2xl sm:border-b-2 ${
+      className={`m-0 mt-auto mb-(--kb-inset) max-h-[calc(92dvh-var(--kb-inset))] w-full max-w-none overflow-hidden rounded-t-2xl border-2 border-b-0 border-line bg-surface p-0 text-ink-900 sm:m-auto sm:rounded-2xl sm:border-b-2 ${
         size === 'wide' ? 'sm:max-w-[min(72rem,calc(100vw-2rem))]' : 'sm:max-w-lg'
       }`}
     >
       {open && (
         <div className="flex max-h-[calc(92dvh-var(--kb-inset))] flex-col">
-          <header className="flex items-center justify-between gap-3 border-b-2 border-night-900 bg-gold-400 py-3 pl-5 pr-3">
+          <header className="flex items-center justify-between gap-3 border-b-2 border-line bg-gold-400 py-3 pl-5 pr-3">
             <h2 id={titleId} className="text-xl font-bold text-night-900">
               {title}
             </h2>
             <button
               type="button"
               onClick={onClose}
-              className="btn-3d font-display flex min-h-12 shrink-0 items-center gap-1 rounded-xl border-2 border-night-900 bg-white px-3 text-base font-bold text-night-900"
+              className="btn-3d font-display flex min-h-12 shrink-0 items-center gap-1 rounded-xl border-2 border-line bg-surface px-3 text-base font-bold text-heading"
             >
               <X className="size-5" aria-hidden />
               Cerrar
             </button>
           </header>
           <div className="overflow-y-auto overscroll-contain px-5 py-5">{children}</div>
-          {footer && <footer className="border-t-2 border-night-900 bg-white px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">{footer}</footer>}
+          {footer && <footer className="border-t-2 border-line bg-surface px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">{footer}</footer>}
         </div>
       )}
     </dialog>

@@ -16,12 +16,12 @@ const base =
  *  · gold      → momentos especiales (ruleta, sorteos, premios).
  */
 const variants: Record<Variant, string> = {
-  primary: 'btn-3d border-2 border-night-900 bg-brand text-white hover:bg-brand-strong',
-  secondary: 'btn-3d border-2 border-night-900 bg-white text-night-900 hover:bg-brand-soft',
-  danger: 'btn-3d border-2 border-night-900 bg-berry-600 text-white hover:bg-berry-700',
-  ghost: 'bg-transparent text-brand underline decoration-2 underline-offset-4 hover:bg-brand-soft active:bg-brand-soft transition-colors',
-  whatsapp: 'btn-3d border-2 border-night-900 bg-[#1f8f4e] text-white hover:bg-[#187540]',
-  gold: 'btn-3d btn-shine border-2 border-night-900 bg-gold-400 text-night-900 hover:bg-gold-300',
+  primary: 'btn-3d border-2 border-line bg-brand text-white hover:bg-brand-strong',
+  secondary: 'btn-3d border-2 border-line bg-surface text-heading hover:bg-brand-soft',
+  danger: 'btn-3d border-2 border-line bg-berry-600 text-white hover:bg-berry-800',
+  ghost: 'bg-transparent text-brand-ink underline decoration-2 underline-offset-4 hover:bg-brand-soft active:bg-brand-soft transition-colors',
+  whatsapp: 'btn-3d border-2 border-line bg-[#1a7f45] text-white hover:bg-[#146637]',
+  gold: 'btn-3d btn-shine border-2 border-line bg-gold-400 text-night-900 hover:bg-gold-300',
 };
 
 // Áreas táctiles de 48 px o más

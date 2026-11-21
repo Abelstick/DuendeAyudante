@@ -11,7 +11,7 @@ export function ProgressBar({ percent, label, tone = 'brand', size = 'lg' }: Pro
   const value = Math.max(0, Math.min(100, Math.round(percent)));
   return (
     <div
-      className={`overflow-hidden rounded-lg border-2 border-night-900 bg-white ${size === 'lg' ? 'h-6' : 'h-5'}`}
+      className={`overflow-hidden rounded-lg border-2 border-line bg-surface ${size === 'lg' ? 'h-6' : 'h-5'}`}
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}

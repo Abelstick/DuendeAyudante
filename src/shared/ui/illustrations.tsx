@@ -234,8 +234,8 @@ export function WinterScene({ className = '' }: { className?: string }) {
       <ellipse cx="320" cy="140" rx="150" ry="96" fill="#2c4a7c" />
       <HillDots fill="#3f6bb3" points={[[262, 80], [300, 62], [344, 66], [380, 84], [290, 98], [336, 96]]} />
       {/* nieve del frente */}
-      <path d="M0 98 C60 84 120 88 190 98 C260 108 330 90 400 96 V120 H0 Z" fill="#fff" />
-      <path d="M0 108 C80 100 150 112 220 110 C290 108 350 104 400 108 V120 H0 Z" fill="#e1e6f0" />
+      <path d="M0 98 C60 84 120 88 190 98 C260 108 330 90 400 96 V120 H0 Z" fill="var(--scene-snow, #fff)" />
+      <path d="M0 108 C80 100 150 112 220 110 C290 108 350 104 400 108 V120 H0 Z" fill="var(--scene-snow-shade, #e1e6f0)" />
       {/* personajes */}
       <g transform="translate(40 40) scale(0.95)">
         <TreeArt />

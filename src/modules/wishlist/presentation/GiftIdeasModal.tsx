@@ -35,7 +35,7 @@ export function GiftIdeasModal({ budget, currency, onPick, onClose }: Props) {
         </fieldset>
 
         {canFilter && (
-          <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-white px-3">
+          <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-surface px-3">
             <input type="checkbox" className="size-5 accent-brand" checked={withinBudget} onChange={(e) => setWithinBudget(e.target.checked)} />
             <span className="text-base font-semibold">Solo lo que se puede comprar con {money(budget)} (el monto del intercambio)</span>
           </label>
@@ -50,7 +50,7 @@ export function GiftIdeasModal({ budget, currency, onPick, onClose }: Props) {
                 <button
                   type="button"
                   onClick={() => onPick(idea)}
-                  className="tap-card flex h-full min-h-16 w-full items-center gap-3 rounded-2xl border-2 border-mist-300 bg-white p-3 text-left hover:border-brand"
+                  className="tap-card flex h-full min-h-16 w-full items-center gap-3 rounded-2xl border-2 border-mist-300 bg-surface p-3 text-left hover:border-brand"
                 >
                   <span className="text-3xl" aria-hidden>
                     {idea.emoji}

@@ -3,7 +3,8 @@ import { Plus, Save, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { FAMILY_COLORS, type Family } from '@/modules/families/domain/Family';
+import { type Family } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS } from '@/modules/families/presentation/familyTheme';
 import { displayName, type Participant } from '@/modules/members/domain/Participant';
 import { Button } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Card';
@@ -107,7 +108,7 @@ export function ResponsibilityFormModal({ eventId, initial, defaultKind, familie
   };
 
   const chip = (active: boolean) =>
-    `min-h-12 rounded-xl border-2 px-3 text-base font-semibold ${active ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-white'}`;
+    `min-h-12 rounded-xl border-2 px-3 text-base font-semibold ${active ? 'border-brand bg-brand text-white' : 'border-mist-200 bg-surface'}`;
 
   return (
     <Modal
@@ -192,7 +193,7 @@ export function ResponsibilityFormModal({ eventId, initial, defaultKind, familie
           )}
           <div className="max-h-64 space-y-2 overflow-y-auto rounded-xl">
             {visiblePeople.map((p) => (
-              <label key={p.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-white px-3">
+              <label key={p.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-surface px-3">
                 <input
                   type="checkbox"
                   className="size-5 accent-brand"

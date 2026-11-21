@@ -33,7 +33,7 @@ function FieldShell({ label, hint, error, optional, id, children }: FieldShellPr
 }
 
 const inputClass =
-  'w-full min-h-13 rounded-xl border-2 bg-white px-4 py-3 text-lg text-ink-900 placeholder:text-ink-500 transition-shadow focus:outline-none focus:ring-4 focus:ring-aqua-400 disabled:bg-mist-100 disabled:text-ink-500';
+  'w-full min-h-13 rounded-xl border-2 bg-surface px-4 py-3 text-lg text-ink-900 placeholder:text-ink-500 transition-shadow focus:outline-none focus:ring-4 focus:ring-aqua-400 disabled:bg-mist-100 disabled:text-ink-500';
 
 interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -83,7 +83,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
           id={fieldId}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
-          className={`${inputClass} ${error ? 'border-berry-600' : 'border-night-900'} ${className}`}
+          className={`${inputClass} ${error ? 'border-berry-600' : 'border-line'} ${className}`}
           enterKeyHint={isSearch ? 'search' : undefined}
           {...rest}
           onKeyDown={handleKeyDown}
@@ -114,7 +114,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
         id={fieldId}
         rows={rows}
         aria-invalid={error ? true : undefined}
-        className={`${inputClass} ${error ? 'border-berry-600' : 'border-night-900'} ${className}`}
+        className={`${inputClass} ${error ? 'border-berry-600' : 'border-line'} ${className}`}
         {...rest}
       />
     </FieldShell>

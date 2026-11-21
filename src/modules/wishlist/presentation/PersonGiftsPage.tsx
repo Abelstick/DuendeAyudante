@@ -2,7 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useLocation, useParams } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { actingParticipants, canManageEvent } from '@/modules/events/domain/Event';
-import { FAMILY_COLORS } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS } from '@/modules/families/presentation/familyTheme';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { displayName } from '@/modules/members/domain/Participant';
@@ -45,7 +45,7 @@ export function PersonGiftsPage() {
       <ButtonLink to={`/e/${event.id}/regalos?vista=todos`} variant="ghost" icon={<ArrowLeft className="size-5" aria-hidden />}>
         Volver a Regalos de todos
       </ButtonLink>
-      <header className="flex items-center gap-4 rounded-2xl border-2 border-night-900 bg-white p-5 shadow-block">
+      <header className="flex items-center gap-4 rounded-2xl border-2 border-line bg-surface p-5 shadow-block">
         <Avatar name={person.fullName} size="lg" colors={family && { bg: FAMILY_COLORS[family.color].soft, fg: FAMILY_COLORS[family.color].text }} />
         <div className="min-w-0 space-y-1">
           <p className="text-sm font-bold uppercase tracking-wide text-ink-500">Lista de deseos de</p>

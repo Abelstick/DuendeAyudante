@@ -53,7 +53,7 @@ export function SignUpPage() {
           <p className="text-lg text-ink-700">
             Te enviamos un enlace a <strong>{sentTo}</strong>. Ábrelo para confirmar tu cuenta y luego entra.
           </p>
-          <Link to="/entrar?modo=organizador" className="inline-block min-h-12 text-lg font-semibold text-brand underline">
+          <Link to="/entrar?modo=organizador" className="inline-block min-h-12 text-lg font-semibold text-brand-ink underline">
             Ir a Entrar
           </Link>
         </Card>
@@ -85,7 +85,7 @@ export function SignUpPage() {
         </form>
         <p className="mt-5 text-center text-base">
           ¿Ya tienes cuenta?{' '}
-          <Link to="/entrar?modo=organizador" className="font-semibold text-brand underline">
+          <Link to="/entrar?modo=organizador" className="font-semibold text-brand-ink underline">
             Entrar
           </Link>
         </p>

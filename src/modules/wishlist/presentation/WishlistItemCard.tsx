@@ -27,7 +27,7 @@ interface Props {
 const priorityStyles = {
   1: 'bg-berry-50 text-berry-700',
   2: 'bg-pine-100 text-pine-700',
-  3: 'bg-night-50 text-night-700',
+  3: 'bg-night-50 text-night-ink',
 } as const;
 
 /** Cada prioridad tiene su caja de regalo (además de la etiqueta con texto). */
@@ -63,14 +63,14 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
           : `${waiting} fotos en cola para subir`;
 
   return (
-    <article className="group animate-pop-in space-y-3 rounded-2xl border-2 border-night-900 bg-white p-5 shadow-block">
+    <article className="group animate-pop-in space-y-3 rounded-2xl border-2 border-line bg-surface p-5 shadow-block">
       <div className="flex items-center gap-3">
         {/* Con fotos: la primera como miniatura (al tocarla se ven en grande). Sin fotos: la caja de regalo. */}
         {cover ? (
           <button
             type="button"
             onClick={() => setViewing(0)}
-            className="relative size-20 shrink-0 overflow-hidden rounded-xl border-2 border-night-900 bg-mist-100 focus-visible:outline-3 focus-visible:outline-gold-400"
+            className="relative size-20 shrink-0 overflow-hidden rounded-xl border-2 border-line bg-mist-100 focus-visible:outline-3 focus-visible:outline-gold-400"
             aria-label={photoCount === 1 ? `Ver la foto de ${item.title}` : `Ver las ${photoCount} fotos de ${item.title}`}
           >
             <DrivePhoto driveFileId={cover.driveFileId} alt="" width={240} className="size-full" />
@@ -81,7 +81,7 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
             )}
           </button>
         ) : (
-          <span className="flex size-16 shrink-0 items-center justify-center rounded-xl border-2 border-night-900 bg-sky-100">
+          <span className="flex size-16 shrink-0 items-center justify-center rounded-xl border-2 border-line bg-sky-100">
             <GiftBox tone={priorityGift[item.priority]} className="w-10 motion-safe:group-hover:animate-float" />
           </span>
         )}
@@ -95,9 +95,9 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
 
       {/* Fotos que suben en segundo plano desde este dispositivo (siempre visibles, para saber cómo van) */}
       {queued.length > 0 && (
-        <div className="space-y-2 rounded-xl border-2 border-dashed border-night-900/30 bg-sky-100 p-3">
-          <p className="flex items-center gap-2 text-sm font-bold text-night-900" aria-live="polite">
-            {uploadingNow ? <Loader2 className="size-4 shrink-0 text-brand motion-safe:animate-spin" aria-hidden /> : <CloudUpload className="size-4 shrink-0" aria-hidden />}
+        <div className="space-y-2 rounded-xl border-2 border-dashed border-line/30 bg-sky-100 p-3">
+          <p className="flex items-center gap-2 text-sm font-bold text-heading" aria-live="polite">
+            {uploadingNow ? <Loader2 className="size-4 shrink-0 text-brand-ink motion-safe:animate-spin" aria-hidden /> : <CloudUpload className="size-4 shrink-0" aria-hidden />}
             {queuedLabel}
           </p>
           <ul className="relative flex gap-2 overflow-x-auto pb-1">
@@ -113,13 +113,13 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
 
       {/* Fotos en un desplegable: se ven completas (sin recortar) y al tocar una se abre en grande */}
       {photoCount > 0 && (
-        <div className="rounded-xl border-2 border-night-900/15 bg-mist-100">
+        <div className="rounded-xl border-2 border-line/15 bg-mist-100">
           <button
             type="button"
             onClick={() => setPhotosOpen((v) => !v)}
             aria-expanded={photosOpen}
             aria-controls={photosId}
-            className="flex min-h-12 w-full items-center gap-2 rounded-xl px-3 text-left text-base font-bold text-night-900 hover:bg-mist-200"
+            className="flex min-h-12 w-full items-center gap-2 rounded-xl px-3 text-left text-base font-bold text-heading hover:bg-mist-200"
           >
             <Images className="size-5 shrink-0" aria-hidden />
             <span className="flex-1">{photosOpen ? 'Ocultar fotos' : photoCount === 1 ? 'Ver la foto' : `Ver las ${photoCount} fotos`}</span>
@@ -133,7 +133,7 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
                     type="button"
                     onClick={() => setViewing(i)}
                     aria-label={`Ver en grande la foto ${i + 1} de ${photoCount}`}
-                    className="block h-48 w-40 overflow-hidden rounded-lg border-2 border-night-900 bg-white sm:h-56 sm:w-48"
+                    className="block h-48 w-40 overflow-hidden rounded-lg border-2 border-line bg-surface sm:h-56 sm:w-48"
                   >
                     <DrivePhoto driveFileId={photo.driveFileId} alt="" width={480} fit="contain" className="size-full" />
                   </button>
@@ -149,7 +149,7 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
           <p className="text-sm font-bold uppercase tracking-wide text-ink-500">{item.brands.length === 1 ? 'Marca' : 'Marcas'}</p>
           <ul className="flex flex-wrap gap-2">
             {item.brands.map((brand) => (
-              <li key={brand} className="inline-flex items-center gap-1 rounded-full border-2 border-night-900 bg-gold-50 px-3 py-0.5 text-base font-bold text-night-900">
+              <li key={brand} className="inline-flex items-center gap-1 rounded-full border-2 border-line bg-gold-50 px-3 py-0.5 text-base font-bold text-heading">
                 <Tag className="size-4 shrink-0" aria-hidden />
                 {brand}
               </li>
@@ -173,7 +173,7 @@ export function WishlistItemCard({ item, budget, currency, canEdit, deleting, on
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
-                className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-night-50 px-4 text-base font-bold text-night-700 underline underline-offset-4 hover:bg-night-100"
+                className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-night-50 px-4 text-base font-bold text-night-ink underline underline-offset-4 hover:bg-night-100"
               >
                 <ExternalLink className="size-5 shrink-0" aria-hidden />
                 Ver en {link.label ?? hostnameOf(link.url)}

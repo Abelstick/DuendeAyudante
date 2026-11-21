@@ -72,7 +72,7 @@ export function RemindersPanel({ members }: { members: Member[] }) {
           {visible.map((r) => {
             const done = sent.has(r.member.id);
             return (
-              <li key={r.member.id} className={`space-y-2 rounded-2xl border-2 p-3 ${done ? 'border-pine-600/30 bg-pine-50' : 'border-mist-300 bg-white'}`}>
+              <li key={r.member.id} className={`space-y-2 rounded-2xl border-2 p-3 ${done ? 'border-pine-600/30 bg-pine-50' : 'border-mist-300 bg-surface'}`}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-bold text-ink-900">{displayName(r.member)}</p>
                   <Pill tone={done ? 'success' : 'gold'}>

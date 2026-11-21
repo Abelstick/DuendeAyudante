@@ -56,7 +56,7 @@ export function ScheduleSection() {
         [...days.entries()].map(([day, dayItems]) => (
           <section key={day} className="space-y-2">
             {days.size > 1 && <h3 className="text-lg font-extrabold text-ink-900 first-letter:uppercase">{formatDateOnly(day)}</h3>}
-            <ol className="stagger relative space-y-4 border-l-4 border-dashed border-night-900/40 pl-5">
+            <ol className="stagger relative space-y-4 border-l-4 border-dashed border-line/40 pl-5">
               {dayItems.map((item) => {
                 const isNow = item.id === currentId;
                 const responsible = people.find((p) => p.id === item.responsibleId);
@@ -65,10 +65,10 @@ export function ScheduleSection() {
                 return (
                   <li
                     key={item.id}
-                    className={`relative rounded-xl border-2 border-night-900 p-4 ${isNow ? 'bg-gold-100 shadow-[0_5px_0_0_var(--color-berry-600)]' : 'bg-white shadow-block'} ${muted ? 'opacity-70' : ''}`}
+                    className={`relative rounded-xl border-2 border-line p-4 ${isNow ? 'bg-gold-100 shadow-[0_5px_0_0_var(--color-berry-600)]' : 'bg-surface shadow-block'} ${muted ? 'opacity-70' : ''}`}
                     aria-current={isNow ? 'step' : undefined}
                   >
-                    <span className={`absolute -left-[2.05rem] top-5 size-5 rounded-md border-2 border-night-900 ${isNow ? 'bg-berry-600' : item.status === 'done' ? 'bg-pine-600' : 'bg-night-600'}`} aria-hidden />
+                    <span className={`absolute -left-[2.05rem] top-5 size-5 rounded-md border-2 border-line ${isNow ? 'bg-berry-600' : item.status === 'done' ? 'bg-pine-600' : 'bg-night-600'}`} aria-hidden />
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="font-display rounded-lg bg-night-800 px-3 py-0.5 text-base font-semibold text-white">
                         {formatTime(item.startsAt, event.timezone)}
@@ -76,7 +76,7 @@ export function ScheduleSection() {
                       </p>
                       {isNow ? (
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-berry-600 px-3 py-1 text-sm font-black text-white">
-                          <span className="size-2 rounded-full bg-white motion-safe:animate-pulse" aria-hidden />
+                          <span className="size-2 rounded-full bg-surface motion-safe:animate-pulse" aria-hidden />
                           AHORA
                         </span>
                       ) : (

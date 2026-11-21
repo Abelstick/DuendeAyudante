@@ -74,7 +74,7 @@ export function PasswordGateModal({ title, children, confirmLabel, onVerified, o
               type="button"
               onClick={() => setShow((v) => !v)}
               aria-pressed={show}
-              className="flex min-h-13 shrink-0 items-center gap-1.5 rounded-xl border-2 border-night-900 bg-white px-3 text-base font-bold text-night-900 hover:bg-brand-soft"
+              className="flex min-h-13 shrink-0 items-center gap-1.5 rounded-xl border-2 border-line bg-surface px-3 text-base font-bold text-heading hover:bg-brand-soft"
             >
               {show ? <EyeOff className="size-5" aria-hidden /> : <Eye className="size-5" aria-hidden />}
               {show ? 'Ocultar' : 'Ver'}

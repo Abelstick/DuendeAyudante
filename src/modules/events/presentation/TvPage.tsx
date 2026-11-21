@@ -172,20 +172,20 @@ export function TvPage() {
 
         <aside className="space-y-4">
           {current && (
-            <div className="rounded-2xl border-2 border-night-900 bg-white/95 p-5 text-night-900 shadow-block">
-              <p className="font-display inline-block rounded-lg border-2 border-night-900 bg-berry-600 px-3 py-1 text-lg font-semibold text-white">AHORA</p>
+            <div className="rounded-2xl border-2 border-line bg-surface/95 p-5 text-heading shadow-block">
+              <p className="font-display inline-block rounded-lg border-2 border-line bg-berry-600 px-3 py-1 text-lg font-semibold text-white">AHORA</p>
               <p className="mt-2 text-3xl font-extrabold lg:text-4xl">{current.title}</p>
               {current.description && <p className="mt-1 text-xl text-ink-700">{current.description}</p>}
             </div>
           )}
           {next && (
-            <div className="rounded-2xl border-2 border-night-900 bg-white/85 p-5 text-night-900 shadow-block">
-              <p className="eyebrow text-lg text-night-700">Después sigue · {formatTime(next.startsAt, ev.timezone)}</p>
+            <div className="rounded-2xl border-2 border-line bg-surface/85 p-5 text-heading shadow-block">
+              <p className="eyebrow text-lg text-night-ink">Después sigue · {formatTime(next.startsAt, ev.timezone)}</p>
               <p className="mt-1 text-2xl font-extrabold lg:text-3xl">{next.title}</p>
             </div>
           )}
           {topGames.length > 0 && (
-            <div className="rounded-2xl border-2 border-night-900 bg-gold-50 p-5 text-night-900 shadow-block">
+            <div className="rounded-2xl border-2 border-line bg-gold-50 p-5 text-heading shadow-block">
               <p className="eyebrow text-lg text-gold-700">🏆 Juegos favoritos</p>
               <ol className="mt-2 space-y-1">
                 {topGames.map((g, i) => (
@@ -200,8 +200,8 @@ export function TvPage() {
       </main>
 
       {latest && (
-        <footer className="relative flex items-start gap-3 rounded-2xl border-2 border-night-900 bg-white/95 p-4 text-night-900 shadow-block">
-          <Megaphone className="size-8 shrink-0 text-berry-600" aria-hidden />
+        <footer className="relative flex items-start gap-3 rounded-2xl border-2 border-line bg-surface/95 p-4 text-heading shadow-block">
+          <Megaphone className="size-8 shrink-0 text-berry-700" aria-hidden />
           <p className="text-xl lg:text-2xl">
             <strong>{latest.title}:</strong> {latest.body}
           </p>

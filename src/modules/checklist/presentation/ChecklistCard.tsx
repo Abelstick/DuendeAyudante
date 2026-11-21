@@ -77,7 +77,7 @@ export function ChecklistCard() {
 
           <ul className="space-y-2">
             {checklist.entries.map((entry) => (
-              <li key={entry.key} className={`rounded-2xl border-2 p-3 transition-colors ${entry.done ? 'border-brand-soft bg-brand-soft' : 'border-mist-200 bg-white'}`}>
+              <li key={entry.key} className={`rounded-2xl border-2 p-3 transition-colors ${entry.done ? 'border-brand-soft bg-brand-soft' : 'border-mist-200 bg-surface'}`}>
                 <div className="flex items-start gap-3">
                   {entry.kind === 'manual' ? (
                     <button
@@ -88,7 +88,7 @@ export function ChecklistCard() {
                       disabled={setDone.isPending}
                       onClick={() => toggle(entry)}
                       className={`flex size-12 shrink-0 items-center justify-center rounded-xl border-2 transition-all active:scale-90 ${
-                        entry.done ? 'border-brand bg-brand text-white' : 'border-ink-500 bg-white hover:border-brand'
+                        entry.done ? 'border-brand bg-brand text-white' : 'border-ink-500 bg-surface hover:border-brand'
                       }`}
                     >
                       {entry.done && <Check className="size-7 animate-pop-in" strokeWidth={3} aria-hidden />}
@@ -96,7 +96,7 @@ export function ChecklistCard() {
                   ) : (
                     <span
                       className={`flex size-12 shrink-0 items-center justify-center rounded-xl border-2 ${
-                        entry.done ? 'border-brand bg-brand text-white' : 'border-dashed border-ink-500 bg-white'
+                        entry.done ? 'border-brand bg-brand text-white' : 'border-dashed border-ink-500 bg-surface'
                       }`}
                       aria-hidden
                     >
@@ -111,7 +111,7 @@ export function ChecklistCard() {
                     {entry.description && !entry.done && <p className="text-sm text-ink-700">{entry.description}</p>}
                     {entry.kind === 'manual' && !entry.done && <p className="text-sm text-ink-500">Toca el cuadro cuando lo hayas hecho.</p>}
                     {entry.link && !entry.done && (
-                      <Link to={entry.link} className="mt-1 inline-flex min-h-12 items-center gap-1 text-base font-bold text-brand underline underline-offset-4">
+                      <Link to={entry.link} className="mt-1 inline-flex min-h-12 items-center gap-1 text-base font-bold text-brand-ink underline underline-offset-4">
                         {entry.linkLabel}
                         <ChevronRight className="size-5" aria-hidden />
                       </Link>

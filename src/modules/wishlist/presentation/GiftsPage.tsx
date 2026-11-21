@@ -3,7 +3,8 @@ import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { actingParticipants } from '@/modules/events/domain/Event';
-import { FAMILY_COLORS, type Family } from '@/modules/families/domain/Family';
+import { type Family } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS } from '@/modules/families/presentation/familyTheme';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { displayName, type Participant } from '@/modules/members/domain/Participant';
@@ -88,8 +89,8 @@ export function GiftsPage() {
       </div>
 
       {budget != null && (
-        <p data-tour="regalos-presupuesto" className="flex items-center gap-3 rounded-xl border-2 border-night-900 bg-gold-100 px-4 py-3 text-base">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border-2 border-night-900 bg-gold-400 text-night-900" aria-hidden>
+        <p data-tour="regalos-presupuesto" className="flex items-center gap-3 rounded-xl border-2 border-line bg-gold-100 px-4 py-3 text-base">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border-2 border-line bg-gold-400 text-night-900" aria-hidden>
             <Wallet className="size-5" />
           </span>
           <span>
@@ -205,7 +206,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
       header: 'Persona',
       sortKey: 'name',
       cell: (p) => (
-        <Link to={`/e/${event.id}/regalos/persona/${p.id}`} className="flex min-h-10 items-center gap-1 font-bold text-brand underline decoration-2 underline-offset-4">
+        <Link to={`/e/${event.id}/regalos/persona/${p.id}`} className="flex min-h-10 items-center gap-1 font-bold text-brand-ink underline decoration-2 underline-offset-4">
           {displayName(p)}
           <ChevronRight className="size-5 shrink-0" aria-hidden />
         </Link>
@@ -285,7 +286,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
                 <li key={p.id}>
                   <Link
                     to={`/e/${event.id}/regalos/persona/${p.id}`}
-                    className="tap-card flex min-h-16 items-center gap-3 rounded-2xl border-2 border-mist-300 bg-white py-3 pl-3 pr-2 shadow-card hover:border-brand sm:pl-4"
+                    className="tap-card flex min-h-16 items-center gap-3 rounded-2xl border-2 border-mist-300 bg-surface py-3 pl-3 pr-2 shadow-card hover:border-brand sm:pl-4"
                   >
                     <Avatar name={p.fullName} colors={g.family && { bg: FAMILY_COLORS[g.family.color].soft, fg: FAMILY_COLORS[g.family.color].text }} />
                     {/* El nombre usa todo el ancho; el contador va debajo, junto a lo que le gustaría */}
@@ -308,9 +309,9 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
                       )}
                     </span>
                     {cover && (
-                      <DrivePhoto driveFileId={cover.driveFileId} alt="" width={200} className="ml-1 size-16 shrink-0 rounded-xl border-2 border-night-900/15 bg-mist-100" />
+                      <DrivePhoto driveFileId={cover.driveFileId} alt="" width={200} className="ml-1 size-16 shrink-0 rounded-xl border-2 border-line/15 bg-mist-100" />
                     )}
-                    <ChevronRight className="size-6 shrink-0 text-brand" aria-hidden />
+                    <ChevronRight className="size-6 shrink-0 text-brand-ink" aria-hidden />
                   </Link>
                 </li>
               );

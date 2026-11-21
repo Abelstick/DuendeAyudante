@@ -56,7 +56,7 @@ export function AccessCard({ firstName, username, password, onClose }: Props) {
           Guarda o envía esta contraseña ahora: por seguridad no la volveremos a mostrar. Si se pierde, puedes crear una nueva.
         </p>
       )}
-      <pre className="whitespace-pre-wrap rounded-2xl bg-white p-4 font-sans text-base text-ink-900">{message}</pre>
+      <pre className="whitespace-pre-wrap rounded-2xl bg-surface p-4 font-sans text-base text-ink-900">{message}</pre>
       <a href={whatsappShareUrl(message)} target="_blank" rel="noopener noreferrer" className={buttonClasses('whatsapp', 'lg')}>
         <MessageCircle className="size-6" aria-hidden />
         <span>Enviar por WhatsApp</span>

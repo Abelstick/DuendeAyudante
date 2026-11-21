@@ -38,7 +38,7 @@ export function Countdown({ target, timezone, title, description, budget, curren
   const headline = c.isOver ? '¡Feliz Navidad!' : c.days === 0 ? '¡Es hoy!' : c.days === 1 ? '¡Falta 1 día!' : `¡Faltan ${c.days} días!`;
 
   return (
-    <section aria-labelledby="countdown-title" className="sky-bg snow-bg relative animate-pop-in overflow-hidden rounded-xl border-2 border-night-900 px-4 pb-24 pt-4 text-white shadow-lift sm:px-5 sm:pb-32 sm:pt-5">
+    <section aria-labelledby="countdown-title" className="sky-bg snow-bg relative animate-pop-in overflow-hidden rounded-xl border-2 border-line px-4 pb-24 pt-4 text-white shadow-lift sm:px-5 sm:pb-32 sm:pt-5">
       <Snowfall fall={380} />
       <Moon className="absolute right-4 top-4 w-14 motion-safe:animate-float" />
 

@@ -19,7 +19,7 @@ export function SegmentedTabs<T extends string>({ label, value, options, onChang
     <div
       role="tablist"
       aria-label={label}
-      className="grid gap-1.5 rounded-2xl border-2 border-night-900 bg-night-800 p-1.5 shadow-block"
+      className="grid gap-1.5 rounded-2xl border-2 border-line bg-night-800 p-1.5 shadow-block"
       style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
     >
       {options.map((o) => {
@@ -46,10 +46,10 @@ export function SegmentedTabs<T extends string>({ label, value, options, onChang
 
 /** Estilo de las opciones tipo "ficha" (elegir persona, filtro, etc.). */
 export function chipClasses(active: boolean) {
-  return `btn-3d font-display min-h-12 rounded-xl border-2 border-night-900 px-4 text-base font-bold ${
-    active ? 'bg-brand text-white' : 'bg-white text-night-900 hover:bg-brand-soft'
+  return `btn-3d font-display min-h-12 rounded-xl border-2 border-line px-4 text-base font-bold ${
+    active ? 'bg-brand text-white' : 'bg-surface text-heading hover:bg-brand-soft'
   }`;
 }
 
 /** Estilo común de los <select>. */
-export const selectClasses = 'min-h-12 w-full rounded-xl border-2 border-night-900 bg-white px-3 text-base text-ink-900 focus:outline-none focus:ring-4 focus:ring-aqua-400';
+export const selectClasses = 'min-h-12 w-full rounded-xl border-2 border-line bg-surface px-3 text-base text-ink-900 focus:outline-none focus:ring-4 focus:ring-aqua-400';

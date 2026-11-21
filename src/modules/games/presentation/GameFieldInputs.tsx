@@ -78,7 +78,7 @@ export function GameFieldInputs({ register, errors, participants, afterName, aut
           {(Object.keys(CATEGORY_LABELS) as GameCategory[]).map((c) => (
             <label key={c} className="relative cursor-pointer">
               <input type="radio" value={c} className="peer sr-only" {...register('category')} />
-              <span className="flex min-h-12 items-center gap-2 rounded-xl border-2 border-mist-300 bg-white px-3 text-base font-semibold peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white peer-focus-visible:outline-3 peer-focus-visible:outline-gold-400">
+              <span className="flex min-h-12 items-center gap-2 rounded-xl border-2 border-mist-300 bg-surface px-3 text-base font-semibold peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white peer-focus-visible:outline-3 peer-focus-visible:outline-gold-400">
                 <span aria-hidden>{CATEGORY_LABELS[c].emoji}</span> {CATEGORY_LABELS[c].label}
               </span>
             </label>
@@ -101,7 +101,7 @@ export function GameFieldInputs({ register, errors, participants, afterName, aut
         <span>
           ¿Quién lo dirige? <span className="font-normal text-ink-500">(opcional)</span>
         </span>
-        <select {...register('responsibleId')} className="min-h-13 w-full rounded-xl border-2 border-mist-300 bg-white px-3 text-lg font-normal text-ink-900">
+        <select {...register('responsibleId')} className="min-h-13 w-full rounded-xl border-2 border-mist-300 bg-surface px-3 text-lg font-normal text-ink-900">
           <option value="">Todavía nadie</option>
           {participants.map((p) => (
             <option key={p.id} value={p.id}>

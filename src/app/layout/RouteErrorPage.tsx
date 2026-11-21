@@ -106,7 +106,7 @@ export function RouteErrorPage() {
           {/* Recarga completa (no navegación interna): deja atrás el estado que falló */}
           <a
             href="/"
-            className="btn-3d font-display flex min-h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-night-900 bg-white px-6 py-3 text-xl font-semibold text-night-900"
+            className="btn-3d font-display flex min-h-14 w-full items-center justify-center gap-2 rounded-xl border-2 border-line bg-surface px-6 py-3 text-xl font-semibold text-heading"
           >
             <House className="size-6" aria-hidden />
             Ir al inicio

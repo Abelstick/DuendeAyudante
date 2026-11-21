@@ -55,7 +55,7 @@ export function QuickAccessGrid() {
       title: 'Juegos',
       detail: pollOpen ? 'Elige tus favoritos' : gameCount === 0 ? 'Propón el primero' : `${plural(gameCount, 'idea', 'ideas')} para jugar`,
       icon: Dices,
-      style: 'bg-sky-500 text-white',
+      style: 'bg-sky-600 text-white',
       badge: pollOpen ? '¡A votar!' : undefined,
     },
     {
@@ -90,16 +90,16 @@ export function QuickAccessGrid() {
             <Link
               to={to}
               onClick={() => playSound('tap')}
-              className={`select-ring relative flex h-full min-h-32 flex-col justify-between gap-2 overflow-hidden rounded-2xl border-2 border-night-900 p-3 shadow-block active:shadow-none sm:p-3.5 ${style}`}
+              className={`select-ring relative flex h-full min-h-32 flex-col justify-between gap-2 overflow-hidden rounded-2xl border-2 border-line p-3 shadow-block active:shadow-none sm:p-3.5 ${style}`}
             >
               {/* franja de brillo, como la carátula de un juego */}
               <span className="pointer-events-none absolute inset-x-0 top-0 h-2 bg-white/25" aria-hidden />
               <span className="relative flex flex-wrap items-start justify-between gap-2">
-                <span className="flex size-12 items-center justify-center rounded-xl border-2 border-night-900 bg-white text-night-900 shadow-[0_3px_0_0_var(--color-night-900)]">
+                <span className="flex size-12 items-center justify-center rounded-xl border-2 border-line bg-surface text-heading shadow-[0_3px_0_0_var(--color-line)]">
                   <Icon className="size-7 motion-safe:animate-float" style={{ animationDelay: `${i * 0.3}s` }} aria-hidden />
                 </span>
                 {badge && (
-                  <span className="font-display whitespace-nowrap rounded-lg border-2 border-night-900 bg-white px-2 py-0.5 text-sm font-semibold text-berry-700 motion-safe:animate-float">
+                  <span className="font-display whitespace-nowrap rounded-lg border-2 border-line bg-surface px-2 py-0.5 text-sm font-semibold text-berry-700 motion-safe:animate-float">
                     {badge}
                   </span>
                 )}

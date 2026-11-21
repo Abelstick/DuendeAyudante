@@ -134,7 +134,7 @@ export function EditMemberModal({ member, members, families, onClose }: Props) {
             </p>
             <div className="max-h-64 space-y-2 overflow-y-auto">
               {possibleGuardians.map((m) => (
-                <label key={m.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-white px-3">
+                <label key={m.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-surface px-3">
                   <input
                     type="checkbox"
                     className="size-5 accent-brand"

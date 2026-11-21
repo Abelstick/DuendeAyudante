@@ -55,7 +55,7 @@ export function CollapsibleCard({ id, icon, tone = 'brand', title, action, defau
   const contentId = useId();
 
   return (
-    <section data-tour={tourId} className={`animate-pop-in rounded-xl border-2 border-night-900 bg-white shadow-block ${className}`}>
+    <section data-tour={tourId} className={`animate-pop-in rounded-xl border-2 border-line bg-surface shadow-block ${className}`}>
       <h2>
         <button
           type="button"
@@ -67,10 +67,10 @@ export function CollapsibleCard({ id, icon, tone = 'brand', title, action, defau
           {icon && <IconBubble tone={tone}>{icon}</IconBubble>}
           {/* El contador va debajo del título: en el celular no le quita espacio y nunca se monta encima */}
           <span className="min-w-0 flex-1">
-            <span className="block text-xl leading-tight font-extrabold text-night-900 hyphens-auto wrap-break-word sm:text-[1.4rem]">{title}</span>
+            <span className="block text-xl leading-tight font-extrabold text-heading hyphens-auto wrap-break-word sm:text-[1.4rem]">{title}</span>
             {action && <span className="mt-1 flex flex-wrap gap-1">{action}</span>}
           </span>
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg text-night-700" aria-hidden>
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg text-night-ink" aria-hidden>
             <ChevronDown className={`size-6 motion-safe:transition-transform motion-safe:duration-200 ${collapsed ? '-rotate-90' : ''}`} />
           </span>
           <span className="sr-only">{collapsed ? 'Mostrar' : 'Ocultar'}</span>

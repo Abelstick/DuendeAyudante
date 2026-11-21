@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { actingParticipants } from '@/modules/events/domain/Event';
-import { FAMILY_COLORS } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS } from '@/modules/families/presentation/familyTheme';
 import { useFamilies } from '@/modules/families/presentation/hooks';
 import { displayName } from '@/modules/members/domain/Participant';
 import { useParticipants } from '@/modules/members/presentation/hooks';
@@ -61,7 +61,7 @@ export function GiftsHomeCard() {
     >
       {/* Mi lista */}
       {context.me && (
-        <div className="flex flex-wrap items-center gap-3 rounded-xl border-2 border-night-900 bg-berry-50 p-3">
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border-2 border-line bg-berry-50 p-3">
           <span className="text-3xl" aria-hidden>
             {myCount === 0 ? '📝' : '🎁'}
           </span>
@@ -96,7 +96,7 @@ export function GiftsHomeCard() {
             placeholder="¿Qué le gustaría a…?"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="min-h-12 w-full rounded-xl border-2 border-night-900 bg-white pl-10 pr-11 text-base text-ink-900 placeholder:text-ink-500 focus:outline-none focus:ring-4 focus:ring-aqua-400 [&::-webkit-search-cancel-button]:hidden"
+            className="min-h-12 w-full rounded-xl border-2 border-line bg-surface pl-10 pr-11 text-base text-ink-900 placeholder:text-ink-500 focus:outline-none focus:ring-4 focus:ring-aqua-400 [&::-webkit-search-cancel-button]:hidden"
           />
           {q && (
             <button
@@ -123,7 +123,7 @@ export function GiftsHomeCard() {
               <li key={p.id} className="w-44 shrink-0 snap-start">
                 <Link
                   to={`${base}/regalos/persona/${p.id}`}
-                  className="tap-card flex h-full flex-col gap-2 rounded-2xl border-2 border-mist-300 bg-white p-3 shadow-card hover:border-brand"
+                  className="tap-card flex h-full flex-col gap-2 rounded-2xl border-2 border-mist-300 bg-surface p-3 shadow-card hover:border-brand"
                   style={colors ? { borderTopColor: colors.swatch, borderTopWidth: 6 } : undefined}
                 >
                   <span className="flex items-center justify-between gap-2">
@@ -140,7 +140,7 @@ export function GiftsHomeCard() {
                     {p.distinguishingNote && <span className="font-semibold text-ink-700"> ({p.distinguishingNote})</span>}
                   </span>
                   {wishes[0]?.photos[0] && (
-                    <DrivePhoto driveFileId={wishes[0].photos[0].driveFileId} alt="" width={360} className="h-24 w-full rounded-lg border-2 border-night-900/15" />
+                    <DrivePhoto driveFileId={wishes[0].photos[0].driveFileId} alt="" width={360} className="h-24 w-full rounded-lg border-2 border-line/15" />
                   )}
                   <span className="mt-auto line-clamp-2 text-sm text-ink-700">
                     {wishes[0] ? (
@@ -160,7 +160,7 @@ export function GiftsHomeCard() {
 
       <Link
         to={`${base}/regalos?vista=todos`}
-        className="inline-flex min-h-11 items-center gap-0.5 rounded-lg px-2 text-base font-bold text-brand underline decoration-2 underline-offset-4 hover:bg-brand-soft"
+        className="inline-flex min-h-11 items-center gap-0.5 rounded-lg px-2 text-base font-bold text-brand-ink underline decoration-2 underline-offset-4 hover:bg-brand-soft"
       >
         Ver los regalos de todos
         <ChevronRight className="size-5" aria-hidden />

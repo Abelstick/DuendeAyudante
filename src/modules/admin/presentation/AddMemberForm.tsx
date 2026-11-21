@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useEventScope } from '@/app/layout/EventLayout';
 import type { EventRole } from '@/modules/events/domain/Event';
-import { FAMILY_COLORS, type Family } from '@/modules/families/domain/Family';
+import { type Family } from '@/modules/families/domain/Family';
+import { FAMILY_COLORS } from '@/modules/families/presentation/familyTheme';
 import type { AssignableRole } from '@/modules/members/domain/IMemberAccountService';
 import { displayName, type Member } from '@/modules/members/domain/Participant';
 import { useMemberMutations } from '@/modules/members/presentation/hooks';
@@ -163,7 +164,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
             {...register('distinguishingNote')}
           />
         ) : (
-          <button type="button" className="min-h-12 text-base font-semibold text-brand underline" onClick={() => setShowNote(true)}>
+          <button type="button" className="min-h-12 text-base font-semibold text-brand-ink underline" onClick={() => setShowNote(true)}>
             ¿Hay otra persona con el mismo nombre?
           </button>
         )}
@@ -203,7 +204,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
             ).map(([value, label]) => (
               <label key={value} className="relative cursor-pointer">
                 <input type="radio" value={value} className="peer sr-only" {...register('hasAccount')} />
-                <span className="flex min-h-14 items-center rounded-2xl border-2 border-mist-300 bg-white px-4 text-base font-semibold peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white">
+                <span className="flex min-h-14 items-center rounded-2xl border-2 border-mist-300 bg-surface px-4 text-base font-semibold peer-checked:border-brand peer-checked:bg-brand peer-checked:text-white">
                   {label}
                 </span>
               </label>
@@ -212,7 +213,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
         </fieldset>
 
         {hasAccount === 'yes' && (
-          <div className="space-y-4 rounded-2xl border-2 border-mist-300 bg-white p-4">
+          <div className="space-y-4 rounded-2xl border-2 border-mist-300 bg-surface p-4">
             <TextField
               label="Usuario"
               hint="Corto y fácil (ej. rosa). Si ya hay otra persona con ese usuario en tu Navidad, agrega el apellido o un número."
@@ -233,7 +234,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
                 <button
                   type="button"
                   onClick={() => setValue('password', generateFriendlyPassword(), { shouldValidate: true })}
-                  className="flex min-h-13 min-w-13 items-center justify-center rounded-xl border-2 border-mist-300 bg-white text-brand"
+                  className="flex min-h-13 min-w-13 items-center justify-center rounded-xl border-2 border-mist-300 bg-surface text-brand-ink"
                   aria-label="Generar otra contraseña"
                   title="Generar otra contraseña"
                 >
@@ -273,7 +274,7 @@ export function AddMemberForm({ families, members, myRole }: Props) {
             <p className="mb-2 text-sm text-ink-700">Por ejemplo, su papá o su mamá.</p>
             <div className="max-h-64 space-y-2 overflow-y-auto">
               {possibleGuardians.map((m) => (
-                <label key={m.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-white px-3">
+                <label key={m.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border-2 border-mist-300 bg-surface px-3">
                   <input
                     type="checkbox"
                     className="size-5 accent-brand"

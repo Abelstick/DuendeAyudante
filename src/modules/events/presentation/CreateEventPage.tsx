@@ -130,7 +130,7 @@ export function CreateEventPage() {
               {...register('joinCode', { onChange: () => setCodeTouched(true), onBlur: verifyCode })}
             />
             {codeStatus === 'checking' && <p className="text-base text-ink-700">Revisando si está libre…</p>}
-            {codeStatus === 'free' && <p className="text-base font-semibold text-brand">✅ ¡Ese código está libre!</p>}
+            {codeStatus === 'free' && <p className="text-base font-semibold text-brand-ink">✅ ¡Ese código está libre!</p>}
             {codeStatus === 'taken' && (
               <p className="text-base font-semibold text-berry-700">⚠️ Ese código ya lo usa otra Navidad. Agrega un número o una palabra.</p>
             )}

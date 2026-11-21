@@ -49,7 +49,7 @@ export function PhotoViewer({ title, photos, startAt = 0, onClose }: Props) {
                 type="button"
                 onClick={() => go(-1)}
                 aria-label="Foto anterior"
-                className="absolute left-2 top-1/2 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-night-900 bg-white/90 text-night-900 shadow-block"
+                className="absolute left-2 top-1/2 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-line bg-white/90 text-night-900 shadow-block"
               >
                 <ChevronLeft className="size-7" aria-hidden />
               </button>
@@ -57,7 +57,7 @@ export function PhotoViewer({ title, photos, startAt = 0, onClose }: Props) {
                 type="button"
                 onClick={() => go(1)}
                 aria-label="Foto siguiente"
-                className="absolute right-2 top-1/2 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-night-900 bg-white/90 text-night-900 shadow-block"
+                className="absolute right-2 top-1/2 flex size-12 -translate-y-1/2 items-center justify-center rounded-full border-2 border-line bg-white/90 text-night-900 shadow-block"
               >
                 <ChevronRight className="size-7" aria-hidden />
               </button>

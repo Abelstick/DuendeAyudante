@@ -89,7 +89,7 @@ export function FamilyLinkModal({ family, access, eligibleCount, onClose }: Prop
                 <button
                   type="button"
                   onClick={() => setWord(suggestSecretWord())}
-                  className="flex min-h-13 min-w-13 items-center justify-center rounded-xl border-2 border-night-900 bg-white text-night-900 hover:bg-brand-soft"
+                  className="flex min-h-13 min-w-13 items-center justify-center rounded-xl border-2 border-line bg-surface text-heading hover:bg-brand-soft"
                   aria-label="Proponer otra palabra"
                   title="Proponer otra palabra"
                 >
@@ -121,13 +121,13 @@ export function FamilyLinkModal({ family, access, eligibleCount, onClose }: Prop
           current && (
             <div className="space-y-4">
               <dl className="space-y-2">
-                <div className="rounded-xl border-2 border-night-900 bg-gold-100 px-4 py-3">
+                <div className="rounded-xl border-2 border-line bg-gold-100 px-4 py-3">
                   <dt className="eyebrow text-ink-700">Palabra secreta</dt>
-                  <dd className="font-display select-all text-2xl font-extrabold tracking-widest text-night-900">{current.secretWord}</dd>
+                  <dd className="font-display select-all text-2xl font-extrabold tracking-widest text-heading">{current.secretWord}</dd>
                 </div>
-                <div className="rounded-xl border-2 border-night-900 bg-white px-4 py-3">
+                <div className="rounded-xl border-2 border-line bg-surface px-4 py-3">
                   <dt className="eyebrow text-ink-700">Enlace (no cambia)</dt>
-                  <dd className="select-all break-all text-base font-semibold text-night-900">{link}</dd>
+                  <dd className="select-all break-all text-base font-semibold text-heading">{link}</dd>
                 </div>
               </dl>
 

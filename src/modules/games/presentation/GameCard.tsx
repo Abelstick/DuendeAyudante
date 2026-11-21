@@ -14,7 +14,7 @@ const CATEGORY_COVER: Record<GameCategory, string> = {
   movement: 'bg-pine-600',
   trivia_challenges: 'bg-night-700',
   kids: 'bg-gold-300',
-  adults: 'bg-berry-700',
+  adults: 'bg-berry-800',
 };
 
 function playersText(g: Game): string | null {
@@ -92,9 +92,9 @@ export function GameCard({ game, rank, votes = 0, percent = 0, showVotes, credit
   const medal = showVotes && rank !== undefined && rank <= 3 && votes > 0 ? ['🥇', '🥈', '🥉'][rank - 1] : null;
 
   return (
-    <article className={`group animate-pop-in overflow-hidden rounded-2xl border-2 border-night-900 bg-white ${selected || voting?.hasVoted ? 'shadow-[0_5px_0_0_var(--brand)]' : 'shadow-block'}`}>
+    <article className={`group animate-pop-in overflow-hidden rounded-2xl border-2 border-line bg-surface ${selected || voting?.hasVoted ? 'shadow-[0_5px_0_0_var(--brand)]' : 'shadow-block'}`}>
       {selecting && (
-        <label className="flex min-h-12 cursor-pointer items-center gap-3 border-b-2 border-night-900 bg-brand-soft px-4 font-bold text-brand">
+        <label className="flex min-h-12 cursor-pointer items-center gap-3 border-b-2 border-line bg-brand-soft px-4 font-bold text-brand-ink">
           <input type="checkbox" className="size-6 accent-brand" checked={selected} onChange={onToggleSelect} />
           Elegir para unir
         </label>
@@ -102,10 +102,10 @@ export function GameCard({ game, rank, votes = 0, percent = 0, showVotes, credit
 
       <div className="flex items-stretch">
         {/* Carátula: emoji de la categoría, como la caja de un videojuego */}
-        <div className={`relative flex w-20 shrink-0 items-center justify-center border-r-2 border-night-900 text-4xl ${CATEGORY_COVER[game.category]}`} aria-hidden>
+        <div className={`relative flex w-20 shrink-0 items-center justify-center border-r-2 border-line text-4xl ${CATEGORY_COVER[game.category]}`} aria-hidden>
           <span className="motion-safe:group-hover:animate-wiggle">{cat.emoji}</span>
           {showVotes && rank !== undefined && (
-            <span className="font-display absolute left-1.5 top-1.5 flex size-8 items-center justify-center rounded-lg border-2 border-night-900 bg-white text-base font-semibold text-night-900">
+            <span className="font-display absolute left-1.5 top-1.5 flex size-8 items-center justify-center rounded-lg border-2 border-line bg-surface text-base font-semibold text-heading">
               {medal ?? rank}
             </span>
           )}
@@ -117,7 +117,7 @@ export function GameCard({ game, rank, votes = 0, percent = 0, showVotes, credit
               {cat.label}
               {showVotes && rank !== undefined && <span className="sr-only"> · Puesto {rank}</span>}
             </p>
-            <h3 className="text-xl font-semibold leading-tight text-night-900">{game.name}</h3>
+            <h3 className="text-xl font-semibold leading-tight text-heading">{game.name}</h3>
           </div>
           {(game.durationMinutes || players) && (
             <p className="flex flex-wrap gap-1.5">
@@ -155,13 +155,13 @@ export function GameCard({ game, rank, votes = 0, percent = 0, showVotes, credit
               type="button"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
-              className="flex min-h-12 items-center gap-2 text-base font-bold text-brand underline underline-offset-4"
+              className="flex min-h-12 items-center gap-2 text-base font-bold text-brand-ink underline underline-offset-4"
             >
               {open ? <ChevronUp className="size-5" aria-hidden /> : <ChevronDown className="size-5" aria-hidden />}
               {open ? 'Ocultar cómo se juega' : 'Ver cómo se juega'}
             </button>
             {open && (
-              <div className="animate-pop-in rounded-xl border-2 border-night-900 bg-sky-100 p-4">
+              <div className="animate-pop-in rounded-xl border-2 border-line bg-sky-100 p-4">
                 <GameDetails game={game} participants={participants} hideMeta />
               </div>
             )}
@@ -169,7 +169,7 @@ export function GameCard({ game, rank, votes = 0, percent = 0, showVotes, credit
         )}
 
         {voting?.hasVoted && !selecting && (
-          <p className="flex items-center gap-2 text-base font-bold text-brand">
+          <p className="flex items-center gap-2 text-base font-bold text-brand-ink">
             <CheckCircle2 className="size-5" aria-hidden /> Votaste por este juego
           </p>
         )}
