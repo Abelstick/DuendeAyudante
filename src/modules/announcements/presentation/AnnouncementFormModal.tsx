@@ -22,6 +22,7 @@ export function AnnouncementFormModal({ eventId, initial, onClose }: { eventId: 
   const { save, remove } = useAnnouncementMutations(eventId);
   const toast = useToast();
   const [priority, setPriority] = useState<AnnouncementPriority>(initial?.priority ?? 'normal');
+  const [pinned, setPinned] = useState(initial?.pinned ?? false);
   const [formError, setFormError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const {
@@ -34,7 +35,7 @@ export function AnnouncementFormModal({ eventId, initial, onClose }: { eventId: 
   const onSubmit = async (v: FormValues) => {
     setFormError(null);
     try {
-      await save.mutateAsync({ id: initial?.id ?? null, eventId, title: v.title, body: v.body, priority });
+      await save.mutateAsync({ id: initial?.id ?? null, eventId, title: v.title, body: v.body, priority, pinned });
       toast.success(initial ? 'Anuncio actualizado.' : '¡Anuncio publicado! Ya lo ven todos. 📢');
       onClose();
     } catch (err) {
@@ -101,6 +102,16 @@ export function AnnouncementFormModal({ eventId, initial, onClose }: { eventId: 
             ))}
           </div>
         </fieldset>
+
+        <label className="flex min-h-13 cursor-pointer items-start gap-3 rounded-xl border-2 border-mist-200 bg-white p-3 has-checked:border-gold-400 has-checked:bg-gold-50">
+          <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} className="mt-1 size-5 shrink-0 accent-gold-600" />
+          <span>
+            <span className="block text-base font-semibold">📌 Fijar arriba en Inicio</span>
+            <span className="block text-sm text-ink-700">
+              Sale como banner destacado debajo de la cuenta regresiva, siempre visible. Ideal para fechas límite. Solo puede haber uno: si otro estaba fijado, se suelta.
+            </span>
+          </span>
+        </label>
 
         {formError && <Notice tone="error">{formError}</Notice>}
 

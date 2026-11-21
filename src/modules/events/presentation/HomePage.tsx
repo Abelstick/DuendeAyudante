@@ -4,6 +4,7 @@ import { AddressCard } from './AddressCard';
 import { Link } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
 import { AnnouncementsHomeCard } from '@/modules/announcements/presentation/AnnouncementsHomeCard';
+import { PinnedAnnouncementBanner } from '@/modules/announcements/presentation/PinnedAnnouncementBanner';
 import { ChecklistCard } from '@/modules/checklist/presentation/ChecklistCard';
 import { FAMILY_COLORS } from '@/modules/families/domain/Family';
 import { FamilyBadge } from '@/modules/families/presentation/FamilyBadge';
@@ -114,6 +115,9 @@ export function HomePage() {
       <div data-tour="inicio-cuenta">
         <Countdown target={event.celebrationAt} timezone={event.timezone} title={event.name} description={event.description} budget={budget} currency={event.currency} />
       </div>
+
+      {/* Anuncio fijado (ej. fecha límite de los regalos): siempre visible */}
+      <PinnedAnnouncementBanner />
 
       {/* Ya empezó la celebración: los recuerdos del año */}
       {event.celebrationAt.getTime() <= Date.now() && (

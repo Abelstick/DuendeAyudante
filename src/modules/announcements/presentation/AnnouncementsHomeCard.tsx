@@ -20,8 +20,9 @@ export function AnnouncementsHomeCard() {
   const isEditor = canEditContent(context.role);
 
   const all = announcements.data ?? [];
-  if (all.length === 0 && !isEditor) return null;
   const shown = announcementsForHome(all);
+  // Si el único anuncio es el fijado, ya se ve arriba: la tarjeta sobra (salvo para quien publica)
+  if (shown.length === 0 && !isEditor) return null;
 
   return (
     <CollapsibleCard
@@ -31,8 +32,10 @@ export function AnnouncementsHomeCard() {
       title="Anuncios"
       action={all.length > 0 ? <Pill tone="night">{all.length}</Pill> : undefined}
     >
-      {shown.length === 0 ? (
+      {all.length === 0 ? (
         <p className="text-base text-ink-700">Todavía no publicaste anuncios. Úsalos para avisar cambios de horario, vestimenta o recordatorios.</p>
+      ) : shown.length === 0 ? (
+        <p className="text-base text-ink-700">Tu anuncio fijado ya se ve arriba, debajo de la cuenta regresiva.</p>
       ) : (
         <div className="space-y-3">
           {shown.map((a) => (

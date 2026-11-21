@@ -3,6 +3,7 @@ import { ArrowLeft, MapPin, Maximize, Megaphone } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { FullPageSpinner } from '@/app/layout/FullPageSpinner';
+import { pinnedAnnouncement } from '@/modules/announcements/domain/Announcement';
 import { useAnnouncements } from '@/modules/announcements/presentation/hooks';
 import { useGames, useGameVotes } from '@/modules/games/presentation/hooks';
 import { currentScheduleItemId, nextScheduleItem } from '@/modules/schedule/domain/Schedule';
@@ -88,7 +89,7 @@ export function TvPage() {
   const items = schedule.data ?? [];
   const current = items.find((i) => i.id === currentScheduleItemId(items, now));
   const next = nextScheduleItem(items, now);
-  const latest = (announcements.data ?? [])[0];
+  const latest = pinnedAnnouncement(announcements.data ?? []) ?? (announcements.data ?? [])[0];
 
   const voteCount = new Map<string, number>();
   for (const v of votes.data ?? []) voteCount.set(v.gameId, (voteCount.get(v.gameId) ?? 0) + 1);

@@ -722,6 +722,17 @@ describe('cronograma y anuncios', () => {
       as(ids.editor, (tx) => tx.query(`update public.announcements set author_name = 'OTRO' where event_id = $1`, [eventA])),
     );
   });
+
+  it('solo hay un anuncio fijado por celebración: fijar otro suelta el anterior', async () => {
+    await as(ids.editor, (tx) =>
+      tx.query(`insert into public.announcements (event_id, title, body, pinned) values ($1, 'Fecha límite', 'Regalos hasta el 20', true)`, [eventA]),
+    );
+    await as(ids.editor, (tx) =>
+      tx.query(`insert into public.announcements (event_id, title, body, pinned) values ($1, 'Nueva fecha', 'Regalos hasta el 22', true)`, [eventA]),
+    );
+    const r = await db.query<{ title: string }>(`select title from public.announcements where event_id = $1 and pinned`, [eventA]);
+    expect(r.rows).toEqual([{ title: 'Nueva fecha' }]);
+  });
 });
 
 describe('RLS: gestión del evento', () => {

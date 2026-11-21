@@ -35,12 +35,14 @@ export function AnnouncementsPage() {
   const isEditor = canEditContent(context.role);
   const all = announcements.data ?? [];
   const patch = (p: Partial<AnnouncementPrefs>) => setPrefs((prev) => ({ ...prev, ...p }));
-  const visible = applySort(
+  const sorted = applySort(
     all.filter((a) => (!prefs.priority || a.priority === prefs.priority) && matchesSearch(prefs.q, a.title, a.body, a.authorName)),
     SORTERS,
     prefs.sort,
     prefs.dir,
   );
+  // El fijado siempre va primero
+  const visible = [...sorted.filter((a) => a.pinned), ...sorted.filter((a) => !a.pinned)];
   const hasFilters = Boolean(prefs.q || prefs.priority);
 
   return (

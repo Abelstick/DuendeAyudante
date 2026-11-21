@@ -6,6 +6,8 @@ export interface Announcement {
   title: string;
   body: string;
   priority: AnnouncementPriority;
+  /** Fijado arriba en Inicio como banner destacado (como mucho uno por celebración). */
+  pinned: boolean;
   authorName: string;
   publishedAt: Date;
 }
@@ -16,6 +18,7 @@ export interface SaveAnnouncementData {
   title: string;
   body: string;
   priority: AnnouncementPriority;
+  pinned: boolean;
 }
 
 export interface IAnnouncementRepository {
@@ -24,9 +27,18 @@ export interface IAnnouncementRepository {
   remove(id: string): Promise<void>;
 }
 
-/** Para Inicio: primero los importantes (más nuevos primero), luego los demás; hasta `max`. */
-export function announcementsForHome(items: Announcement[], max = 3): Announcement[] {
-  const byDate = [...items].sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
+/** El anuncio fijado (si por una carrera hubiera varios, el más nuevo). */
+export function pinnedAnnouncement(items: readonly Announcement[]): Announcement | null {
+  return items.filter((a) => a.pinned).sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime())[0] ?? null;
+}
+
+/**
+ * Para la tarjeta de Anuncios en Inicio: primero los importantes (más nuevos
+ * primero), luego los demás; hasta `max`. El fijado no entra: ya sale arriba.
+ */
+export function announcementsForHome(items: readonly Announcement[], max = 3): Announcement[] {
+  const pinned = pinnedAnnouncement(items);
+  const byDate = items.filter((a) => a !== pinned).sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime());
   return [...byDate.filter((a) => a.priority === 'important'), ...byDate.filter((a) => a.priority === 'normal')].slice(0, max);
 }
 

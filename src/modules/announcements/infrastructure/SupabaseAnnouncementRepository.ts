@@ -8,6 +8,7 @@ interface Row {
   title: string;
   body: string;
   priority: AnnouncementPriority;
+  pinned: boolean;
   author_name: string;
   published_at: string;
 }
@@ -18,7 +19,7 @@ export class SupabaseAnnouncementRepository implements IAnnouncementRepository {
   async list(eventId: string): Promise<Announcement[]> {
     const { data, error } = await this.supabase
       .from('announcements')
-      .select('id, event_id, title, body, priority, author_name, published_at')
+      .select('id, event_id, title, body, priority, pinned, author_name, published_at')
       .eq('event_id', eventId)
       .order('published_at', { ascending: false })
       .returns<Row[]>();
@@ -29,13 +30,14 @@ export class SupabaseAnnouncementRepository implements IAnnouncementRepository {
       title: r.title,
       body: r.body,
       priority: r.priority,
+      pinned: r.pinned,
       authorName: r.author_name,
       publishedAt: new Date(r.published_at),
     }));
   }
 
   async save(d: SaveAnnouncementData): Promise<void> {
-    const row = { title: d.title, body: d.body, priority: d.priority };
+    const row = { title: d.title, body: d.body, priority: d.priority, pinned: d.pinned };
     const { error } = d.id
       ? await this.supabase.from('announcements').update(row).eq('id', d.id)
       : await this.supabase.from('announcements').insert({ ...row, event_id: d.eventId });
