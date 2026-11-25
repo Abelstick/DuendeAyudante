@@ -17,7 +17,7 @@ import { WishlistService } from '../application/WishlistService';
 import { DrivePhoto } from './DrivePhoto';
 import { useEventWishlist } from './hooks';
 import { useQuestionStats } from './questionHooks';
-import { questionsLabel, QuestionsPill } from './QuestionsPill';
+import { questionsLabel } from './QuestionsPill';
 import { sumStats } from '../domain/GiftQuestion';
 import { closeKeyboardOnEnter } from '@/shared/lib/virtualKeyboard';
 
@@ -46,7 +46,11 @@ export function GiftsHomeCard() {
   const others = participants.data.filter((p) => !mineIds.has(p.id));
   const withGifts = others.filter((p) => (byPerson.get(p.id)?.length ?? 0) > 0);
   const myStats = sumStats([...mineIds].map((id) => stats.get(id) ?? { total: 0, pending: 0 }));
-  const othersStats = sumStats(others.map((p) => stats.get(p.id) ?? { total: 0, pending: 0 }));
+  // Personas a cuyos regalos ya les preguntaron algo (primero las que tienen más preguntas)
+  const askedAbout = sortBy(
+    others.filter((p) => (stats.get(p.id)?.total ?? 0) > 0),
+    (p) => -(stats.get(p.id)?.total ?? 0),
+  );
 
   // Sin búsqueda: solo quienes ya tienen lista. Buscando: cualquiera que coincida.
   const familyName = (familyId: string | null) => familyList.find((f) => f.id === familyId)?.name;
@@ -70,7 +74,7 @@ export function GiftsHomeCard() {
             {myStats.pending > 0 && (
               <Pill tone="berry">
                 <MessagesSquare className="size-4" aria-hidden />
-                {myStats.pending} por responder
+                {myStats.pending === 1 ? '1 pregunta para ti' : `${myStats.pending} preguntas para ti`}
               </Pill>
             )}
           </span>
@@ -99,28 +103,25 @@ export function GiftsHomeCard() {
           >
             {myCount === 0 ? 'Agregar' : 'Mi lista'}
           </ButtonLink>
-          {myStats.total > 0 && (
-            <p className="flex w-full items-center gap-2 text-sm font-semibold text-ink-700">
-              <QuestionsPill stats={myStats} />
-              <span>{myStats.pending > 0 ? 'en tus regalos. ¡Responde para que acierten!' : 'en tus regalos, todas respondidas.'}</span>
-            </p>
-          )}
         </div>
       )}
 
       {/* Preguntas en los regalos de los demás: para leer lo que ya se preguntó */}
-      {othersStats.total > 0 && (
+      {askedAbout.length > 0 && (
         <Link
-          to={`${base}/regalos?vista=todos`}
-          className="tap-card flex min-h-12 items-center gap-3 rounded-xl border-2 border-line bg-mist-100 px-3 py-2 text-base text-ink-900 hover:border-brand"
+          to={askedAbout.length === 1 ? `${base}/regalos/persona/${askedAbout[0]?.id}` : `${base}/regalos?vista=todos`}
+          className="tap-card flex min-h-14 items-center gap-3 rounded-xl border-2 border-line bg-mist-100 px-3 py-2 text-base text-ink-900 hover:border-brand"
         >
-          <MessagesSquare className="size-5 shrink-0 text-heading" aria-hidden />
-          <span className="min-w-0 flex-1">
-            <strong>{questionsLabel(othersStats.total)}</strong> en los regalos de los demás
-            {othersStats.pending > 0 && <span className="text-ink-700"> · {othersStats.pending} sin responder</span>}
-            <span className="block text-sm text-ink-700">Mira las preguntas y respuestas, quizá ya resuelven tu duda.</span>
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border-2 border-line bg-surface text-heading" aria-hidden>
+            <MessagesSquare className="size-5" />
           </span>
-          <ChevronRight className="size-5 shrink-0 text-brand-ink" aria-hidden />
+          <span className="min-w-0 flex-1">
+            <span className="block font-bold">
+              Hay preguntas sobre los regalos de {namesList(askedAbout.map((p) => toTitleCase(p.firstName)))}
+            </span>
+            <span className="block text-sm text-ink-700">Toca para leer qué preguntaron y qué respondieron.</span>
+          </span>
+          <ChevronRight className="size-6 shrink-0 text-brand-ink" aria-hidden />
         </Link>
       )}
 
@@ -175,7 +176,6 @@ export function GiftsHomeCard() {
                           <span className="sr-only">{wishes.length === 1 ? ' regalo' : ' regalos'}</span>
                         </Pill>
                       )}
-                      <QuestionsPill stats={stats.get(p.id)} compact />
                     </span>
                   </span>
                   <span className="line-clamp-2 text-base font-bold leading-tight text-ink-900">
@@ -184,6 +184,12 @@ export function GiftsHomeCard() {
                   </span>
                   {wishes[0]?.photos[0] && (
                     <DrivePhoto driveFileId={wishes[0].photos[0].driveFileId} alt="" width={360} className="h-24 w-full rounded-lg border-2 border-line/15" />
+                  )}
+                  {(stats.get(p.id)?.total ?? 0) > 0 && (
+                    <span className="flex items-center gap-1 text-sm font-semibold text-ink-700">
+                      <MessagesSquare className="size-4 shrink-0" aria-hidden />
+                      {questionsLabel(stats.get(p.id)?.total ?? 0)}
+                    </span>
                   )}
                   <span className="mt-auto line-clamp-2 text-sm text-ink-700">
                     {wishes[0] ? (
@@ -210,4 +216,11 @@ export function GiftsHomeCard() {
       </Link>
     </CollapsibleCard>
   );
+}
+
+/** "Ana", "Ana y Luis", "Ana, Luis y Rosa", "Ana, Luis y 3 más". */
+function namesList(names: string[]): string {
+  if (names.length <= 1) return names[0] ?? '';
+  if (names.length <= 3) return `${names.slice(0, -1).join(', ')} y ${names[names.length - 1]}`;
+  return `${names.slice(0, 2).join(', ')} y ${names.length - 2} más`;
 }
