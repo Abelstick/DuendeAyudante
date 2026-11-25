@@ -16,6 +16,8 @@ import { useMySecretFriends } from '@/modules/secret-friend/presentation/hooks';
 import { EditableWishlist } from './EditableWishlist';
 import { GiftQuestions } from './GiftQuestions';
 import { useEventWishlist } from './hooks';
+import { useQuestionStats } from './questionHooks';
+import { QuestionsPill } from './QuestionsPill';
 import { WishlistItemCard } from './WishlistItemCard';
 
 /** Lista de deseos de una persona (todos los del evento pueden verla). */
@@ -29,6 +31,7 @@ export function PersonGiftsPage() {
   const families = useFamilies(event.id);
   const wishlist = useEventWishlist(event.id);
   const budget = event.giftExchange?.budgetMax ?? null;
+  const stats = useQuestionStats(event.id);
 
   if (participants.isLoading || wishlist.isLoading) return <Spinner label="Cargando…" />;
   if (participants.error || wishlist.error) return <Notice tone="error">{errorMessage(participants.error ?? wishlist.error)}</Notice>;
@@ -51,6 +54,12 @@ export function PersonGiftsPage() {
           <p className="text-sm font-bold uppercase tracking-wide text-ink-500">Lista de deseos de</p>
           <h1 className="text-2xl font-black leading-tight text-ink-900">{displayName(person)}</h1>
           <FamilyBadge family={family} showColorName />
+          {stats.get(person.id) && (
+            <p className="flex flex-wrap items-center gap-2 pt-1 text-sm text-ink-700">
+              <QuestionsPill stats={stats.get(person.id)} />
+              <span>Están dentro de cada regalo.</span>
+            </p>
+          )}
         </div>
       </header>
 

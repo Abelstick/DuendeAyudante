@@ -1,4 +1,4 @@
-import { ChevronRight, Gift, Plus, Search, X } from 'lucide-react';
+import { ChevronRight, Gift, MessagesSquare, Plus, Search, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
@@ -16,6 +16,9 @@ import { toTitleCase } from '@/shared/validation/names';
 import { WishlistService } from '../application/WishlistService';
 import { DrivePhoto } from './DrivePhoto';
 import { useEventWishlist } from './hooks';
+import { useQuestionStats } from './questionHooks';
+import { questionsLabel, QuestionsPill } from './QuestionsPill';
+import { sumStats } from '../domain/GiftQuestion';
 import { closeKeyboardOnEnter } from '@/shared/lib/virtualKeyboard';
 
 /**
@@ -29,6 +32,7 @@ export function GiftsHomeCard() {
   const participants = useParticipants(event.id);
   const families = useFamilies(event.id);
   const [q, setQ] = useState('');
+  const stats = useQuestionStats(event.id);
 
   const base = `/e/${event.id}`;
   const mineIds = new Set(actingParticipants(context).map((p) => p.id));
@@ -41,6 +45,8 @@ export function GiftsHomeCard() {
   const myFamilyId = context.me?.familyId ?? null;
   const others = participants.data.filter((p) => !mineIds.has(p.id));
   const withGifts = others.filter((p) => (byPerson.get(p.id)?.length ?? 0) > 0);
+  const myStats = sumStats([...mineIds].map((id) => stats.get(id) ?? { total: 0, pending: 0 }));
+  const othersStats = sumStats(others.map((p) => stats.get(p.id) ?? { total: 0, pending: 0 }));
 
   // Sin búsqueda: solo quienes ya tienen lista. Buscando: cualquiera que coincida.
   const familyName = (familyId: string | null) => familyList.find((f) => f.id === familyId)?.name;
@@ -57,7 +63,19 @@ export function GiftsHomeCard() {
       icon={<Gift className="size-6" />}
       tone="berry"
       title="Regalos"
-      action={withGifts.length > 0 ? <Pill tone="berry">{withGifts.length} con lista</Pill> : undefined}
+      action={
+        withGifts.length > 0 || myStats.pending > 0 ? (
+          <span className="flex flex-wrap items-center gap-1">
+            {withGifts.length > 0 && <Pill tone="berry">{withGifts.length} con lista</Pill>}
+            {myStats.pending > 0 && (
+              <Pill tone="berry">
+                <MessagesSquare className="size-4" aria-hidden />
+                {myStats.pending} por responder
+              </Pill>
+            )}
+          </span>
+        ) : undefined
+      }
     >
       {/* Mi lista */}
       {context.me && (
@@ -81,7 +99,29 @@ export function GiftsHomeCard() {
           >
             {myCount === 0 ? 'Agregar' : 'Mi lista'}
           </ButtonLink>
+          {myStats.total > 0 && (
+            <p className="flex w-full items-center gap-2 text-sm font-semibold text-ink-700">
+              <QuestionsPill stats={myStats} />
+              <span>{myStats.pending > 0 ? 'en tus regalos. ¡Responde para que acierten!' : 'en tus regalos, todas respondidas.'}</span>
+            </p>
+          )}
         </div>
+      )}
+
+      {/* Preguntas en los regalos de los demás: para leer lo que ya se preguntó */}
+      {othersStats.total > 0 && (
+        <Link
+          to={`${base}/regalos?vista=todos`}
+          className="tap-card flex min-h-12 items-center gap-3 rounded-xl border-2 border-line bg-mist-100 px-3 py-2 text-base text-ink-900 hover:border-brand"
+        >
+          <MessagesSquare className="size-5 shrink-0 text-heading" aria-hidden />
+          <span className="min-w-0 flex-1">
+            <strong>{questionsLabel(othersStats.total)}</strong> en los regalos de los demás
+            {othersStats.pending > 0 && <span className="text-ink-700"> · {othersStats.pending} sin responder</span>}
+            <span className="block text-sm text-ink-700">Mira las preguntas y respuestas, quizá ya resuelven tu duda.</span>
+          </span>
+          <ChevronRight className="size-5 shrink-0 text-brand-ink" aria-hidden />
+        </Link>
       )}
 
       {/* Buscar a alguien */}
@@ -128,12 +168,15 @@ export function GiftsHomeCard() {
                 >
                   <span className="flex items-center justify-between gap-2">
                     <Avatar name={p.fullName} size="sm" colors={colors && { bg: colors.soft, fg: colors.text }} />
-                    {wishes.length > 0 && (
-                      <Pill tone="berry">
-                        🎁 {wishes.length}
-                        <span className="sr-only">{wishes.length === 1 ? ' regalo' : ' regalos'}</span>
-                      </Pill>
-                    )}
+                    <span className="flex flex-wrap justify-end gap-1">
+                      {wishes.length > 0 && (
+                        <Pill tone="berry">
+                          🎁 {wishes.length}
+                          <span className="sr-only">{wishes.length === 1 ? ' regalo' : ' regalos'}</span>
+                        </Pill>
+                      )}
+                      <QuestionsPill stats={stats.get(p.id)} compact />
+                    </span>
                   </span>
                   <span className="line-clamp-2 text-base font-bold leading-tight text-ink-900">
                     {toTitleCase(p.firstName)}

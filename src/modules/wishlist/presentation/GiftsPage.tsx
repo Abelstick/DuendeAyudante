@@ -1,4 +1,4 @@
-import { ChevronRight, Gift, Users, Wallet } from 'lucide-react';
+import { ChevronRight, Gift, MessagesSquare, Users, Wallet } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
@@ -28,6 +28,9 @@ import { DrivePhoto } from './DrivePhoto';
 import { EditableWishlist } from './EditableWishlist';
 import { GiftQuestionsNotice } from './GiftQuestionsNotice';
 import { useEventWishlist } from './hooks';
+import { useQuestionStats } from './questionHooks';
+import { questionsLabel, QuestionsPill } from './QuestionsPill';
+import { sumStats } from '../domain/GiftQuestion';
 
 /** Guía de Regalos: solo se abre si la persona toca «¿Cómo funcionan los regalos?». */
 const GIFTS_TOUR: TourStep[] = [
@@ -58,11 +61,14 @@ const GIFTS_TOUR: TourStep[] = [
 ];
 
 export function GiftsPage() {
-  const { event } = useEventScope();
+  const { event, context } = useEventScope();
   const [params, setParams] = useSearchParams();
   const view = params.get('vista') === 'todos' ? 'all' : 'mine';
   const wishlist = useEventWishlist(event.id);
   const budget = event.giftExchange?.budgetMax ?? null;
+  const stats = useQuestionStats(event.id);
+  // Preguntas que esperan mi respuesta (en mis regalos o los de quien tengo a cargo)
+  const myPending = actingParticipants(context).reduce((n, p) => n + (stats.get(p.id)?.pending ?? 0), 0);
 
   const setView = (v: 'mine' | 'all') => setParams(v === 'all' ? { vista: 'todos' } : {}, { replace: true, preventScrollReset: true });
 
@@ -82,7 +88,7 @@ export function GiftsPage() {
           value={view}
           onChange={setView}
           options={[
-            { value: 'mine', label: 'Mis regalos', icon: <Gift className="size-5" aria-hidden /> },
+            { value: 'mine', label: 'Mis regalos', icon: <Gift className="size-5" aria-hidden />, badge: myPending, badgeLabel: myPending === 1 ? 'pregunta sin responder' : 'preguntas sin responder' },
             { value: 'all', label: 'Regalos de todos', icon: <Users className="size-5" aria-hidden /> },
           ]}
         />
@@ -172,6 +178,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
   const participants = useParticipants(event.id);
   const families = useFamilies(event.id);
   const byPerson = useMemo(() => WishlistService.groupByParticipant(items), [items]);
+  const stats = useQuestionStats(event.id);
   const [prefs, setPrefs] = useSessionState<GiftListPrefs>(`${event.id}:regalos:todos`, GIFT_LIST_DEFAULTS);
 
   if (participants.isLoading || families.isLoading) return <Spinner label="Cargando…" />;
@@ -186,6 +193,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
     name: (p) => displayName(p),
     family: (p) => familyOf(p)?.name,
     count: countOf,
+    questions: (p) => stats.get(p.id)?.total ?? 0,
   };
   // Búsqueda sin importar tildes ni mayúsculas: "jose" encuentra a "JOSÉ"
   const people = applySort(
@@ -220,7 +228,15 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
       className: 'whitespace-nowrap tabular-nums',
       cell: (p) => (countOf(p) === 0 ? <span className="text-ink-500">Todavía ninguno</span> : `🎁 ${countOf(p)}`),
     },
+    {
+      key: 'questions',
+      header: 'Preguntas',
+      sortKey: 'questions',
+      className: 'whitespace-nowrap',
+      cell: (p) => (stats.get(p.id)?.total ? <QuestionsPill stats={stats.get(p.id)} /> : <span className="text-ink-500">Ninguna</span>),
+    },
   ];
+  const totals = sumStats(stats.values());
   const groups: { key: string; family?: Family; people: Participant[] }[] = [
     ...familyList.map((f) => ({ key: f.id, family: f, people: people.filter((p) => p.familyId === f.id) })),
     { key: 'none', people: people.filter((p) => !p.familyId || !familyList.some((f) => f.id === p.familyId)) },
@@ -231,6 +247,23 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
       <p className="flex items-center gap-2 text-base text-ink-700">
         <Users className="size-5 shrink-0" aria-hidden /> Toca a una persona para ver qué le gustaría recibir.
       </p>
+      {totals.total > 0 && (
+        <p className="flex items-center gap-3 rounded-xl border-2 border-line bg-mist-100 px-4 py-3 text-base text-ink-900">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-lg border-2 border-line bg-surface text-heading" aria-hidden>
+            <MessagesSquare className="size-5" />
+          </span>
+          <span className="min-w-0">
+            Hay <strong>{questionsLabel(totals.total)}</strong> sobre los regalos
+            {totals.pending > 0 && (
+              <>
+                {' '}
+                (<strong className="text-berry-700">{totals.pending} sin responder</strong>)
+              </>
+            )}
+            .<span className="block text-sm text-ink-700">Entra a una persona para leer las preguntas y respuestas.</span>
+          </span>
+        </p>
+      )}
       <ListToolbar
         prefs={prefs}
         onChange={patch}
@@ -239,6 +272,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
           { value: 'name', label: 'Nombre' },
           { value: 'family', label: 'Familia' },
           { value: 'count', label: 'Cantidad de regalos' },
+          { value: 'questions', label: 'Cantidad de preguntas' },
         ]}
         showView
         summary={hasFilters ? `${people.length} de ${everyone.length} personas` : undefined}
@@ -300,6 +334,7 @@ function EveryonesGifts({ items }: { items: WishlistItem[] }) {
                             🎁 {count}
                             <span className="sr-only">{count === 1 ? ' regalo' : ' regalos'}</span>
                           </Pill>
+                          <QuestionsPill stats={stats.get(p.id)} compact />
                           <span className="min-w-0 truncate">
                             <span className="sr-only">Le gustaría: </span>
                             {preview.join(' · ')}

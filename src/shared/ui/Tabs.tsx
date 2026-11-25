@@ -4,6 +4,10 @@ interface TabOption<T extends string> {
   value: T;
   label: string;
   icon?: ReactNode;
+  /** Número para llamar la atención (ej. preguntas por responder). Con 0 o sin valor no se muestra. */
+  badge?: number;
+  /** Texto para lectores de pantalla que explica el número (ej. "preguntas sin responder"). */
+  badgeLabel?: string;
 }
 
 interface Props<T extends string> {
@@ -36,7 +40,15 @@ export function SegmentedTabs<T extends string>({ label, value, options, onChang
             }`}
           >
             {o.icon}
-            {o.label}
+            <span className="inline-flex items-center gap-1.5">
+              {o.label}
+              {o.badge ? (
+                <span className="inline-flex min-w-6 items-center justify-center rounded-full border-2 border-line bg-berry-600 px-1.5 text-xs font-extrabold leading-5 text-white">
+                  {o.badge}
+                  {o.badgeLabel && <span className="sr-only"> {o.badgeLabel}</span>}
+                </span>
+              ) : null}
+            </span>
           </button>
         );
       })}

@@ -1,4 +1,4 @@
-import { ChevronDown, MessageCircleQuestion, Send, Trash2 } from 'lucide-react';
+import { ChevronDown, MessagesSquare, Send, Trash2 } from 'lucide-react';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { Pill } from '@/shared/ui/Card';
@@ -73,7 +73,7 @@ export function GiftQuestions({ eventId, itemId, canAnswer, canAsk }: Props) {
         aria-controls={panelId}
         className="flex min-h-12 w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-base font-bold text-heading hover:bg-mist-200"
       >
-        <MessageCircleQuestion className="size-5 shrink-0" aria-hidden />
+        <MessagesSquare className="size-5 shrink-0" aria-hidden />
         <span className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
           {questions.length === 0 ? '¿Tienes una duda? Pregunta de forma anónima' : `Preguntas y respuestas (${questions.length})`}
           {canAnswer && pending > 0 && <Pill tone="berry">{pending} sin responder</Pill>}
@@ -115,6 +115,9 @@ export function GiftQuestions({ eventId, itemId, canAnswer, canAsk }: Props) {
   );
 }
 
+/** Etiqueta pequeña sobre la pregunta y la respuesta (en vez de un emoji que confunde). */
+const labelClasses = 'text-xs font-extrabold uppercase tracking-wide text-ink-500';
+
 function QuestionRow({ eventId, question: q, canAnswer }: { eventId: string; question: GiftQuestion; canAnswer: boolean }) {
   const { answer, remove } = useGiftQuestionMutations(eventId);
   const toast = useToast();
@@ -149,11 +152,10 @@ function QuestionRow({ eventId, question: q, canAnswer }: { eventId: string; que
 
   return (
     <li className="space-y-2 rounded-lg bg-surface p-3">
-      <p className="text-base font-bold text-ink-900 wrap-break-word">
-        <span aria-hidden>❓ </span>
-        <span className="sr-only">Pregunta: </span>
-        {q.question}
-      </p>
+      <div className="space-y-0.5">
+        <p className={labelClasses}>Pregunta</p>
+        <p className="text-base font-bold text-ink-900 wrap-break-word">{q.question}</p>
+      </div>
       {q.isMine && <p className="text-sm font-semibold text-ink-500">La hiciste tú (solo tú lo sabes).</p>}
 
       {answering ? (
@@ -186,11 +188,10 @@ function QuestionRow({ eventId, question: q, canAnswer }: { eventId: string; que
           </div>
         </div>
       ) : q.answer !== null ? (
-        <p className="rounded-lg bg-pine-50 px-3 py-2 text-base whitespace-pre-line text-ink-900 wrap-break-word">
-          <span aria-hidden>💬 </span>
-          <span className="sr-only">Respuesta: </span>
-          {q.answer}
-        </p>
+        <div className="space-y-0.5 rounded-lg border-l-4 border-pine-600 bg-pine-50 px-3 py-2">
+          <p className={`${labelClasses} text-pine-700!`}>Respuesta</p>
+          <p className="text-base whitespace-pre-line text-ink-900 wrap-break-word">{q.answer}</p>
+        </div>
       ) : (
         <p className="text-sm text-ink-700">Todavía sin respuesta.</p>
       )}

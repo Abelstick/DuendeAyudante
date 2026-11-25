@@ -1,4 +1,4 @@
-import { ChevronRight, MessageCircleQuestion, MessageCircleReply } from 'lucide-react';
+import { ChevronRight, MessageCircleReply, MessagesSquare } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useEventScope } from '@/app/layout/EventLayout';
@@ -46,7 +46,7 @@ export function GiftQuestionsNotice({ inGifts = false }: { inGifts?: boolean }) 
       {pending > 0 &&
         (inGifts ? (
           <p className={rowClasses}>
-            {icon(<MessageCircleQuestion className="size-5" />)}
+            {icon(<MessagesSquare className="size-5" />)}
             <span className="min-w-0 flex-1">
               {pendingText}
               <span className="block text-sm font-semibold text-ink-700">Están más abajo, dentro de cada regalo.</span>
@@ -54,7 +54,7 @@ export function GiftQuestionsNotice({ inGifts = false }: { inGifts?: boolean }) 
           </p>
         ) : (
           <Link to={base} className={`tap-card ${rowClasses}`}>
-            {icon(<MessageCircleQuestion className="size-5" />)}
+            {icon(<MessagesSquare className="size-5" />)}
             <span className="min-w-0 flex-1">
               {pendingText}
               <span className="block text-sm font-semibold text-ink-700">Toca para responder</span>
